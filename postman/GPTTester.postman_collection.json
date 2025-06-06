@@ -1,0 +1,1726 @@
+{
+  "info": {
+    "name": "API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "login_for_access_token_token_post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/token",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "token"
+          ]
+        },
+        "header": []
+      }
+    },
+    {
+      "name": "create_user_users__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/users/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"\",\n  \"email\": \"\",\n  \"is_active\": true,\n  \"password\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "read_users_me_users_me_get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/users/me",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "me"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "assign_role_to_user_users__user_id__roles__role_id__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/users/{user_id}/roles/{role_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "{user_id}",
+            "roles",
+            "{role_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "remove_role_from_user_users__user_id__roles__role_id__delete",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/users/{user_id}/roles/{role_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "{user_id}",
+            "roles",
+            "{role_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create_test_tests__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/tests/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "tests"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"description\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "read_tests_tests__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/tests/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "tests"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "delete_test_tests__test_id__delete",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/tests/{test_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "tests",
+            "{test_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "read_roles_roles__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/roles/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "roles"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create_role_roles__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/roles/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "roles"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "update_role_roles__role_id__put",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{base_url}}/roles/{role_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "roles",
+            "{role_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "delete_role_roles__role_id__delete",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/roles/{role_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "roles",
+            "{role_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "read_clients_clients__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/clients/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "clients"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create_client_clients__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/clients/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "clients"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"is_active\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "read_client_clients__client_id__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/clients/{client_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "clients",
+            "{client_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "update_client_clients__client_id__put",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{base_url}}/clients/{client_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "clients",
+            "{client_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"is_active\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "read_projects_projects__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/projects/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "projects"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create_project_projects__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/projects/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "projects"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"client_id\": 0,\n  \"is_active\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "read_project_projects__project_id__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/projects/{project_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "projects",
+            "{project_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "update_project_projects__project_id__put",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{base_url}}/projects/{project_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "projects",
+            "{project_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"client_id\": 0,\n  \"is_active\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "add_analyst_to_project_projects__project_id__analysts__user_id__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/projects/{project_id}/analysts/{user_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "projects",
+            "{project_id}",
+            "analysts",
+            "{user_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "remove_analyst_from_project_projects__project_id__analysts__user_id__delete",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/projects/{project_id}/analysts/{user_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "projects",
+            "{project_id}",
+            "analysts",
+            "{user_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "read_testplans_testplans__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/testplans/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "testplans"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create_testplan_testplans__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/testplans/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "testplans"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"\",\n  \"objetivo\": \"\",\n  \"alcance\": \"\",\n  \"criterios_entrada\": \"\",\n  \"criterios_salida\": \"\",\n  \"estrategia_pruebas\": \"\",\n  \"responsables\": \"\",\n  \"fecha_inicio\": \"\",\n  \"fecha_fin\": \"\",\n  \"bdd_stories\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "read_testplan_testplans__testplan_id__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/testplans/{testplan_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "testplans",
+            "{testplan_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "update_testplan_testplans__testplan_id__put",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{base_url}}/testplans/{testplan_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "testplans",
+            "{testplan_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"\",\n  \"objetivo\": \"\",\n  \"alcance\": \"\",\n  \"criterios_entrada\": \"\",\n  \"criterios_salida\": \"\",\n  \"estrategia_pruebas\": \"\",\n  \"responsables\": \"\",\n  \"fecha_inicio\": \"\",\n  \"fecha_fin\": \"\",\n  \"bdd_stories\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "delete_testplan_testplans__testplan_id__delete",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/testplans/{testplan_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "testplans",
+            "{testplan_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "read_pages_pages__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/pages/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create_page_pages__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/pages/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"description\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "read_page_pages__page_id__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/pages/{page_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages",
+            "{page_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "update_page_pages__page_id__put",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{base_url}}/pages/{page_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages",
+            "{page_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"description\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "delete_page_pages__page_id__delete",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/pages/{page_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages",
+            "{page_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create_element_pages__page_id__elements_post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/pages/{page_id}/elements",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages",
+            "{page_id}",
+            "elements"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"tipo\": \"\",\n  \"estrategia\": \"\",\n  \"valor\": \"\",\n  \"descripcion\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "read_elements_pages__page_id__elements_get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/pages/{page_id}/elements",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages",
+            "{page_id}",
+            "elements"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "read_element_pages__page_id__elements__element_id__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/pages/{page_id}/elements/{element_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages",
+            "{page_id}",
+            "elements",
+            "{element_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "update_element_pages__page_id__elements__element_id__put",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{base_url}}/pages/{page_id}/elements/{element_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages",
+            "{page_id}",
+            "elements",
+            "{element_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"tipo\": \"\",\n  \"estrategia\": \"\",\n  \"valor\": \"\",\n  \"descripcion\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "delete_element_pages__page_id__elements__element_id__delete",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/pages/{page_id}/elements/{element_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages",
+            "{page_id}",
+            "elements",
+            "{element_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "add_element_to_scenario_pages_elements__element_id__scenarios__scenario_id__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/pages/elements/{element_id}/scenarios/{scenario_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages",
+            "elements",
+            "{element_id}",
+            "scenarios",
+            "{scenario_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "remove_element_from_scenario_pages_elements__element_id__scenarios__scenario_id__delete",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/pages/elements/{element_id}/scenarios/{scenario_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages",
+            "elements",
+            "{element_id}",
+            "scenarios",
+            "{scenario_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "read_scenarios_scenarios__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/scenarios/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "scenarios"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create_scenario_scenarios__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/scenarios/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "scenarios"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "read_scenario_scenarios__scenario_id__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/scenarios/{scenario_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "scenarios",
+            "{scenario_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "update_scenario_scenarios__scenario_id__put",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{base_url}}/scenarios/{scenario_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "scenarios",
+            "{scenario_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "delete_scenario_scenarios__scenario_id__delete",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/scenarios/{scenario_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "scenarios",
+            "{scenario_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "read_actions_actions__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/actions/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "actions"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create_action_actions__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/actions/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "actions"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"\",\n  \"tipo\": \"\",\n  \"codigo\": \"\",\n  \"argumentos\": {}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "read_action_actions__action_id__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/actions/{action_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "actions",
+            "{action_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "update_action_actions__action_id__put",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{base_url}}/actions/{action_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "actions",
+            "{action_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"\",\n  \"tipo\": \"\",\n  \"codigo\": \"\",\n  \"argumentos\": {}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "delete_action_actions__action_id__delete",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/actions/{action_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "actions",
+            "{action_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create_assignment_assignments__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/assignments/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "assignments"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"action_id\": 0,\n  \"element_id\": 0,\n  \"test_id\": 0,\n  \"parameters\": {}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "read_assignments_assignments__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/assignments/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "assignments"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "read_assignment_assignments__assignment_id__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/assignments/{assignment_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "assignments",
+            "{assignment_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "update_assignment_assignments__assignment_id__put",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{base_url}}/assignments/{assignment_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "assignments",
+            "{assignment_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"action_id\": 0,\n  \"element_id\": 0,\n  \"test_id\": 0,\n  \"parameters\": {}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "delete_assignment_assignments__assignment_id__delete",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/assignments/{assignment_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "assignments",
+            "{assignment_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "read_agents_agents__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/agents/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "agents"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create_agent_agents__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/agents/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "agents"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"alias\": \"\",\n  \"hostname\": \"\",\n  \"sistema_operativo\": \"\",\n  \"categoria\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "read_agent_agents__agent_id__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/agents/{agent_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "agents",
+            "{agent_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "update_agent_agents__agent_id__put",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{base_url}}/agents/{agent_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "agents",
+            "{agent_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"alias\": \"\",\n  \"hostname\": \"\",\n  \"sistema_operativo\": \"\",\n  \"categoria\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "delete_agent_agents__agent_id__delete",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/agents/{agent_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "agents",
+            "{agent_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "create_execution_plan_execution_plans__post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/execution-plans/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "execution-plans"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"\",\n  \"test_id\": 0,\n  \"agent_id\": 0\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "read_execution_plans_execution_plans__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/execution-plans/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "execution-plans"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "read_execution_plan_execution_plans__plan_id__get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/execution-plans/{plan_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "execution-plans",
+            "{plan_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "update_execution_plan_execution_plans__plan_id__put",
+      "request": {
+        "method": "PUT",
+        "url": {
+          "raw": "{{base_url}}/execution-plans/{plan_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "execution-plans",
+            "{plan_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"\",\n  \"test_id\": 0,\n  \"agent_id\": 0\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "delete_execution_plan_execution_plans__plan_id__delete",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "{{base_url}}/execution-plans/{plan_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "execution-plans",
+            "{plan_id}"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "execute_plan_execution_plans__plan_id__execute_post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/execution-plans/{plan_id}/execute",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "execution-plans",
+            "{plan_id}",
+            "execute"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "get_pending_execution_executions_pending_get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/executions/pending",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "executions",
+            "pending"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "upload_execution_report_executions__execution_id__report_post",
+      "request": {
+        "method": "POST",
+        "url": {
+          "raw": "{{base_url}}/executions/{execution_id}/report",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "executions",
+            "{execution_id}",
+            "report"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    },
+    {
+      "name": "download_execution_report_executions__execution_id__report_get",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/executions/{execution_id}/report",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "executions",
+            "{execution_id}",
+            "report"
+          ]
+        },
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
