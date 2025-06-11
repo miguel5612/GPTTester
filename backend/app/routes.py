@@ -1,6 +1,7 @@
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, Request
 import json
+from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -946,6 +947,32 @@ def delete_execution_plan(
     db.delete(plan)
     db.commit()
     return {"ok": True}
+
+@router.post("/executionplans/{plan_id}/run", response_model=schemas.PlanExecution)
+def run_execution_plan(
+    plan_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    plan = db.query(models.ExecutionPlan).filter(models.ExecutionPlan.id == plan_id).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="ExecutionPlan not found")
+    pending = db.query(models.PlanExecution).filter(
+        models.PlanExecution.agent_id == plan.agent_id,
+        models.PlanExecution.status.in_(["Llamando al agente", "En ejecucion"]),
+    ).first()
+    if pending:
+        raise HTTPException(status_code=400, detail="Agent has a pending execution")
+    record = models.PlanExecution(
+        plan_id=plan.id,
+        agent_id=plan.agent_id,
+        status="Llamando al agente",
+        started_at=datetime.utcnow(),
+    )
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+    return record
     try:
         security.rate_limit_login(ip)
     except HTTPException:

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, root_validator
 from typing import List, Optional
-from datetime import date
+from datetime import date, datetime
 
 
 class RoleBase(BaseModel):
@@ -228,6 +228,19 @@ class ExecutionPlanCreate(ExecutionPlanBase):
 
 
 class ExecutionPlan(ExecutionPlanBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+class PlanExecutionBase(BaseModel):
+    plan_id: int
+    agent_id: int
+    status: str
+    started_at: datetime
+
+
+class PlanExecution(PlanExecutionBase):
     id: int
 
     class Config:

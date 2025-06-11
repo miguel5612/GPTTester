@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table, Date, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table, Date, DateTime, UniqueConstraint
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -192,4 +192,16 @@ class ExecutionPlan(Base):
     agent_id = Column(Integer, ForeignKey("agents.id"), nullable=False)
 
     test = relationship("TestCase")
+    agent = relationship("ExecutionAgent")
+
+class PlanExecution(Base):
+    __tablename__ = "execution_records"
+
+    id = Column(Integer, primary_key=True, index=True)
+    plan_id = Column(Integer, ForeignKey("execution_plans.id"), nullable=False)
+    agent_id = Column(Integer, ForeignKey("agents.id"), nullable=False)
+    status = Column(String, nullable=False, default="Llamando al agente")
+    started_at = Column(DateTime, nullable=False)
+
+    plan = relationship("ExecutionPlan")
     agent = relationship("ExecutionAgent")
