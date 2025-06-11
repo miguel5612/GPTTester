@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -19,6 +19,11 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     role = relationship("Role")
     tests = relationship("TestCase", back_populates="owner")
+    projects = relationship(
+        "Project",
+        secondary="project_analysts",
+        back_populates="analysts",
+    )
 
 class TestCase(Base):
     __tablename__ = "tests"
@@ -29,3 +34,36 @@ class TestCase(Base):
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="tests")
+
+
+project_analysts = Table(
+    "project_analysts",
+    Base.metadata,
+    Column("project_id", Integer, ForeignKey("projects.id"), primary_key=True),
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+)
+
+
+class Client(Base):
+    __tablename__ = "clients"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, nullable=False)
+    is_active = Column(Boolean, default=True)
+    projects = relationship("Project", back_populates="client")
+
+
+class Project(Base):
+    __tablename__ = "projects"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
+    is_active = Column(Boolean, default=True)
+
+    client = relationship("Client", back_populates="projects")
+    analysts = relationship(
+        "User",
+        secondary=project_analysts,
+        back_populates="projects",
+    )

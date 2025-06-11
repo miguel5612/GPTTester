@@ -116,6 +116,186 @@ def login_for_access_token(
     db: Session = Depends(deps.get_db),
 ):
     ip = request.client.host
+
+
+@router.post("/clients/", response_model=schemas.Client)
+def create_client(
+    client: schemas.ClientCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    if db.query(models.Client).filter(models.Client.name == client.name).first():
+        raise HTTPException(status_code=400, detail="Client already exists")
+    db_client = models.Client(name=client.name)
+    db.add(db_client)
+    db.commit()
+    db.refresh(db_client)
+    return db_client
+
+
+@router.get("/clients/", response_model=list[schemas.Client])
+def read_clients(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    return db.query(models.Client).all()
+
+
+@router.put("/clients/{client_id}", response_model=schemas.Client)
+def update_client(
+    client_id: int,
+    client: schemas.ClientCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    db_client = db.query(models.Client).filter(models.Client.id == client_id).first()
+    if db_client is None:
+        raise HTTPException(status_code=404, detail="Client not found")
+    db_client.name = client.name
+    db.commit()
+    db.refresh(db_client)
+    return db_client
+
+
+@router.delete("/clients/{client_id}")
+def delete_client(
+    client_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    db_client = db.query(models.Client).filter(models.Client.id == client_id).first()
+    if db_client is None:
+        raise HTTPException(status_code=404, detail="Client not found")
+    db_client.is_active = False
+    db.commit()
+    return {"ok": True}
+
+
+@router.post("/projects/", response_model=schemas.Project)
+def create_project(
+    project: schemas.ProjectCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    if not db.query(models.Client).filter(models.Client.id == project.client_id).first():
+        raise HTTPException(status_code=404, detail="Client not found")
+    db_project = models.Project(name=project.name, client_id=project.client_id)
+    db.add(db_project)
+    db.commit()
+    db.refresh(db_project)
+    return db_project
+
+
+@router.get("/projects/", response_model=list[schemas.Project])
+def read_projects(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    if current_user.role and current_user.role.name == "Administrador":
+        return db.query(models.Project).all()
+    return (
+        db.query(models.Project)
+        .join(models.project_analysts)
+        .filter(models.project_analysts.c.user_id == current_user.id)
+        .all()
+    )
+
+
+@router.get("/projects/{project_id}", response_model=schemas.Project)
+def read_project(
+    project_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    query = db.query(models.Project).filter(models.Project.id == project_id)
+    project = query.first()
+    if project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+    if (
+        current_user.role and current_user.role.name == "Administrador"
+    ) or (
+        db.query(models.project_analysts)
+        .filter(
+            models.project_analysts.c.project_id == project_id,
+            models.project_analysts.c.user_id == current_user.id,
+        )
+        .first()
+    ):
+        return project
+    raise HTTPException(status_code=403, detail="Insufficient permissions")
+
+
+@router.put("/projects/{project_id}", response_model=schemas.Project)
+def update_project(
+    project_id: int,
+    project: schemas.ProjectCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    db_project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    if db_project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+    if not db.query(models.Client).filter(models.Client.id == project.client_id).first():
+        raise HTTPException(status_code=404, detail="Client not found")
+    db_project.name = project.name
+    db_project.client_id = project.client_id
+    db.commit()
+    db.refresh(db_project)
+    return db_project
+
+
+@router.delete("/projects/{project_id}")
+def delete_project(
+    project_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    db_project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    if db_project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+    db_project.is_active = False
+    db.commit()
+    return {"ok": True}
+
+
+@router.post("/projects/{project_id}/analysts/{user_id}", response_model=schemas.Project)
+def assign_analyst(
+    project_id: int,
+    user_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    if project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user not in project.analysts:
+        project.analysts.append(user)
+        db.commit()
+    db.refresh(project)
+    return project
+
+
+@router.delete("/projects/{project_id}/analysts/{user_id}", response_model=schemas.Project)
+def unassign_analyst(
+    project_id: int,
+    user_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    project = db.query(models.Project).filter(models.Project.id == project_id).first()
+    if project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user in project.analysts:
+        project.analysts.remove(user)
+        db.commit()
+    db.refresh(project)
+    return project
     try:
         security.rate_limit_login(ip)
     except HTTPException:
