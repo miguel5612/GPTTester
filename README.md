@@ -64,6 +64,15 @@ Cada plan también incluye:
 - `responsables`
 - `fecha_inicio` y `fecha_fin`
 - `historias_bdd` para la trazabilidad a BDD
+Cada plan también incluye:
+
+- `objetivo`
+- `alcance`
+- `criterios_entrada` y `criterios_salida`
+- `estrategia`
+- `responsables`
+- `fecha_inicio` y `fecha_fin`
+- `historias_bdd` para la trazabilidad a BDD
 
 Endpoints:
 

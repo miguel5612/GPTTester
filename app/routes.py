@@ -306,6 +306,10 @@ def create_testplan(
 ):
     if plan.fecha_inicio and plan.fecha_fin and plan.fecha_inicio > plan.fecha_fin:
         raise HTTPException(status_code=400, detail="fecha_inicio must be before fecha_fin")
+    if plan_in.fecha_inicio and plan_in.fecha_fin and plan_in.fecha_inicio > plan_in.fecha_fin:
+        raise HTTPException(status_code=400, detail="fecha_inicio must be before fecha_fin")
+    if plan.fecha_inicio and plan.fecha_fin and plan.fecha_inicio > plan.fecha_fin:
+        raise HTTPException(status_code=400, detail="fecha_inicio must be before fecha_fin")
     db_plan = models.TestPlan(**plan.dict())
     db.add(db_plan)
     try:
