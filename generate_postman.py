@@ -45,18 +45,46 @@ def build_collection(spec):
 
     for path, methods in spec.get("paths", {}).items():
         for method, operation in methods.items():
+            headers = []
+            body = None
+
+            if operation.get("security"):
+                headers.append({"key": "Authorization", "value": "Bearer {{token}}"})
+
+            if operation.get("requestBody"):
+                content = operation["requestBody"].get("content", {})
+                if "application/json" in content:
+                    headers.append({"key": "Content-Type", "value": "application/json"})
+                    schema = content["application/json"].get("schema", {})
+                    example = content["application/json"].get("example") or build_example_from_schema(schema)
+                    if example is not None:
+                        body = {"mode": "raw", "raw": json.dumps(example, indent=2)}
+                else:
+                    for mime in ["application/x-www-form-urlencoded", "multipart/form-data"]:
+                        if mime in content:
+                            headers.append({"key": "Content-Type", "value": mime})
+                            schema = content[mime].get("schema", {})
+                            example = build_example_from_schema(schema) or {}
+                            body = {
+                                "mode": "urlencoded",
+                                "urlencoded": [
+                                    {"key": key, "value": str(val) if val is not None else ""}
+                                    for key, val in (example.items() if isinstance(example, dict) else [])
+                                ],
+                            }
+                            break
+
             request = {
                 "method": method.upper(),
-                "header": [
-                    {"key": "Content-Type", "value": "application/json"},
-                    {"key": "Authorization", "value": "Bearer {{token}}"},
-                ],
+                "header": headers,
                 "url": {
                     "raw": f"{{{{base_url}}}}{path}",
                     "host": ["{{base_url}}"],
                     "path": [p for p in path.strip("/").split("/") if p],
                 },
             }
+            if body:
+                request["body"] = body
             if operation.get("parameters"):
                 query = [p for p in operation["parameters"] if p.get("in") == "query"]
                 if query:
