@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, root_validator
 from typing import List, Optional
 from datetime import date
 
@@ -100,7 +100,13 @@ class TestPlanBase(BaseModel):
 
 
 class TestPlanCreate(TestPlanBase):
-    pass
+    @root_validator
+    def validate_dates(cls, values):
+        start = values.get("fecha_inicio")
+        end = values.get("fecha_fin")
+        if start and end and start > end:
+            raise ValueError("fecha_inicio must be before fecha_fin")
+        return values
 
 
 class TestPlan(TestPlanBase):

@@ -63,6 +63,7 @@ Cada plan también incluye:
 - `estrategia`
 - `responsables`
 - `fecha_inicio` y `fecha_fin`
+- Se valida que `fecha_inicio` sea anterior o igual a `fecha_fin`
 - `historias_bdd` para la trazabilidad a BDD
 Cada plan también incluye:
 
