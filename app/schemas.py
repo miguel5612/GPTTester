@@ -114,3 +114,38 @@ class TestPlan(TestPlanBase):
 
     class Config:
         orm_mode = True
+
+
+class PageBase(BaseModel):
+    name: str
+
+
+class PageCreate(PageBase):
+    pass
+
+
+class Page(PageBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class PageElementBase(BaseModel):
+    page_id: int
+    name: str
+    tipo: str
+    estrategia: str
+    valor: str
+    descripcion: Optional[str] = None
+
+
+class PageElementCreate(PageElementBase):
+    pass
+
+
+class PageElement(PageElementBase):
+    id: int
+
+    class Config:
+        orm_mode = True

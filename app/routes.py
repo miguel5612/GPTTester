@@ -373,6 +373,212 @@ def delete_testplan(
     db.delete(plan)
     db.commit()
     return {"ok": True}
+
+
+# Pages CRUD
+@router.post("/pages/", response_model=schemas.Page)
+def create_page(
+    page: schemas.PageCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    if db.query(models.Page).filter(models.Page.name == page.name).first():
+        raise HTTPException(status_code=400, detail="Page already exists")
+    db_page = models.Page(name=page.name)
+    db.add(db_page)
+    db.commit()
+    db.refresh(db_page)
+    return db_page
+
+
+@router.get("/pages/", response_model=list[schemas.Page])
+def read_pages(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    return db.query(models.Page).all()
+
+
+@router.get("/pages/{page_id}", response_model=schemas.Page)
+def read_page(
+    page_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    page = db.query(models.Page).filter(models.Page.id == page_id).first()
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+    return page
+
+
+@router.put("/pages/{page_id}", response_model=schemas.Page)
+def update_page(
+    page_id: int,
+    page_in: schemas.PageCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    page = db.query(models.Page).filter(models.Page.id == page_id).first()
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+    if (
+        page_in.name != page.name
+        and db.query(models.Page).filter(models.Page.name == page_in.name).first()
+    ):
+        raise HTTPException(status_code=400, detail="Page already exists")
+    page.name = page_in.name
+    db.commit()
+    db.refresh(page)
+    return page
+
+
+@router.delete("/pages/{page_id}")
+def delete_page(
+    page_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    page = db.query(models.Page).filter(models.Page.id == page_id).first()
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+    db.delete(page)
+    db.commit()
+    return {"ok": True}
+
+
+# Page elements CRUD
+@router.post("/elements/", response_model=schemas.PageElement)
+def create_element(
+    element: schemas.PageElementCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    if db.query(models.PageElement).filter(
+        models.PageElement.page_id == element.page_id,
+        models.PageElement.name == element.name,
+    ).first():
+        raise HTTPException(status_code=400, detail="Element already exists for page")
+    db_element = models.PageElement(**element.dict())
+    db.add(db_element)
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Integrity error")
+    db.refresh(db_element)
+    return db_element
+
+
+@router.get("/elements/", response_model=list[schemas.PageElement])
+def read_elements(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    return db.query(models.PageElement).all()
+
+
+@router.get("/elements/{element_id}", response_model=schemas.PageElement)
+def read_element(
+    element_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    element = (
+        db.query(models.PageElement).filter(models.PageElement.id == element_id).first()
+    )
+    if not element:
+        raise HTTPException(status_code=404, detail="Element not found")
+    return element
+
+
+@router.put("/elements/{element_id}", response_model=schemas.PageElement)
+def update_element(
+    element_id: int,
+    element_in: schemas.PageElementCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    element = (
+        db.query(models.PageElement).filter(models.PageElement.id == element_id).first()
+    )
+    if not element:
+        raise HTTPException(status_code=404, detail="Element not found")
+    if (
+        (element_in.name != element.name or element_in.page_id != element.page_id)
+        and db.query(models.PageElement)
+        .filter(
+            models.PageElement.page_id == element_in.page_id,
+            models.PageElement.name == element_in.name,
+        )
+        .first()
+    ):
+        raise HTTPException(status_code=400, detail="Element already exists for page")
+    for field, value in element_in.dict().items():
+        setattr(element, field, value)
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Integrity error")
+    db.refresh(element)
+    return element
+
+
+@router.delete("/elements/{element_id}")
+def delete_element(
+    element_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    element = (
+        db.query(models.PageElement).filter(models.PageElement.id == element_id).first()
+    )
+    if not element:
+        raise HTTPException(status_code=404, detail="Element not found")
+    db.delete(element)
+    db.commit()
+    return {"ok": True}
+
+
+# Associate elements with tests
+@router.post("/elements/{element_id}/tests/{test_id}", response_model=schemas.PageElement)
+def add_element_to_test(
+    element_id: int,
+    test_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    element = (
+        db.query(models.PageElement).filter(models.PageElement.id == element_id).first()
+    )
+    test = db.query(models.TestCase).filter(models.TestCase.id == test_id).first()
+    if not element or not test:
+        raise HTTPException(status_code=404, detail="Element or Test not found")
+    if test not in element.tests:
+        element.tests.append(test)
+        db.commit()
+    db.refresh(element)
+    return element
+
+
+@router.delete("/elements/{element_id}/tests/{test_id}", response_model=schemas.PageElement)
+def remove_element_from_test(
+    element_id: int,
+    test_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    element = (
+        db.query(models.PageElement).filter(models.PageElement.id == element_id).first()
+    )
+    test = db.query(models.TestCase).filter(models.TestCase.id == test_id).first()
+    if not element or not test:
+        raise HTTPException(status_code=404, detail="Element or Test not found")
+    if test in element.tests:
+        element.tests.remove(test)
+        db.commit()
+    db.refresh(element)
+    return element
     try:
         security.rate_limit_login(ip)
     except HTTPException:

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table, Date
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table, Date, UniqueConstraint
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -34,6 +34,11 @@ class TestCase(Base):
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="tests")
+    elements = relationship(
+        "PageElement",
+        secondary="element_flows",
+        back_populates="tests",
+    )
 
 
 project_analysts = Table(
@@ -83,3 +88,42 @@ class TestPlan(Base):
     fecha_inicio = Column(Date, nullable=True)
     fecha_fin = Column(Date, nullable=True)
     historias_bdd = Column(String, nullable=True)
+
+
+element_flows = Table(
+    "element_flows",
+    Base.metadata,
+    Column("element_id", Integer, ForeignKey("page_elements.id"), primary_key=True),
+    Column("test_id", Integer, ForeignKey("tests.id"), primary_key=True),
+)
+
+
+class Page(Base):
+    __tablename__ = "pages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, nullable=False)
+
+    elements = relationship("PageElement", back_populates="page")
+
+
+class PageElement(Base):
+    __tablename__ = "page_elements"
+    __table_args__ = (
+        UniqueConstraint("page_id", "name", name="uix_page_element_name"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    page_id = Column(Integer, ForeignKey("pages.id"), nullable=False)
+    name = Column(String, nullable=False)
+    tipo = Column(String, nullable=False)
+    estrategia = Column(String, nullable=False)
+    valor = Column(String, nullable=False)
+    descripcion = Column(String, nullable=True)
+
+    page = relationship("Page", back_populates="elements")
+    tests = relationship(
+        "TestCase",
+        secondary=element_flows,
+        back_populates="elements",
+    )

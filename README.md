@@ -65,6 +65,34 @@ Cada plan también incluye:
 - `fecha_inicio` y `fecha_fin`
 - Se valida que `fecha_inicio` sea anterior o igual a `fecha_fin`
 - `historias_bdd` para la trazabilidad a BDD
+
+### Páginas y localizadores
+
+Se implementa la gestión de páginas siguiendo el patrón Screenplay. Cada página
+puede contener múltiples elementos (botones, campos de entrada, etc.). Para cada
+elemento se registran:
+
+- `nombre`
+- `tipo`
+- `estrategia` de localización (`xpath`, `css`, `id`)
+- `valor` del localizador
+- `descripcion` de uso
+
+Los elementos son únicos por página y pueden asociarse a casos de prueba para
+favorecer su reutilización en distintos flujos.
+
+Endpoints principales:
+
+- `POST /pages/` crear página
+- `GET /pages/` listar páginas
+- `PUT /pages/{id}` actualizar página
+- `DELETE /pages/{id}` eliminar página
+- `POST /elements/` crear elemento
+- `GET /elements/` listar elementos
+- `PUT /elements/{id}` actualizar elemento
+- `DELETE /elements/{id}` eliminar elemento
+- `POST /elements/{id}/tests/{test_id}` asociar elemento a caso de prueba
+- `DELETE /elements/{id}/tests/{test_id}` desasociar elemento del caso de prueba
 Cada plan también incluye:
 
 - `objetivo`
