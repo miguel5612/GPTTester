@@ -39,6 +39,11 @@ class TestCase(Base):
         secondary="element_flows",
         back_populates="tests",
     )
+    actions = relationship(
+        "AutomationAction",
+        secondary="test_actions",
+        back_populates="tests",
+    )
 
 
 project_analysts = Table(
@@ -126,4 +131,28 @@ class PageElement(Base):
         "TestCase",
         secondary=element_flows,
         back_populates="elements",
+    )
+
+
+test_actions = Table(
+    "test_actions",
+    Base.metadata,
+    Column("test_id", Integer, ForeignKey("tests.id"), primary_key=True),
+    Column("action_id", Integer, ForeignKey("actions.id"), primary_key=True),
+)
+
+
+class AutomationAction(Base):
+    __tablename__ = "actions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, nullable=False)
+    tipo = Column(String, nullable=False)
+    codigo = Column(String, nullable=False)
+    argumentos = Column(String, nullable=True)
+
+    tests = relationship(
+        "TestCase",
+        secondary=test_actions,
+        back_populates="actions",
     )

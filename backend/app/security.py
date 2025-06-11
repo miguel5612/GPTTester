@@ -7,6 +7,8 @@ WINDOW_SECONDS = 60
 
 _login_attempts: dict[str, list[float]] = {}
 
+BANNED_CODE_PATTERNS = ["import os", "import sys", "subprocess", "eval(", "exec(", "open(", "__"]
+
 
 def validate_username(username: str) -> None:
     if not 3 <= len(username) <= 20:
@@ -44,3 +46,9 @@ def rate_limit_login(ip: str) -> None:
                             detail="Invalid username or password")
     attempts.append(now)
     _login_attempts[ip] = attempts
+
+
+def validate_action_code(code: str) -> None:
+    for pattern in BANNED_CODE_PATTERNS:
+        if pattern in code:
+            raise ValueError("Insecure code detected")

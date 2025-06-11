@@ -101,3 +101,25 @@ Endpoints principales:
 - `DELETE /elements/{id}` eliminar elemento
 - `POST /elements/{id}/tests/{test_id}` asociar elemento a caso de prueba
 - `DELETE /elements/{id}/tests/{test_id}` desasociar elemento del caso de prueba
+
+### Acciones de automatización
+
+Las acciones permiten definir operaciones reutilizables como "dar click" o "escribir texto".
+Cada acción incluye:
+
+- `nombre`
+- `tipo`
+- `codigo` Python/JS que se ejecutará
+- `argumentos` necesarios (por ejemplo: localizador, texto, tiempo)
+
+El código se valida para evitar instrucciones peligrosas. Las acciones pueden asociarse a `TestCase` para su ejecución parametrizada.
+
+Endpoints principales:
+
+- `POST /actions/` crear acción
+- `GET /actions/` listar acciones
+- `GET /actions/{id}` obtener acción
+- `PUT /actions/{id}` actualizar acción
+- `DELETE /actions/{id}` eliminar acción
+- `POST /actions/{id}/tests/{test_id}` asociar acción a un caso de prueba
+- `DELETE /actions/{id}/tests/{test_id}` desasociar acción del caso de prueba

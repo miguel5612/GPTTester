@@ -579,6 +579,120 @@ def remove_element_from_test(
         db.commit()
     db.refresh(element)
     return element
+
+
+# Actions CRUD
+@router.post("/actions/", response_model=schemas.Action)
+def create_action(
+    action: schemas.ActionCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    if db.query(models.AutomationAction).filter(models.AutomationAction.name == action.name).first():
+        raise HTTPException(status_code=400, detail="Action already exists")
+    try:
+        security.validate_action_code(action.codigo)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid code")
+    db_action = models.AutomationAction(**action.dict())
+    db.add(db_action)
+    db.commit()
+    db.refresh(db_action)
+    return db_action
+
+
+@router.get("/actions/", response_model=list[schemas.Action])
+def read_actions(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    return db.query(models.AutomationAction).all()
+
+
+@router.get("/actions/{action_id}", response_model=schemas.Action)
+def read_action(
+    action_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    action = db.query(models.AutomationAction).filter(models.AutomationAction.id == action_id).first()
+    if not action:
+        raise HTTPException(status_code=404, detail="Action not found")
+    return action
+
+
+@router.put("/actions/{action_id}", response_model=schemas.Action)
+def update_action(
+    action_id: int,
+    action_in: schemas.ActionCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    action = db.query(models.AutomationAction).filter(models.AutomationAction.id == action_id).first()
+    if not action:
+        raise HTTPException(status_code=404, detail="Action not found")
+    if action_in.name != action.name and db.query(models.AutomationAction).filter(models.AutomationAction.name == action_in.name).first():
+        raise HTTPException(status_code=400, detail="Action already exists")
+    try:
+        security.validate_action_code(action_in.codigo)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid code")
+    for field, value in action_in.dict().items():
+        setattr(action, field, value)
+    db.commit()
+    db.refresh(action)
+    return action
+
+
+@router.delete("/actions/{action_id}")
+def delete_action(
+    action_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    action = db.query(models.AutomationAction).filter(models.AutomationAction.id == action_id).first()
+    if not action:
+        raise HTTPException(status_code=404, detail="Action not found")
+    db.delete(action)
+    db.commit()
+    return {"ok": True}
+
+
+# Associate actions with tests
+@router.post("/actions/{action_id}/tests/{test_id}", response_model=schemas.Action)
+def add_action_to_test(
+    action_id: int,
+    test_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    action = db.query(models.AutomationAction).filter(models.AutomationAction.id == action_id).first()
+    test = db.query(models.TestCase).filter(models.TestCase.id == test_id).first()
+    if not action or not test:
+        raise HTTPException(status_code=404, detail="Action or Test not found")
+    if test not in action.tests:
+        action.tests.append(test)
+        db.commit()
+    db.refresh(action)
+    return action
+
+
+@router.delete("/actions/{action_id}/tests/{test_id}", response_model=schemas.Action)
+def remove_action_from_test(
+    action_id: int,
+    test_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    action = db.query(models.AutomationAction).filter(models.AutomationAction.id == action_id).first()
+    test = db.query(models.TestCase).filter(models.TestCase.id == test_id).first()
+    if not action or not test:
+        raise HTTPException(status_code=404, detail="Action or Test not found")
+    if test in action.tests:
+        action.tests.remove(test)
+        db.commit()
+    db.refresh(action)
+    return action
     try:
         security.rate_limit_login(ip)
     except HTTPException:

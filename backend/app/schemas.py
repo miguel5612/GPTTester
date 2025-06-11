@@ -27,6 +27,7 @@ class TestCreate(TestBase):
 class Test(TestBase):
     id: int
     owner_id: int
+    actions: List["Action"] = []
 
     class Config:
         orm_mode = True
@@ -145,6 +146,24 @@ class PageElementCreate(PageElementBase):
 
 
 class PageElement(PageElementBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class ActionBase(BaseModel):
+    name: str
+    tipo: str
+    codigo: str
+    argumentos: Optional[str] = None
+
+
+class ActionCreate(ActionBase):
+    pass
+
+
+class Action(ActionBase):
     id: int
 
     class Config:
