@@ -154,3 +154,16 @@ Endpoints principales:
 - `GET /agents/{id}` obtener agente
 - `PUT /agents/{id}` actualizar agente
 - `DELETE /agents/{id}` eliminar agente
+
+### Planes de ejecución
+
+Un plan de ejecución define qué caso de prueba se ejecutará y en qué agente.
+Se valida que el `TestCase` y el agente existan antes de crearlo.
+
+Endpoints principales:
+
+- `POST /executionplans/` crear plan de ejecución
+- `GET /executionplans/` listar planes con filtros opcionales `agent_id`, `test_id` o `nombre`
+- `GET /executionplans/{id}` obtener plan
+- `PUT /executionplans/{id}` actualizar plan
+- `DELETE /executionplans/{id}` eliminar plan

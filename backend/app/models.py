@@ -181,3 +181,15 @@ class ExecutionAgent(Base):
     hostname = Column(String, unique=True, nullable=False)
     os = Column(String, nullable=False)
     categoria = Column(String, nullable=True)
+
+
+class ExecutionPlan(Base):
+    __tablename__ = "execution_plans"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String, nullable=False)
+    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
+    agent_id = Column(Integer, ForeignKey("agents.id"), nullable=False)
+
+    test = relationship("TestCase")
+    agent = relationship("ExecutionAgent")

@@ -862,6 +862,90 @@ def delete_agent(
     db.delete(agent)
     db.commit()
     return {"ok": True}
+
+
+# CRUD for execution plans
+
+@router.post("/executionplans/", response_model=schemas.ExecutionPlan)
+def create_execution_plan(
+    plan: schemas.ExecutionPlanCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    if not db.query(models.TestCase).filter(models.TestCase.id == plan.test_id).first():
+        raise HTTPException(status_code=404, detail="TestCase not found")
+    if not db.query(models.ExecutionAgent).filter(models.ExecutionAgent.id == plan.agent_id).first():
+        raise HTTPException(status_code=404, detail="Agent not found")
+    db_plan = models.ExecutionPlan(**plan.dict())
+    db.add(db_plan)
+    db.commit()
+    db.refresh(db_plan)
+    return db_plan
+
+
+@router.get("/executionplans/", response_model=list[schemas.ExecutionPlan])
+def read_execution_plans(
+    agent_id: int | None = None,
+    test_id: int | None = None,
+    nombre: str | None = None,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    query = db.query(models.ExecutionPlan)
+    if agent_id is not None:
+        query = query.filter(models.ExecutionPlan.agent_id == agent_id)
+    if test_id is not None:
+        query = query.filter(models.ExecutionPlan.test_id == test_id)
+    if nombre is not None:
+        query = query.filter(models.ExecutionPlan.nombre.ilike(f"%{nombre}%"))
+    return query.all()
+
+
+@router.get("/executionplans/{plan_id}", response_model=schemas.ExecutionPlan)
+def read_execution_plan(
+    plan_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    plan = db.query(models.ExecutionPlan).filter(models.ExecutionPlan.id == plan_id).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="ExecutionPlan not found")
+    return plan
+
+
+@router.put("/executionplans/{plan_id}", response_model=schemas.ExecutionPlan)
+def update_execution_plan(
+    plan_id: int,
+    plan_in: schemas.ExecutionPlanCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    plan = db.query(models.ExecutionPlan).filter(models.ExecutionPlan.id == plan_id).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="ExecutionPlan not found")
+    if not db.query(models.TestCase).filter(models.TestCase.id == plan_in.test_id).first():
+        raise HTTPException(status_code=404, detail="TestCase not found")
+    if not db.query(models.ExecutionAgent).filter(models.ExecutionAgent.id == plan_in.agent_id).first():
+        raise HTTPException(status_code=404, detail="Agent not found")
+    for field, value in plan_in.dict().items():
+        setattr(plan, field, value)
+    db.commit()
+    db.refresh(plan)
+    return plan
+
+
+@router.delete("/executionplans/{plan_id}")
+def delete_execution_plan(
+    plan_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    plan = db.query(models.ExecutionPlan).filter(models.ExecutionPlan.id == plan_id).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="ExecutionPlan not found")
+    db.delete(plan)
+    db.commit()
+    return {"ok": True}
     try:
         security.rate_limit_login(ip)
     except HTTPException:
