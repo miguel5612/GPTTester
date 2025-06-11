@@ -245,3 +245,16 @@ class PlanExecution(PlanExecutionBase):
 
     class Config:
         orm_mode = True
+
+
+class AssignmentDetail(BaseModel):
+    action: Action
+    element: PageElement
+    parametros: dict[str, str] | None = None
+
+
+class PendingExecution(BaseModel):
+    execution_id: int
+    plan: ExecutionPlan
+    test: Test
+    assignments: list[AssignmentDetail]

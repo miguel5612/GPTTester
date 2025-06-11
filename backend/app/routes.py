@@ -977,6 +977,59 @@ def run_execution_plan(
     db.commit()
     db.refresh(record)
     return record
+
+
+@router.get("/agents/{hostname}/pending", response_model=schemas.PendingExecution)
+def get_pending_execution(
+    hostname: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    if current_user.username != hostname:
+        raise HTTPException(status_code=403, detail="Insufficient permissions")
+    agent = (
+        db.query(models.ExecutionAgent)
+        .filter(models.ExecutionAgent.hostname == hostname)
+        .first()
+    )
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    record = (
+        db.query(models.PlanExecution)
+        .filter(
+            models.PlanExecution.agent_id == agent.id,
+            models.PlanExecution.status.in_(
+                [
+                    models.ExecutionStatus.CALLING.value,
+                    models.ExecutionStatus.RUNNING.value,
+                ]
+            ),
+        )
+        .order_by(models.PlanExecution.started_at)
+        .first()
+    )
+    if not record:
+        raise HTTPException(status_code=404, detail="No pending execution")
+    test = record.plan.test
+    assignments = (
+        db.query(models.ActionAssignment)
+        .filter(models.ActionAssignment.test_id == test.id)
+        .all()
+    )
+    details = [
+        schemas.AssignmentDetail(
+            action=schemas.Action.from_orm(a.action),
+            element=schemas.PageElement.from_orm(a.element),
+            parametros=json.loads(a.parametros or "{}"),
+        )
+        for a in assignments
+    ]
+    return schemas.PendingExecution(
+        execution_id=record.id,
+        plan=schemas.ExecutionPlan.from_orm(record.plan),
+        test=schemas.Test.from_orm(test),
+        assignments=details,
+    )
     try:
         security.rate_limit_login(ip)
     except HTTPException:

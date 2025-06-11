@@ -168,3 +168,4 @@ Endpoints principales:
 - `PUT /executionplans/{id}` actualizar plan
 - `DELETE /executionplans/{id}` eliminar plan
 - `POST /executionplans/{id}/run` disparar la ejecución y registrar el estado inicial. Si el agente ya tiene una ejecución pendiente se rechaza la petición.
+- `GET /agents/{hostname}/pending` un agente autenticado consulta su próxima ejecución pendiente y recibe el plan, caso de prueba, elementos y acciones con parámetros
