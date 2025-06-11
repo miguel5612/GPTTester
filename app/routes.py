@@ -18,6 +18,24 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(deps.get_db)):
     if deps.get_user(db, username=user.username):
         raise HTTPException(status_code=400, detail="Invalid username or password")
 
+def login_for_access_token(
+    request: Request,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(deps.get_db),
+):
+    ip = request.client.host
+    try:
+        security.rate_limit_login(ip)
+    except HTTPException:
+        # generic rate limit response
+        raise
+
+        raise HTTPException(status_code=400, detail="Invalid username or password")
+        raise
+
+    if deps.get_user(db, username=user.username):
+        raise HTTPException(status_code=400, detail="Invalid username or password")
+
     hashed_password = deps.get_password_hash(user.password)
     new_user = models.User(username=user.username, hashed_password=hashed_password)
     db.add(new_user)
