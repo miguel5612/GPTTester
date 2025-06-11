@@ -61,26 +61,19 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(deps.get_db)):
         security.validate_username(user.username)
         security.validate_password_strength(user.password)
     except HTTPException:
-        # re-raise to keep generic message
         raise
 
     if deps.get_user(db, username=user.username):
         raise HTTPException(status_code=400, detail="Invalid username or password")
 
-    default_role = db.query(models.Role).filter(models.Role.name == "Analista de Pruebas con skill de automatizaci\u00f3n").first()
+    default_role = db.query(models.Role).filter(models.Role.name == "Analista de Pruebas con skill de automatización").first()
+    hashed_password = deps.get_password_hash(user.password)
     new_user = models.User(username=user.username, hashed_password=hashed_password, role=default_role)
-    request: Request,
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(deps.get_db),
-):
-    ip = request.client.host
-    try:
-        security.rate_limit_login(ip)
-    except HTTPException:
-        # generic rate limit response
-        raise
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
 
-        raise HTTPException(status_code=400, detail="Invalid username or password")
 
 @router.put("/users/{user_id}/role", response_model=schemas.User)
 def set_user_role(
@@ -100,17 +93,6 @@ def set_user_role(
     db.refresh(user)
     return user
 
-        raise
-
-    if deps.get_user(db, username=user.username):
-        raise HTTPException(status_code=400, detail="Invalid username or password")
-
-    hashed_password = deps.get_password_hash(user.password)
-    new_user = models.User(username=user.username, hashed_password=hashed_password)
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
 
 @router.post("/token")
 def login_for_access_token(
@@ -119,6 +101,16 @@ def login_for_access_token(
     db: Session = Depends(deps.get_db),
 ):
     ip = request.client.host
+    try:
+        security.rate_limit_login(ip)
+    except HTTPException:
+        raise
+
+    user = deps.authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid username or password")
+    token = deps.create_access_token({"sub": user.username})
+    return {"access_token": token, "token_type": "bearer"}
 
 
 @router.post("/clients/", response_model=schemas.Client)
@@ -307,17 +299,16 @@ def create_testplan(
     db: Session = Depends(deps.get_db),
     current_user: models.User = deps.require_role(["Administrador"]),
 ):
-    except IntegrityError:
-    except IntegrityError:
     db_plan = models.TestPlan(**plan.dict())
     db.add(db_plan)
     try:
         db.commit()
-    except Exception:
+    except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=400, detail="Integrity error")
     db.refresh(db_plan)
     return db_plan
+
 
 
 @router.get("/testplans/", response_model=list[schemas.TestPlan])

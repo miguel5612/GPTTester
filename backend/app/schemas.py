@@ -101,7 +101,7 @@ class TestPlanBase(BaseModel):
 
 
 class TestPlanCreate(TestPlanBase):
-    @root_validator
+    @root_validator(skip_on_failure=True)
     def validate_dates(cls, values):
         start = values.get("fecha_inicio")
         end = values.get("fecha_fin")
@@ -193,7 +193,7 @@ class AgentBase(BaseModel):
     os: str = Field(...)
     categoria: Optional[str] = None
 
-    @root_validator
+    @root_validator(skip_on_failure=True)
     def validate_fields(cls, values):
         os_val = values.get('os')
         categoria = values.get('categoria')
