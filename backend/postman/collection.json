@@ -1,0 +1,2104 @@
+{
+  "info": {
+    "name": "Test Automation API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "GET /roles/",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/roles/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "roles"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /roles/",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/roles/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "roles"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /roles/{role_id}",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/roles/{role_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "roles",
+            "{role_id}"
+          ],
+          "variable": [
+            {
+              "key": "role_id",
+              "value": "<role_id>"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /roles/{role_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/roles/{role_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "roles",
+            "{role_id}"
+          ],
+          "variable": [
+            {
+              "key": "role_id",
+              "value": "<role_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /users/",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /users/{user_id}/role",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/{user_id}/role",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "{user_id}",
+            "role"
+          ],
+          "variable": [
+            {
+              "key": "user_id",
+              "value": "<user_id>"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/token",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "token"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /clients/",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/clients/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "clients"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /clients/",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/clients/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "clients"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /clients/{client_id}",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/clients/{client_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "clients",
+            "{client_id}"
+          ],
+          "variable": [
+            {
+              "key": "client_id",
+              "value": "<client_id>"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /clients/{client_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/clients/{client_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "clients",
+            "{client_id}"
+          ],
+          "variable": [
+            {
+              "key": "client_id",
+              "value": "<client_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /projects/",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/projects/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "projects"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /projects/",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/projects/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "projects"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /projects/{project_id}",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/projects/{project_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "projects",
+            "{project_id}"
+          ],
+          "variable": [
+            {
+              "key": "project_id",
+              "value": "<project_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /projects/{project_id}",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/projects/{project_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "projects",
+            "{project_id}"
+          ],
+          "variable": [
+            {
+              "key": "project_id",
+              "value": "<project_id>"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /projects/{project_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/projects/{project_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "projects",
+            "{project_id}"
+          ],
+          "variable": [
+            {
+              "key": "project_id",
+              "value": "<project_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /projects/{project_id}/analysts/{user_id}",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/projects/{project_id}/analysts/{user_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "projects",
+            "{project_id}",
+            "analysts",
+            "{user_id}"
+          ],
+          "variable": [
+            {
+              "key": "project_id",
+              "value": "<project_id>"
+            },
+            {
+              "key": "user_id",
+              "value": "<user_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /projects/{project_id}/analysts/{user_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/projects/{project_id}/analysts/{user_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "projects",
+            "{project_id}",
+            "analysts",
+            "{user_id}"
+          ],
+          "variable": [
+            {
+              "key": "project_id",
+              "value": "<project_id>"
+            },
+            {
+              "key": "user_id",
+              "value": "<user_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /testplans/",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/testplans/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "testplans"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /testplans/",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/testplans/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "testplans"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /testplans/{plan_id}",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/testplans/{plan_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "testplans",
+            "{plan_id}"
+          ],
+          "variable": [
+            {
+              "key": "plan_id",
+              "value": "<plan_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /testplans/{plan_id}",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/testplans/{plan_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "testplans",
+            "{plan_id}"
+          ],
+          "variable": [
+            {
+              "key": "plan_id",
+              "value": "<plan_id>"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /testplans/{plan_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/testplans/{plan_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "testplans",
+            "{plan_id}"
+          ],
+          "variable": [
+            {
+              "key": "plan_id",
+              "value": "<plan_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /pages/",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/pages/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /pages/",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/pages/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /pages/{page_id}",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/pages/{page_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages",
+            "{page_id}"
+          ],
+          "variable": [
+            {
+              "key": "page_id",
+              "value": "<page_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /pages/{page_id}",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/pages/{page_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages",
+            "{page_id}"
+          ],
+          "variable": [
+            {
+              "key": "page_id",
+              "value": "<page_id>"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /pages/{page_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/pages/{page_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "pages",
+            "{page_id}"
+          ],
+          "variable": [
+            {
+              "key": "page_id",
+              "value": "<page_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /elements/",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/elements/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "elements"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /elements/",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/elements/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "elements"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /elements/{element_id}",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/elements/{element_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "elements",
+            "{element_id}"
+          ],
+          "variable": [
+            {
+              "key": "element_id",
+              "value": "<element_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /elements/{element_id}",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/elements/{element_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "elements",
+            "{element_id}"
+          ],
+          "variable": [
+            {
+              "key": "element_id",
+              "value": "<element_id>"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /elements/{element_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/elements/{element_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "elements",
+            "{element_id}"
+          ],
+          "variable": [
+            {
+              "key": "element_id",
+              "value": "<element_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /elements/{element_id}/tests/{test_id}",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/elements/{element_id}/tests/{test_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "elements",
+            "{element_id}",
+            "tests",
+            "{test_id}"
+          ],
+          "variable": [
+            {
+              "key": "element_id",
+              "value": "<element_id>"
+            },
+            {
+              "key": "test_id",
+              "value": "<test_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /elements/{element_id}/tests/{test_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/elements/{element_id}/tests/{test_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "elements",
+            "{element_id}",
+            "tests",
+            "{test_id}"
+          ],
+          "variable": [
+            {
+              "key": "element_id",
+              "value": "<element_id>"
+            },
+            {
+              "key": "test_id",
+              "value": "<test_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /actions/",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/actions/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "actions"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /actions/",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/actions/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "actions"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /actions/{action_id}",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/actions/{action_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "actions",
+            "{action_id}"
+          ],
+          "variable": [
+            {
+              "key": "action_id",
+              "value": "<action_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /actions/{action_id}",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/actions/{action_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "actions",
+            "{action_id}"
+          ],
+          "variable": [
+            {
+              "key": "action_id",
+              "value": "<action_id>"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /actions/{action_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/actions/{action_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "actions",
+            "{action_id}"
+          ],
+          "variable": [
+            {
+              "key": "action_id",
+              "value": "<action_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /actions/{action_id}/tests/{test_id}",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/actions/{action_id}/tests/{test_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "actions",
+            "{action_id}",
+            "tests",
+            "{test_id}"
+          ],
+          "variable": [
+            {
+              "key": "action_id",
+              "value": "<action_id>"
+            },
+            {
+              "key": "test_id",
+              "value": "<test_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /actions/{action_id}/tests/{test_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/actions/{action_id}/tests/{test_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "actions",
+            "{action_id}",
+            "tests",
+            "{test_id}"
+          ],
+          "variable": [
+            {
+              "key": "action_id",
+              "value": "<action_id>"
+            },
+            {
+              "key": "test_id",
+              "value": "<test_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /assignments/",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/assignments/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "assignments"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /assignments/",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/assignments/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "assignments"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /assignments/{assignment_id}",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/assignments/{assignment_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "assignments",
+            "{assignment_id}"
+          ],
+          "variable": [
+            {
+              "key": "assignment_id",
+              "value": "<assignment_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /assignments/{assignment_id}",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/assignments/{assignment_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "assignments",
+            "{assignment_id}"
+          ],
+          "variable": [
+            {
+              "key": "assignment_id",
+              "value": "<assignment_id>"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /assignments/{assignment_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/assignments/{assignment_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "assignments",
+            "{assignment_id}"
+          ],
+          "variable": [
+            {
+              "key": "assignment_id",
+              "value": "<assignment_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /agents/",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/agents/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "agents"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /agents/",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/agents/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "agents"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /agents/{agent_id}",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/agents/{agent_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "agents",
+            "{agent_id}"
+          ],
+          "variable": [
+            {
+              "key": "agent_id",
+              "value": "<agent_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /agents/{agent_id}",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/agents/{agent_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "agents",
+            "{agent_id}"
+          ],
+          "variable": [
+            {
+              "key": "agent_id",
+              "value": "<agent_id>"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /agents/{agent_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/agents/{agent_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "agents",
+            "{agent_id}"
+          ],
+          "variable": [
+            {
+              "key": "agent_id",
+              "value": "<agent_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /executionplans/",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/executionplans/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "executionplans"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /executionplans/",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/executionplans/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "executionplans"
+          ],
+          "query": [
+            {
+              "key": "agent_id",
+              "value": "",
+              "description": ""
+            },
+            {
+              "key": "test_id",
+              "value": "",
+              "description": ""
+            },
+            {
+              "key": "nombre",
+              "value": "",
+              "description": ""
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /executionplans/{plan_id}",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/executionplans/{plan_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "executionplans",
+            "{plan_id}"
+          ],
+          "variable": [
+            {
+              "key": "plan_id",
+              "value": "<plan_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT /executionplans/{plan_id}",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/executionplans/{plan_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "executionplans",
+            "{plan_id}"
+          ],
+          "variable": [
+            {
+              "key": "plan_id",
+              "value": "<plan_id>"
+            }
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /executionplans/{plan_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/executionplans/{plan_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "executionplans",
+            "{plan_id}"
+          ],
+          "variable": [
+            {
+              "key": "plan_id",
+              "value": "<plan_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /executionplans/{plan_id}/run",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/executionplans/{plan_id}/run",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "executionplans",
+            "{plan_id}",
+            "run"
+          ],
+          "variable": [
+            {
+              "key": "plan_id",
+              "value": "<plan_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /agents/{hostname}/pending",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/agents/{hostname}/pending",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "agents",
+            "{hostname}",
+            "pending"
+          ],
+          "variable": [
+            {
+              "key": "hostname",
+              "value": "<hostname>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /users/me/",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/me/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "me"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /tests/",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/tests/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "tests"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST /tests/",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/tests/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "tests"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "\"\""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET /tests/{test_id}",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/tests/{test_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "tests",
+            "{test_id}"
+          ],
+          "variable": [
+            {
+              "key": "test_id",
+              "value": "<test_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE /tests/{test_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/tests/{test_id}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "tests",
+            "{test_id}"
+          ],
+          "variable": [
+            {
+              "key": "test_id",
+              "value": "<test_id>"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
