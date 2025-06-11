@@ -87,16 +87,16 @@ class Project(ProjectBase):
 
 
 class TestPlanBase(BaseModel):
-    name: str = Field(..., min_length=5)
-    objective: Optional[str] = None
-    scope: Optional[str] = None
-    entry_criteria: Optional[str] = None
-    exit_criteria: Optional[str] = None
-    strategy: Optional[str] = None
-    responsibles: Optional[str] = None
-    start_date: Optional[date] = None
-    end_date: Optional[date] = None
-    bdd_stories: Optional[str] = None
+    nombre: str = Field(..., min_length=5)
+    objetivo: Optional[str] = None
+    alcance: Optional[str] = None
+    criterios_entrada: Optional[str] = None
+    criterios_salida: Optional[str] = None
+    estrategia: Optional[str] = None
+    responsables: Optional[str] = None
+    fecha_inicio: Optional[date] = None
+    fecha_fin: Optional[date] = None
+    historias_bdd: Optional[str] = None
 
 
 class TestPlanCreate(TestPlanBase):

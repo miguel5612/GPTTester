@@ -55,6 +55,15 @@ Endpoints principales:
 ### Planes de prueba
 
 Los planes de prueba siguen las buenas prácticas de ISTQB y Business Centric Testing. El campo `nombre` es obligatorio y debe tener al menos 5 caracteres.
+Cada plan también incluye:
+
+- `objetivo`
+- `alcance`
+- `criterios_entrada` y `criterios_salida`
+- `estrategia`
+- `responsables`
+- `fecha_inicio` y `fecha_fin`
+- `historias_bdd` para la trazabilidad a BDD
 
 Endpoints:
 

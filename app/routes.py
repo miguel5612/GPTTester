@@ -304,6 +304,8 @@ def create_testplan(
     db: Session = Depends(deps.get_db),
     current_user: models.User = deps.require_role(["Administrador"]),
 ):
+    if plan.fecha_inicio and plan.fecha_fin and plan.fecha_inicio > plan.fecha_fin:
+        raise HTTPException(status_code=400, detail="fecha_inicio must be before fecha_fin")
     db_plan = models.TestPlan(**plan.dict())
     db.add(db_plan)
     try:
@@ -345,6 +347,8 @@ def update_testplan(
     plan = db.query(models.TestPlan).filter(models.TestPlan.id == plan_id).first()
     if not plan:
         raise HTTPException(status_code=404, detail="TestPlan not found")
+    if plan_in.fecha_inicio and plan_in.fecha_fin and plan_in.fecha_inicio > plan_in.fecha_fin:
+        raise HTTPException(status_code=400, detail="fecha_inicio must be before fecha_fin")
     for field, value in plan_in.dict().items():
         setattr(plan, field, value)
     try:
