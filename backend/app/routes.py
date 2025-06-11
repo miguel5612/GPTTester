@@ -959,15 +959,19 @@ def run_execution_plan(
         raise HTTPException(status_code=404, detail="ExecutionPlan not found")
     pending = db.query(models.PlanExecution).filter(
         models.PlanExecution.agent_id == plan.agent_id,
-        models.PlanExecution.status.in_(["Llamando al agente", "En ejecucion"]),
+        models.PlanExecution.status.in_(
+            [
+                models.ExecutionStatus.CALLING.value,
+                models.ExecutionStatus.RUNNING.value,
+            ]
+        ),
     ).first()
     if pending:
         raise HTTPException(status_code=400, detail="Agent has a pending execution")
     record = models.PlanExecution(
         plan_id=plan.id,
         agent_id=plan.agent_id,
-        status="Llamando al agente",
-        started_at=datetime.utcnow(),
+        status=models.ExecutionStatus.CALLING.value,
     )
     db.add(record)
     db.commit()

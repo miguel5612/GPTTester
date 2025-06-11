@@ -1,4 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table, Date, DateTime, UniqueConstraint
+import enum
+from datetime import datetime
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -194,14 +196,20 @@ class ExecutionPlan(Base):
     test = relationship("TestCase")
     agent = relationship("ExecutionAgent")
 
+
+class ExecutionStatus(str, enum.Enum):
+    CALLING = "Llamando al agente"
+    RUNNING = "En ejecucion"
+    FINISHED = "Finalizado"
+
 class PlanExecution(Base):
     __tablename__ = "execution_records"
 
     id = Column(Integer, primary_key=True, index=True)
     plan_id = Column(Integer, ForeignKey("execution_plans.id"), nullable=False)
     agent_id = Column(Integer, ForeignKey("agents.id"), nullable=False)
-    status = Column(String, nullable=False, default="Llamando al agente")
-    started_at = Column(DateTime, nullable=False)
+    status = Column(String, nullable=False, default=ExecutionStatus.CALLING.value)
+    started_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     plan = relationship("ExecutionPlan")
     agent = relationship("ExecutionAgent")
