@@ -20,6 +20,10 @@
         "method": "GET",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -78,6 +82,7 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+
           }
         ],
         "url": {
@@ -108,6 +113,10 @@
       "request": {
         "method": "DELETE",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -140,6 +149,10 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
           }
         ],
         "url": {
@@ -204,6 +217,10 @@
           {
             "key": "Content-Type",
             "value": "application/x-www-form-urlencoded"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token
           }
         ],
         "url": {
@@ -217,7 +234,6 @@
         },
         "body": {
           "mode": "urlencoded",
-          "urlencoded": []
         }
       },
       "response": []
@@ -227,6 +243,10 @@
       "request": {
         "method": "GET",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -317,6 +337,10 @@
         "method": "DELETE",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -345,6 +369,10 @@
       "request": {
         "method": "GET",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -397,6 +425,10 @@
       "request": {
         "method": "GET",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -464,6 +496,10 @@
         "method": "DELETE",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -492,6 +528,10 @@
       "request": {
         "method": "POST",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -528,6 +568,10 @@
         "method": "DELETE",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -562,6 +606,10 @@
       "request": {
         "method": "GET",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -614,6 +662,10 @@
       "request": {
         "method": "GET",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -681,6 +733,10 @@
         "method": "DELETE",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -709,6 +765,10 @@
       "request": {
         "method": "GET",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -761,6 +821,10 @@
       "request": {
         "method": "GET",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -857,6 +921,10 @@
         "method": "GET",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -908,6 +976,10 @@
       "request": {
         "method": "GET",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -975,6 +1047,10 @@
         "method": "DELETE",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -1003,6 +1079,10 @@
       "request": {
         "method": "POST",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -1039,6 +1119,10 @@
         "method": "DELETE",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -1073,6 +1157,10 @@
       "request": {
         "method": "GET",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -1125,6 +1213,10 @@
       "request": {
         "method": "GET",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -1192,6 +1284,10 @@
         "method": "DELETE",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -1220,6 +1316,10 @@
       "request": {
         "method": "POST",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -1256,6 +1356,10 @@
         "method": "DELETE",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -1291,6 +1395,10 @@
         "method": "GET",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -1319,6 +1427,7 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+
           }
         ],
         "url": {
@@ -1342,6 +1451,10 @@
       "request": {
         "method": "GET",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -1378,6 +1491,7 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+
           }
         ],
         "url": {
@@ -1409,6 +1523,10 @@
         "method": "DELETE",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -1437,6 +1555,10 @@
       "request": {
         "method": "GET",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -1490,6 +1612,10 @@
         "method": "GET",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -1525,6 +1651,7 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+
           }
         ],
         "url": {
@@ -1555,6 +1682,11 @@
       "request": {
         "method": "DELETE",
         "header": [
+          {
+
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -1615,6 +1747,10 @@
         "method": "GET",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -1654,6 +1790,10 @@
         "method": "GET",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -1689,6 +1829,7 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+
           }
         ],
         "url": {
@@ -1720,6 +1861,10 @@
         "method": "DELETE",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -1748,6 +1893,10 @@
       "request": {
         "method": "POST",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -1779,6 +1928,10 @@
         "method": "GET",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -1809,6 +1962,10 @@
         "method": "GET",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -1831,6 +1988,10 @@
       "request": {
         "method": "GET",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
@@ -1884,6 +2045,10 @@
         "method": "GET",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{token}}"
           }
@@ -1912,6 +2077,10 @@
       "request": {
         "method": "DELETE",
         "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
           {
             "key": "Authorization",
             "value": "Bearer {{token}}"
