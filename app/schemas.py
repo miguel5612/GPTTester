@@ -1,6 +1,21 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
+
+class RoleBase(BaseModel):
+    name: str
+
+
+class RoleCreate(RoleBase):
+    pass
+
+
+class Role(RoleBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
 class TestBase(BaseModel):
     name: str
     description: Optional[str] = None
@@ -21,9 +36,14 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
 
+
+class UserRoleUpdate(BaseModel):
+    role_id: int
+
 class User(UserBase):
     id: int
     is_active: bool
+    role: Role
     tests: List[Test] = []
 
     class Config:
