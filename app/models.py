@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table, Date
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -67,3 +67,19 @@ class Project(Base):
         secondary=project_analysts,
         back_populates="projects",
     )
+
+
+class TestPlan(Base):
+    __tablename__ = "testplans"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    objective = Column(String, nullable=True)
+    scope = Column(String, nullable=True)
+    entry_criteria = Column(String, nullable=True)
+    exit_criteria = Column(String, nullable=True)
+    strategy = Column(String, nullable=True)
+    responsibles = Column(String, nullable=True)
+    start_date = Column(Date, nullable=True)
+    end_date = Column(Date, nullable=True)
+    bdd_stories = Column(String, nullable=True)

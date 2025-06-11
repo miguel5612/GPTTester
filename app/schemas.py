@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
+from datetime import date
 
 
 class RoleBase(BaseModel):
@@ -80,6 +81,30 @@ class Project(ProjectBase):
     id: int
     is_active: bool
     analysts: List[User] = []
+
+    class Config:
+        orm_mode = True
+
+
+class TestPlanBase(BaseModel):
+    name: str = Field(..., min_length=5)
+    objective: Optional[str] = None
+    scope: Optional[str] = None
+    entry_criteria: Optional[str] = None
+    exit_criteria: Optional[str] = None
+    strategy: Optional[str] = None
+    responsibles: Optional[str] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    bdd_stories: Optional[str] = None
+
+
+class TestPlanCreate(TestPlanBase):
+    pass
+
+
+class TestPlan(TestPlanBase):
+    id: int
 
     class Config:
         orm_mode = True

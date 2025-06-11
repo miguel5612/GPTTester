@@ -296,6 +296,78 @@ def unassign_analyst(
         db.commit()
     db.refresh(project)
     return project
+
+
+@router.post("/testplans/", response_model=schemas.TestPlan)
+def create_testplan(
+    plan: schemas.TestPlanCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    db_plan = models.TestPlan(**plan.dict())
+    db.add(db_plan)
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Integrity error")
+    db.refresh(db_plan)
+    return db_plan
+
+
+@router.get("/testplans/", response_model=list[schemas.TestPlan])
+def read_testplans(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    return db.query(models.TestPlan).all()
+
+
+@router.get("/testplans/{plan_id}", response_model=schemas.TestPlan)
+def read_testplan(
+    plan_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    plan = db.query(models.TestPlan).filter(models.TestPlan.id == plan_id).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="TestPlan not found")
+    return plan
+
+
+@router.put("/testplans/{plan_id}", response_model=schemas.TestPlan)
+def update_testplan(
+    plan_id: int,
+    plan_in: schemas.TestPlanCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    plan = db.query(models.TestPlan).filter(models.TestPlan.id == plan_id).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="TestPlan not found")
+    for field, value in plan_in.dict().items():
+        setattr(plan, field, value)
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Integrity error")
+    db.refresh(plan)
+    return plan
+
+
+@router.delete("/testplans/{plan_id}")
+def delete_testplan(
+    plan_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    plan = db.query(models.TestPlan).filter(models.TestPlan.id == plan_id).first()
+    if not plan:
+        raise HTTPException(status_code=404, detail="TestPlan not found")
+    db.delete(plan)
+    db.commit()
+    return {"ok": True}
     try:
         security.rate_limit_login(ip)
     except HTTPException:

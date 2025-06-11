@@ -52,6 +52,18 @@ Endpoints principales:
 - `DELETE /projects/{id}/analysts/{user_id}` quitar analista
 - `GET /projects/` listar proyectos asignados al usuario
 
+### Planes de prueba
+
+Los planes de prueba siguen las buenas prácticas de ISTQB y Business Centric Testing. El campo `nombre` es obligatorio y debe tener al menos 5 caracteres.
+
+Endpoints:
+
+- `POST /testplans/` crear plan de prueba
+- `GET /testplans/` listar planes de prueba
+- `GET /testplans/{id}` obtener un plan de prueba
+- `PUT /testplans/{id}` actualizar plan de prueba
+- `DELETE /testplans/{id}` eliminar plan de prueba
+
 ## Autenticación
 
 Regístrate enviando un POST a `/users/` con `username` y `password`. El login se realiza en `/token` utilizando un formulario `application/x-www-form-urlencoded`.
