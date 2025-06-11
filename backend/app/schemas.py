@@ -168,3 +168,21 @@ class Action(ActionBase):
 
     class Config:
         orm_mode = True
+
+
+class ActionAssignmentBase(BaseModel):
+    action_id: int
+    element_id: int
+    test_id: int
+    parametros: dict[str, str] | None = None
+
+
+class ActionAssignmentCreate(ActionAssignmentBase):
+    pass
+
+
+class ActionAssignment(ActionAssignmentBase):
+    id: int
+
+    class Config:
+        orm_mode = True

@@ -52,3 +52,15 @@ def validate_action_code(code: str) -> None:
     for pattern in BANNED_CODE_PATTERNS:
         if pattern in code:
             raise ValueError("Insecure code detected")
+
+
+def validate_assignment_params(action_args: str | None, params: dict[str, str]) -> None:
+    if not action_args:
+        return
+    required = [arg.strip() for arg in action_args.split(",") if arg.strip()]
+    missing = [r for r in required if r not in params]
+    if missing:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Missing parameters: {', '.join(missing)}",
+        )

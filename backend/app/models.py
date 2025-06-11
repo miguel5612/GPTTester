@@ -156,3 +156,20 @@ class AutomationAction(Base):
         secondary=test_actions,
         back_populates="actions",
     )
+
+
+class ActionAssignment(Base):
+    __tablename__ = "action_assignments"
+    __table_args__ = (
+        UniqueConstraint("action_id", "element_id", "test_id", name="uix_assign"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    action_id = Column(Integer, ForeignKey("actions.id"), nullable=False)
+    element_id = Column(Integer, ForeignKey("page_elements.id"), nullable=False)
+    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
+    parametros = Column(String, nullable=True)
+
+    action = relationship("AutomationAction")
+    element = relationship("PageElement")
+    test = relationship("TestCase")

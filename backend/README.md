@@ -123,3 +123,17 @@ Endpoints principales:
 - `DELETE /actions/{id}` eliminar acción
 - `POST /actions/{id}/tests/{test_id}` asociar acción a un caso de prueba
 - `DELETE /actions/{id}/tests/{test_id}` desasociar acción del caso de prueba
+
+### Asignación de acciones a objetos
+
+Permite vincular una acción con un elemento de página en un `TestCase` e indicar
+los parámetros concretos a usar. Se valida que los parámetros requeridos por la
+acción estén presentes.
+
+Endpoints principales:
+
+- `POST /assignments/` crear asignación
+- `GET /assignments/` listar asignaciones
+- `GET /assignments/{id}` obtener una asignación
+- `PUT /assignments/{id}` actualizar asignación
+- `DELETE /assignments/{id}` eliminar asignación

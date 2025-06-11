@@ -1,5 +1,6 @@
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, Request
+import json
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -693,6 +694,106 @@ def remove_action_from_test(
         db.commit()
     db.refresh(action)
     return action
+
+
+# CRUD for action assignments
+@router.post("/assignments/", response_model=schemas.ActionAssignment)
+def create_assignment(
+    assignment: schemas.ActionAssignmentCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    action = db.query(models.AutomationAction).filter(models.AutomationAction.id == assignment.action_id).first()
+    element = db.query(models.PageElement).filter(models.PageElement.id == assignment.element_id).first()
+    test = db.query(models.TestCase).filter(models.TestCase.id == assignment.test_id).first()
+    if not action or not element or not test:
+        raise HTTPException(status_code=404, detail="Related objects not found")
+    security.validate_assignment_params(action.argumentos, assignment.parametros or {})
+    db_assignment = models.ActionAssignment(
+        action_id=assignment.action_id,
+        element_id=assignment.element_id,
+        test_id=assignment.test_id,
+        parametros=json.dumps(assignment.parametros or {}),
+    )
+    try:
+        db.add(db_assignment)
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Integrity error")
+    db.refresh(db_assignment)
+    return db_assignment
+
+
+@router.get("/assignments/", response_model=list[schemas.ActionAssignment])
+def read_assignments(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    assignments = db.query(models.ActionAssignment).all()
+    for a in assignments:
+        a.parametros = json.loads(a.parametros or "{}")
+    return assignments
+
+
+@router.get("/assignments/{assignment_id}", response_model=schemas.ActionAssignment)
+def read_assignment(
+    assignment_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    a = db.query(models.ActionAssignment).filter(models.ActionAssignment.id == assignment_id).first()
+    if not a:
+        raise HTTPException(status_code=404, detail="Assignment not found")
+    a.parametros = json.loads(a.parametros or "{}")
+    return a
+
+
+@router.put("/assignments/{assignment_id}", response_model=schemas.ActionAssignment)
+def update_assignment(
+    assignment_id: int,
+    assignment_in: schemas.ActionAssignmentCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    a = db.query(models.ActionAssignment).filter(models.ActionAssignment.id == assignment_id).first()
+    if not a:
+        raise HTTPException(status_code=404, detail="Assignment not found")
+    action = db.query(models.AutomationAction).filter(models.AutomationAction.id == assignment_in.action_id).first()
+    element = db.query(models.PageElement).filter(models.PageElement.id == assignment_in.element_id).first()
+    test = db.query(models.TestCase).filter(models.TestCase.id == assignment_in.test_id).first()
+    if not action or not element or not test:
+        raise HTTPException(status_code=404, detail="Related objects not found")
+    security.validate_assignment_params(action.argumentos, assignment_in.parametros or {})
+    for field, value in {
+        "action_id": assignment_in.action_id,
+        "element_id": assignment_in.element_id,
+        "test_id": assignment_in.test_id,
+        "parametros": json.dumps(assignment_in.parametros or {}),
+    }.items():
+        setattr(a, field, value)
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Integrity error")
+    db.refresh(a)
+    a.parametros = json.loads(a.parametros or "{}")
+    return a
+
+
+@router.delete("/assignments/{assignment_id}")
+def delete_assignment(
+    assignment_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    a = db.query(models.ActionAssignment).filter(models.ActionAssignment.id == assignment_id).first()
+    if not a:
+        raise HTTPException(status_code=404, detail="Assignment not found")
+    db.delete(a)
+    db.commit()
+    return {"ok": True}
     try:
         security.rate_limit_login(ip)
     except HTTPException:
