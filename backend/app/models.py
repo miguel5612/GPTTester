@@ -173,3 +173,11 @@ class ActionAssignment(Base):
     action = relationship("AutomationAction")
     element = relationship("PageElement")
     test = relationship("TestCase")
+
+class ExecutionAgent(Base):
+    __tablename__ = "agents"
+    id = Column(Integer, primary_key=True, index=True)
+    alias = Column(String, nullable=False)
+    hostname = Column(String, unique=True, nullable=False)
+    os = Column(String, nullable=False)
+    categoria = Column(String, nullable=True)

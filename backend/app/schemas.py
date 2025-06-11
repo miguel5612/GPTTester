@@ -186,3 +186,32 @@ class ActionAssignment(ActionAssignmentBase):
 
     class Config:
         orm_mode = True
+
+class AgentBase(BaseModel):
+    alias: str = Field(..., min_length=1)
+    hostname: str = Field(..., min_length=1)
+    os: str = Field(...)
+    categoria: Optional[str] = None
+
+    @root_validator
+    def validate_fields(cls, values):
+        os_val = values.get('os')
+        categoria = values.get('categoria')
+        allowed = ["Windows", "Linux", "Mac", "Android", "iOS"]
+        if os_val not in allowed:
+            raise ValueError("Invalid operating system")
+        if categoria:
+            if categoria != "granja m\u00f3vil":
+                raise ValueError("Invalid categoria")
+            if os_val not in ["Android", "iOS"]:
+                raise ValueError("categoria only allowed for Android/iOS agents")
+        return values
+
+class AgentCreate(AgentBase):
+    pass
+
+class Agent(AgentBase):
+    id: int
+
+    class Config:
+        orm_mode = True

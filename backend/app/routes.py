@@ -794,6 +794,74 @@ def delete_assignment(
     db.delete(a)
     db.commit()
     return {"ok": True}
+
+# CRUD for execution agents
+@router.post("/agents/", response_model=schemas.Agent)
+def create_agent(
+    agent: schemas.AgentCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    if db.query(models.ExecutionAgent).filter(models.ExecutionAgent.hostname == agent.hostname).first():
+        raise HTTPException(status_code=400, detail="Hostname already registered")
+    db_agent = models.ExecutionAgent(**agent.dict())
+    db.add(db_agent)
+    db.commit()
+    db.refresh(db_agent)
+    return db_agent
+
+
+@router.get("/agents/", response_model=list[schemas.Agent])
+def read_agents(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    return db.query(models.ExecutionAgent).all()
+
+
+@router.get("/agents/{agent_id}", response_model=schemas.Agent)
+def read_agent(
+    agent_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    agent = db.query(models.ExecutionAgent).filter(models.ExecutionAgent.id == agent_id).first()
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    return agent
+
+
+@router.put("/agents/{agent_id}", response_model=schemas.Agent)
+def update_agent(
+    agent_id: int,
+    agent_in: schemas.AgentCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    agent = db.query(models.ExecutionAgent).filter(models.ExecutionAgent.id == agent_id).first()
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    if agent.hostname != agent_in.hostname and db.query(models.ExecutionAgent).filter(models.ExecutionAgent.hostname == agent_in.hostname).first():
+        raise HTTPException(status_code=400, detail="Hostname already registered")
+    for field, value in agent_in.dict().items():
+        setattr(agent, field, value)
+    db.commit()
+    db.refresh(agent)
+    return agent
+
+
+@router.delete("/agents/{agent_id}")
+def delete_agent(
+    agent_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    agent = db.query(models.ExecutionAgent).filter(models.ExecutionAgent.id == agent_id).first()
+    if not agent:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    db.delete(agent)
+    db.commit()
+    return {"ok": True}
     try:
         security.rate_limit_login(ip)
     except HTTPException:

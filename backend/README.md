@@ -137,3 +137,20 @@ Endpoints principales:
 - `GET /assignments/{id}` obtener una asignación
 - `PUT /assignments/{id}` actualizar asignación
 - `DELETE /assignments/{id}` eliminar asignación
+
+### Agentes de ejecuci\u00f3n
+
+Los agentes representan m\u00e1quinas o dispositivos en los que se ejecutan las pruebas. Deben registrar:
+
+- `alias`
+- `hostname` \u00fanico en toda la plataforma
+- `os` (Windows, Linux, Mac, Android, iOS)
+- `categoria` opcional `granja m\u00f3vil` para dispositivos Android/iOS
+
+Endpoints principales:
+
+- `POST /agents/` crear agente
+- `GET /agents/` listar agentes
+- `GET /agents/{id}` obtener agente
+- `PUT /agents/{id}` actualizar agente
+- `DELETE /agents/{id}` eliminar agente
