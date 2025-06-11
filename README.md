@@ -18,3 +18,7 @@ Configura la variable `DATABASE_URL` seg\u00fan tu entorno y ejecuta la aplicaci
 ```bash
 uvicorn app.main:app --reload
 ```
+
+## Autenticación
+
+Regístrate enviando un POST a `/users/` con `username` y `password`. El login se realiza en `/token` utilizando un formulario `application/x-www-form-urlencoded`.
