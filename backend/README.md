@@ -169,3 +169,19 @@ Endpoints principales:
 - `DELETE /executionplans/{id}` eliminar plan
 - `POST /executionplans/{id}/run` disparar la ejecución y registrar el estado inicial. Si el agente ya tiene una ejecución pendiente se rechaza la petición.
 - `GET /agents/{hostname}/pending` un agente autenticado consulta su próxima ejecución pendiente y recibe el plan, caso de prueba, elementos y acciones con parámetros
+
+## Colección Postman
+
+Para facilitar las pruebas manuales o de integración se incluye el script
+`generate_postman.py` ubicado en la raíz del repositorio. Al ejecutarlo se toma
+el esquema OpenAPI de la aplicación y se genera automáticamente una colección
+compatible con Postman.
+
+```bash
+python generate_postman.py
+```
+
+Se crearán los archivos `postman/collection.json` y `postman/environment.json`
+que puedes importar directamente en Postman. La colección contiene ejemplos de
+cada endpoint y variables de entorno como `base_url` y `token` para que puedas
+ejecutar las peticiones rápidamente.
