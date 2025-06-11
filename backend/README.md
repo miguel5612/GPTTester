@@ -1,6 +1,6 @@
 # Test Automation API
 
-Este proyecto contiene la estructura b\u00e1sica de un backend en Python utilizando FastAPI y SQLAlchemy. Incluye modelos para usuarios y pruebas, autenticaci\u00f3n mediante JWT y rutas CRUD protegidas. Es un punto de partida para ampliar con funcionalidades de automatizaci\u00f3n de pruebas.
+Este proyecto contiene la estructura básica de un backend en Python utilizando FastAPI y SQLAlchemy. Incluye modelos para usuarios y pruebas, autenticación mediante JWT y rutas CRUD protegidas. Es un punto de partida para ampliar con funcionalidades de automatización de pruebas.
 
 ## Requisitos
 
@@ -13,10 +13,17 @@ Instala las dependencias con:
 pip install -r requirements.txt
 ```
 
-Configura la variable `DATABASE_URL` seg\u00fan tu entorno y ejecuta la aplicaci\u00f3n:
+Configura la variable `DATABASE_URL` según tu entorno y ejecuta la aplicación desde la raíz del repositorio:
 
 ```bash
 uvicorn backend.app.main:app --reload
+```
+
+Si prefieres iniciar el servidor dentro de la carpeta `backend`, usa la ruta relativa del paquete:
+
+```bash
+cd backend
+uvicorn app.main:app --reload
 ```
 
 ## Autenticación
@@ -33,8 +40,6 @@ Al iniciar la aplicación se crean automáticamente los roles:
 - Analista de Pruebas con skill de automatización
 
 También se genera el usuario inicial `admin` con la contraseña `admin` perteneciente al rol **Administrador**.
-
-Solo los usuarios con rol Administrador pueden administrar roles y asignarlos a otros usuarios mediante los endpoints bajo `/roles/` y `/users/{id}/role`.
 
 ## Clientes y proyectos
 
@@ -76,9 +81,7 @@ Endpoints:
 
 ### Páginas y localizadores
 
-Se implementa la gestión de páginas siguiendo el patrón Screenplay. Cada página
-puede contener múltiples elementos (botones, campos de entrada, etc.). Para cada
-elemento se registran:
+Se implementa la gestión de páginas siguiendo el patrón Screenplay. Cada página puede contener múltiples elementos (botones, campos de entrada, etc.). Para cada elemento se registran:
 
 - `nombre`
 - `tipo`
@@ -86,8 +89,7 @@ elemento se registran:
 - `valor` del localizador
 - `descripcion` de uso
 
-Los elementos son únicos por página y pueden asociarse a casos de prueba para
-favorecer su reutilización en distintos flujos.
+Los elementos son únicos por página y pueden asociarse a casos de prueba para favorecer su reutilización en distintos flujos.
 
 Endpoints principales:
 
@@ -126,9 +128,7 @@ Endpoints principales:
 
 ### Asignación de acciones a objetos
 
-Permite vincular una acción con un elemento de página en un `TestCase` e indicar
-los parámetros concretos a usar. Se valida que los parámetros requeridos por la
-acción estén presentes.
+Permite vincular una acción con un elemento de página en un `TestCase` e indicar los parámetros concretos a usar. Se valida que los parámetros requeridos por la acción estén presentes.
 
 Endpoints principales:
 
@@ -138,14 +138,14 @@ Endpoints principales:
 - `PUT /assignments/{id}` actualizar asignación
 - `DELETE /assignments/{id}` eliminar asignación
 
-### Agentes de ejecuci\u00f3n
+### Agentes de ejecución
 
-Los agentes representan m\u00e1quinas o dispositivos en los que se ejecutan las pruebas. Deben registrar:
+Los agentes representan máquinas o dispositivos en los que se ejecutan las pruebas. Deben registrar:
 
 - `alias`
-- `hostname` \u00fanico en toda la plataforma
+- `hostname` único en toda la plataforma
 - `os` (Windows, Linux, Mac, Android, iOS)
-- `categoria` opcional `granja m\u00f3vil` para dispositivos Android/iOS
+- `categoria` opcional `granja móvil` para dispositivos Android/iOS
 
 Endpoints principales:
 
