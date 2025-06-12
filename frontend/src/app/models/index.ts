@@ -32,6 +32,12 @@ export interface Test {
   description?: string;
   owner_id: number;
   actions: Action[];
+  priority?: string;
+  status?: string;
+  given?: string;
+  when?: string;
+  then?: string;
+  test_plan_id?: number;
 }
 
 export interface TestPlan {
@@ -141,6 +147,12 @@ export interface ProjectCreate {
 export interface TestCreate {
   name: string;
   description?: string;
+  priority?: string;
+  status?: string;
+  given?: string;
+  when?: string;
+  then?: string;
+  test_plan_id?: number;
 }
 
 export interface TestPlanCreate {

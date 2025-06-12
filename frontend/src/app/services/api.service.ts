@@ -126,8 +126,14 @@ export class ApiService {
   }
 
   // Tests
-  getTests(): Observable<Test[]> {
-    return this.http.get<Test[]>(`${this.baseUrl}/tests/`, { headers: this.getHeaders() });
+  getTests(search?: string, priority?: string, status?: string, planId?: number): Observable<Test[]> {
+    const params: string[] = [];
+    if (search) params.push(`search=${encodeURIComponent(search)}`);
+    if (priority) params.push(`priority=${priority}`);
+    if (status) params.push(`status=${status}`);
+    if (planId !== undefined) params.push(`test_plan_id=${planId}`);
+    const query = params.length ? `?${params.join('&')}` : '';
+    return this.http.get<Test[]>(`${this.baseUrl}/tests/${query}`, { headers: this.getHeaders() });
   }
 
   getTest(id: number): Observable<Test> {
@@ -136,6 +142,10 @@ export class ApiService {
 
   createTest(test: TestCreate): Observable<Test> {
     return this.http.post<Test>(`${this.baseUrl}/tests/`, test, { headers: this.getHeaders() });
+  }
+
+  updateTest(id: number, test: TestCreate): Observable<Test> {
+    return this.http.put<Test>(`${this.baseUrl}/tests/${id}`, test, { headers: this.getHeaders() });
   }
 
   deleteTest(id: number): Observable<any> {
