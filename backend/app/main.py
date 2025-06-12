@@ -13,7 +13,8 @@ def init_data():
             "Administrador",
             "Arquitecto de Automatización",
             "Automation Engineer",
-            "Analista de Pruebas con skill de automatización",
+            "Automatizador de Pruebas",
+            "Analista de Pruebas con skill de automatización"            
         ]
         for name in predefined:
             if not db.query(models.Role).filter(models.Role.name == name).first():
