@@ -79,6 +79,14 @@ export class ApiService {
     return this.http.put<User>(`${this.baseUrl}/users/${userId}/role`, roleUpdate, { headers: this.getHeaders() });
   }
 
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.baseUrl}/users/`, { headers: this.getHeaders() });
+  }
+
+  getUser(id: number): Observable<User> {
+    return this.http.get<User>(`${this.baseUrl}/users/${id}`, { headers: this.getHeaders() });
+  }
+
   // Clientes
   getClients(): Observable<Client[]> {
     return this.http.get<Client[]>(`${this.baseUrl}/clients/`, { headers: this.getHeaders() });

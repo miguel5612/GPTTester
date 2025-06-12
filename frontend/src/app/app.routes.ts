@@ -15,8 +15,12 @@ export const routes: Routes = [
     loadComponent: () => import('./components/dashboard/dashboard.component').then(m => m.DashboardComponent)
   },
   {
-    path: 'actors',
-    loadComponent: () => import('./components/actors/actors.component').then(m => m.ActorsComponent)
+    path: 'users',
+    loadComponent: () => import('./components/users/users.component').then(m => m.UsersComponent)
+  },
+  {
+    path: 'roles',
+    loadComponent: () => import('./components/roles/roles.component').then(m => m.RolesComponent)
   },
   {
     path: 'flow-builder',
