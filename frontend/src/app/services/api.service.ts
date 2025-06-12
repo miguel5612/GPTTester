@@ -336,6 +336,22 @@ export class ApiService {
     return this.http.get<PendingExecution>(`${this.baseUrl}/agents/${hostname}/pending`, { headers: this.getHeaders() });
   }
 
+  getExecutions(planId?: number, agentId?: number): Observable<PlanExecution[]> {
+    const params: string[] = [];
+    if (planId) params.push(`plan_id=${planId}`);
+    if (agentId) params.push(`agent_id=${agentId}`);
+    const query = params.length ? `?${params.join('&')}` : '';
+    return this.http.get<PlanExecution[]>(`${this.baseUrl}/executions/${query}`, { headers: this.getHeaders() });
+  }
+
+  getExecution(id: number): Observable<PlanExecution> {
+    return this.http.get<PlanExecution>(`${this.baseUrl}/executions/${id}`, { headers: this.getHeaders() });
+  }
+
+  downloadExecutionFile(id: number, type: 'report' | 'evidence'): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/executions/${id}/${type}`, { headers: this.getHeaders(), responseType: 'blob' as any });
+  }
+
   isAuthenticated(): boolean {
     return !!this.tokenSubject.value;
   }
