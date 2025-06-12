@@ -125,6 +125,14 @@ export class ApiService {
     return this.http.delete<Project>(`${this.baseUrl}/projects/${projectId}/analysts/${userId}`, { headers: this.getHeaders() });
   }
 
+  assignAgentToProject(agentId: number, projectId: number): Observable<Project> {
+    return this.http.post<Project>(`${this.baseUrl}/agents/${agentId}/projects/${projectId}`, {}, { headers: this.getHeaders() });
+  }
+
+  removeAgentFromProject(agentId: number, projectId: number): Observable<Project> {
+    return this.http.delete<Project>(`${this.baseUrl}/agents/${agentId}/projects/${projectId}`, { headers: this.getHeaders() });
+  }
+
   // Tests
   getTests(search?: string, priority?: string, status?: string, planId?: number): Observable<Test[]> {
     const params: string[] = [];
