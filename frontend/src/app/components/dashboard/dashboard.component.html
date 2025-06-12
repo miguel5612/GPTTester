@@ -1,0 +1,244 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <h1 class="fade-in">Analista de Pruebas</h1>
+    <div class="user-info" *ngIf="currentUser">
+      <span class="text-secondary">Bienvenido, {{ currentUser.username }}</span>
+      <span class="badge badge-role">{{ currentUser.role?.name }}</span>
+    </div>
+  </header>
+
+  <!-- Main Panel -->
+  <div class="main-panel">
+    
+    <!-- Gestión de Actores Section -->
+    <div class="section">
+      <h2>Gestión de Actores</h2>
+      <div class="row">
+        <div class="col-md-8">
+          <p class="text-secondary">Administra los actores del sistema de automatización</p>
+          <div class="actors-grid">
+            <div class="actor-card" *ngFor="let agent of agents">
+              <div class="actor-icon">🤖</div>
+              <div class="actor-info">
+                <h4>{{ agent.alias }}</h4>
+                <p class="text-secondary">{{ agent.os }} - {{ agent.hostname }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <button class="btn-primary" (click)="createNewActor()">
+            <span>➕</span> Crear Actor
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Creación de Flujos Section -->
+    <div class="section">
+      <h2>Creación de Flujos de Automatización</h2>
+      
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <div class="progress-track">
+          <div class="progress-bar"></div>
+        </div>
+        <div class="step-indicators">
+          <div class="step-indicator" [class.active]="currentStep >= 1">1</div>
+          <div class="step-indicator" [class.active]="currentStep >= 2">2</div>
+          <div class="step-indicator" [class.active]="currentStep >= 3">3</div>
+          <div class="step-indicator" [class.active]="currentStep >= 4">4</div>
+        </div>
+      </div>
+
+      <!-- Step 1: Select Test -->
+      <div class="flow-step" *ngIf="currentStep === 0">
+        <h3>Seleccionar Caso de Prueba</h3>
+        <div class="test-selector">
+          <div class="test-grid">
+            <div class="test-card" 
+                 *ngFor="let test of tests" 
+                 (click)="selectTest(test)"
+                 [class.selected]="selectedTest?.id === test.id">
+              <div class="test-icon">📋</div>
+              <div class="test-info">
+                <h4>{{ test.name }}</h4>
+                <p class="text-secondary">{{ test.description || 'Sin descripción' }}</p>
+              </div>
+            </div>
+          </div>
+          <button class="flow-btn" (click)="createNewTest()">
+            <span>➕</span> Crear Nuevo Test
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Build Flow -->
+      <div class="flow-step" *ngIf="currentStep >= 1">
+        <h3>Construir Flujo</h3>
+        <div class="row">
+          <div class="col-md-6">
+            <h4>Acciones Disponibles</h4>
+            <div class="actions-list">
+              <div class="action-item" 
+                   *ngFor="let action of actions"
+                   (click)="addAction(action)">
+                <span class="action-type">{{ action.tipo }}</span>
+                <span class="action-name">{{ action.name }}</span>
+                <button class="flow-btn">→</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h4>Flujo Actual</h4>
+            <div class="flow-builder">
+              <div class="flow-item" *ngFor="let step of flowSteps; let i = index">
+                <div class="flow-number">{{ i + 1 }}</div>
+                <div class="flow-content">
+                  <span *ngIf="step.action">{{ step.action.name }}</span>
+                  <span *ngIf="step.type === 'condition'" class="condition">
+                    Condición: {{ step.value }}
+                  </span>
+                </div>
+                <button class="flow-btn-remove" 
+                        *ngIf="step.action"
+                        (click)="removeAction(step.action)">✕</button>
+              </div>
+              
+              <!-- Add Condition Button -->
+              <div class="flow-controls">
+                <button class="flow-btn" (click)="toggleConditionField()">
+                  <span>🔀</span> Agregar Condición
+                </button>
+                
+                <!-- Expandable Condition Field -->
+                <div class="expandable-field" [class.expanded]="showConditionField">
+                  <div class="condition-input">
+                    <input type="text" 
+                           class="form-control" 
+                           placeholder="Ingrese la condición..."
+                           [(ngModel)]="conditionValue">
+                    <button class="btn-primary" (click)="addCondition()">Agregar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flow-actions" *ngIf="flowSteps.length > 0">
+          <button class="btn-primary" (click)="previewFlow()">Vista Previa</button>
+          <button class="flow-btn" (click)="resetFlow()">Reiniciar</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Preview -->
+      <div class="flow-step" *ngIf="currentStep === 3">
+        <h3>Vista Previa del Flujo</h3>
+        <div class="flow-preview">
+          <div class="preview-header">
+            <h4>{{ selectedTest?.name }}</h4>
+            <p class="text-secondary">{{ flowSteps.length }} pasos configurados</p>
+          </div>
+          
+          <div class="preview-steps">
+            <div class="preview-step" 
+                 *ngFor="let step of flowSteps; let i = index"
+                 [class.completed]="step.completed">
+              <div class="step-number">{{ i + 1 }}</div>
+              <div class="step-details">
+                <span *ngIf="step.action">{{ step.action.name }}</span>
+                <span *ngIf="step.type === 'condition'" class="condition">
+                  {{ step.value }}
+                </span>
+              </div>
+              <div class="step-status">
+                <span *ngIf="step.completed" class="status-completed">✓</span>
+                <span *ngIf="!step.completed" class="status-pending">⏳</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="preview-actions">
+            <button class="btn-primary" (click)="executeFlow()">Ejecutar Flujo</button>
+            <button class="flow-btn" (click)="currentStep = 2">Editar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Execution -->
+      <div class="flow-step" *ngIf="currentStep === 4">
+        <h3>Ejecución en Progreso</h3>
+        <div class="execution-status">
+          <div class="execution-info">
+            <h4>{{ selectedTest?.name }}</h4>
+            <p class="text-secondary">Ejecutando en agente disponible...</p>
+          </div>
+          
+          <div class="execution-progress">
+            <div class="progress-track">
+              <div class="progress-bar" style="width: 75%;"></div>
+            </div>
+            <span class="progress-text">75% completado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Logs y Debug Section -->
+    <div class="section">
+      <h2>Logs y Debug</h2>
+      <div class="logs-container">
+        <div class="log-tabs">
+          <button class="log-tab active">Ejecución</button>
+          <button class="log-tab">Errores</button>
+          <button class="log-tab">Debug</button>
+        </div>
+        
+        <div class="log-content">
+          <div class="log-entry">
+            <span class="log-time">10:30:15</span>
+            <span class="log-level info">INFO</span>
+            <span class="log-message">Iniciando ejecución del flujo...</span>
+          </div>
+          <div class="log-entry">
+            <span class="log-time">10:30:16</span>
+            <span class="log-level success">SUCCESS</span>
+            <span class="log-message">Elemento encontrado: #login-button</span>
+          </div>
+          <div class="log-entry log-highlight">
+            <span class="log-time">10:30:17</span>
+            <span class="log-level warning">WARNING</span>
+            <span class="log-message">
+              Diferencia detectada - Esperado: "Login", Actual: "Iniciar Sesión"
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section">
+      <h2>Acciones Rápidas</h2>
+      <div class="quick-actions">
+        <button class="flow-btn" routerLink="/test-plans">
+          <span>📊</span> Planes de Prueba
+        </button>
+        <button class="flow-btn" routerLink="/actors">
+          <span>👥</span> Gestionar Actores
+        </button>
+        <button class="flow-btn" routerLink="/execution">
+          <span>▶️</span> Centro de Ejecución
+        </button>
+        <button class="flow-btn" (click)="resetFlow()">
+          <span>🔄</span> Nuevo Flujo
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

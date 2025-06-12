@@ -1,0 +1,424 @@
+/* Variables de colores según especificaciones */
+:root {
+  --bg-general: #E6F0FA;
+  --bg-general-alt: #D9EBFF;
+  --panel-bg: #FFFFFF;
+  --btn-primary: #3399FF;
+  --btn-primary-text: #FFFFFF;
+  --title-color: #1A1A1A;
+  --subtitle-color: #333333;
+  --input-bg: #F9F9F9;
+  --border-color: #DDDDDD;
+  --input-text: #555555;
+  --checkbox-color: #CCCCCC;
+  --secondary-text: #666666;
+}
+
+/* Reset y configuración base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Roboto', 'Open Sans', 'Lato', sans-serif;
+  background: linear-gradient(135deg, var(--bg-general) 0%, var(--bg-general-alt) 100%);
+  min-height: 100vh;
+  color: var(--title-color);
+  line-height: 1.6;
+  animation: fadeInBackground 0.8s ease-out;
+}
+
+/* Animación de entrada del fondo */
+@keyframes fadeInBackground {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Panel principal */
+.main-panel {
+  background: var(--panel-bg);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 1200px;
+  animation: panelEntrance 0.6s ease-out 0.2s both;
+}
+
+@keyframes panelEntrance {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Títulos y encabezados */
+h1 {
+  color: var(--title-color);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+h2 {
+  color: var(--subtitle-color);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+h3 {
+  color: var(--subtitle-color);
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+/* Secciones con animación secuencial */
+.section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--border-color);
+  animation: sectionSlideIn 0.5s ease-out both;
+}
+
+.section:nth-child(1) { animation-delay: 0.3s; }
+.section:nth-child(2) { animation-delay: 0.4s; }
+.section:nth-child(3) { animation-delay: 0.5s; }
+.section:nth-child(4) { animation-delay: 0.6s; }
+.section:nth-child(5) { animation-delay: 0.7s; }
+
+@keyframes sectionSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Botones */
+.btn-primary {
+  background: var(--btn-primary);
+  color: var(--btn-primary-text);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(51, 153, 255, 0.3);
+}
+
+.btn-primary:hover {
+  background: #2980e6;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 4px 16px rgba(51, 153, 255, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Botones dinámicos tipo flow builder */
+.flow-btn {
+  background: var(--panel-bg);
+  border: 2px solid var(--btn-primary);
+  color: var(--btn-primary);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.flow-btn:hover {
+  background: var(--btn-primary);
+  color: var(--btn-primary-text);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(51, 153, 255, 0.3);
+}
+
+/* Campos de entrada */
+.form-control {
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  color: var(--input-text);
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--btn-primary);
+  box-shadow: 0 0 0 3px rgba(51, 153, 255, 0.1);
+  background: var(--panel-bg);
+}
+
+/* Selectores dropdown */
+.form-select {
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  color: var(--input-text);
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--btn-primary);
+  box-shadow: 0 0 0 3px rgba(51, 153, 255, 0.1);
+}
+
+/* Animación para dropdown */
+.dropdown-menu {
+  animation: dropdownSlide 0.3s ease-out;
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Checkboxes personalizados */
+.form-check-input {
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 2px solid var(--checkbox-color);
+  border-radius: 4px;
+  background: var(--panel-bg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.form-check-input:checked {
+  background: var(--btn-primary);
+  border-color: var(--btn-primary);
+  animation: checkboxCheck 0.3s ease;
+}
+
+@keyframes checkboxCheck {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Texto secundario */
+.text-secondary {
+  color: var(--secondary-text);
+  font-size: 0.9rem;
+}
+
+/* Líneas divisoras */
+.divider {
+  height: 1px;
+  background: var(--checkbox-color);
+  margin: 1.5rem 0;
+  opacity: 0.6;
+}
+
+/* Barra de progreso para vista previa de flujo */
+.progress-bar {
+  background: var(--btn-primary);
+  height: 6px;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: progressShine 2s infinite;
+}
+
+@keyframes progressShine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Indicadores de pasos */
+.step-indicator {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--checkbox-color);
+  color: var(--panel-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.step-indicator.active {
+  background: var(--btn-primary);
+  animation: stepActivate 0.5s ease;
+}
+
+@keyframes stepActivate {
+  0% {
+    transform: scale(0.8);
+    background: var(--checkbox-color);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    background: var(--btn-primary);
+  }
+}
+
+/* Logs y debug con resaltado */
+.log-highlight {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  padding: 0.5rem;
+  border-radius: 4px;
+  animation: highlightFade 2s ease-out;
+}
+
+@keyframes highlightFade {
+  0% {
+    background: #fff3cd;
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+/* Campos que se expanden dinámicamente */
+.expandable-field {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s ease;
+}
+
+.expandable-field.expanded {
+  max-height: 200px;
+  padding: 1rem 0;
+  animation: slideDown 0.4s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Utilidades de animación */
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main-panel {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .section {
+    padding: 1rem;
+  }
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--input-bg);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--checkbox-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--btn-primary);
+}
