@@ -224,8 +224,12 @@ export class ApiService {
   }
 
   // Actions
-  getActions(): Observable<Action[]> {
-    return this.http.get<Action[]>(`${this.baseUrl}/actions/`, { headers: this.getHeaders() });
+  getActions(search?: string, tipo?: string): Observable<Action[]> {
+    const params: string[] = [];
+    if (search) params.push(`search=${encodeURIComponent(search)}`);
+    if (tipo) params.push(`tipo=${tipo}`);
+    const query = params.length ? `?${params.join('&')}` : '';
+    return this.http.get<Action[]>(`${this.baseUrl}/actions/${query}`, { headers: this.getHeaders() });
   }
 
   getAction(id: number): Observable<Action> {
