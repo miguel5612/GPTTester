@@ -1,7 +1,9 @@
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import FileResponse
 import json
 from datetime import datetime
+import os
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -73,6 +75,19 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(deps.get_db)):
     db.commit()
     db.refresh(new_user)
     return new_user
+
+
+@router.get("/users/", response_model=list[schemas.User])
+def read_users(db: Session = Depends(deps.get_db), current_user: models.User = deps.require_role(["Administrador"])):
+    return db.query(models.User).all()
+
+
+@router.get("/users/{user_id}", response_model=schemas.User)
+def read_user(user_id: int, db: Session = Depends(deps.get_db), current_user: models.User = deps.require_role(["Administrador"])):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 
 @router.put("/users/{user_id}/role", response_model=schemas.User)
@@ -970,6 +985,50 @@ def run_execution_plan(
     return record
 
 
+@router.get("/executions/", response_model=list[schemas.PlanExecution])
+def read_executions(
+    plan_id: int | None = None,
+    agent_id: int | None = None,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    query = db.query(models.PlanExecution)
+    if plan_id is not None:
+        query = query.filter(models.PlanExecution.plan_id == plan_id)
+    if agent_id is not None:
+        query = query.filter(models.PlanExecution.agent_id == agent_id)
+    return query.all()
+
+
+@router.get("/executions/{execution_id}", response_model=schemas.PlanExecution)
+def read_execution(
+    execution_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    record = db.query(models.PlanExecution).filter(models.PlanExecution.id == execution_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Execution not found")
+    return record
+
+
+@router.get("/executions/{execution_id}/{file_type}")
+def get_execution_file(
+    execution_id: int,
+    file_type: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    record = db.query(models.PlanExecution).filter(models.PlanExecution.id == execution_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Execution not found")
+    filename = f"{file_type}_{execution_id}.{'pdf' if file_type == 'report' else 'zip'}"
+    path = os.path.join('/tmp', filename)
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(path, filename=filename)
+
+
 @router.get("/agents/{hostname}/pending", response_model=schemas.PendingExecution)
 def get_pending_execution(
     hostname: str,
@@ -1046,14 +1105,47 @@ def create_test(test: schemas.TestCreate, db: Session = Depends(deps.get_db), cu
     return db_test
 
 @router.get("/tests/", response_model=list[schemas.Test])
-def read_tests(db: Session = Depends(deps.get_db), current_user: models.User = Depends(deps.get_current_user)):
-    return db.query(models.TestCase).filter(models.TestCase.owner_id == current_user.id).all()
+def read_tests(
+    search: str | None = None,
+    priority: str | None = None,
+    status: str | None = None,
+    test_plan_id: int | None = None,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    query = db.query(models.TestCase).filter(models.TestCase.owner_id == current_user.id)
+    if search is not None:
+        query = query.filter(models.TestCase.name.ilike(f"%{search}%"))
+    if priority is not None:
+        query = query.filter(models.TestCase.priority == priority)
+    if status is not None:
+        query = query.filter(models.TestCase.status == status)
+    if test_plan_id is not None:
+        query = query.filter(models.TestCase.test_plan_id == test_plan_id)
+    return query.all()
 
 @router.get("/tests/{test_id}", response_model=schemas.Test)
 def read_test(test_id: int, db: Session = Depends(deps.get_db), current_user: models.User = Depends(deps.get_current_user)):
     test = db.query(models.TestCase).filter(models.TestCase.id == test_id, models.TestCase.owner_id == current_user.id).first()
     if test is None:
         raise HTTPException(status_code=404, detail="Test not found")
+    return test
+
+
+@router.put("/tests/{test_id}", response_model=schemas.Test)
+def update_test(
+    test_id: int,
+    test_in: schemas.TestCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    test = db.query(models.TestCase).filter(models.TestCase.id == test_id, models.TestCase.owner_id == current_user.id).first()
+    if test is None:
+        raise HTTPException(status_code=404, detail="Test not found")
+    for field, value in test_in.dict().items():
+        setattr(test, field, value)
+    db.commit()
+    db.refresh(test)
     return test
 
 @router.delete("/tests/{test_id}")

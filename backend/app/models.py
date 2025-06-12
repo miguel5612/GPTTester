@@ -33,6 +33,12 @@ class TestCase(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     description = Column(String, nullable=True)
+    priority = Column(String, nullable=True)
+    status = Column(String, nullable=True)
+    given = Column(String, nullable=True)
+    when = Column(String, nullable=True)
+    then = Column(String, nullable=True)
+    test_plan_id = Column(Integer, ForeignKey("testplans.id"), nullable=True)
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="tests")
@@ -46,6 +52,7 @@ class TestCase(Base):
         secondary="test_actions",
         back_populates="tests",
     )
+    plan = relationship("TestPlan")
 
 
 project_analysts = Table(

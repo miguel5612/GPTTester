@@ -79,6 +79,14 @@ export class ApiService {
     return this.http.put<User>(`${this.baseUrl}/users/${userId}/role`, roleUpdate, { headers: this.getHeaders() });
   }
 
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.baseUrl}/users/`, { headers: this.getHeaders() });
+  }
+
+  getUser(id: number): Observable<User> {
+    return this.http.get<User>(`${this.baseUrl}/users/${id}`, { headers: this.getHeaders() });
+  }
+
   // Clientes
   getClients(): Observable<Client[]> {
     return this.http.get<Client[]>(`${this.baseUrl}/clients/`, { headers: this.getHeaders() });
@@ -125,9 +133,23 @@ export class ApiService {
     return this.http.delete<Project>(`${this.baseUrl}/projects/${projectId}/analysts/${userId}`, { headers: this.getHeaders() });
   }
 
+  assignAgentToProject(agentId: number, projectId: number): Observable<Project> {
+    return this.http.post<Project>(`${this.baseUrl}/agents/${agentId}/projects/${projectId}`, {}, { headers: this.getHeaders() });
+  }
+
+  removeAgentFromProject(agentId: number, projectId: number): Observable<Project> {
+    return this.http.delete<Project>(`${this.baseUrl}/agents/${agentId}/projects/${projectId}`, { headers: this.getHeaders() });
+  }
+
   // Tests
-  getTests(): Observable<Test[]> {
-    return this.http.get<Test[]>(`${this.baseUrl}/tests/`, { headers: this.getHeaders() });
+  getTests(search?: string, priority?: string, status?: string, planId?: number): Observable<Test[]> {
+    const params: string[] = [];
+    if (search) params.push(`search=${encodeURIComponent(search)}`);
+    if (priority) params.push(`priority=${priority}`);
+    if (status) params.push(`status=${status}`);
+    if (planId !== undefined) params.push(`test_plan_id=${planId}`);
+    const query = params.length ? `?${params.join('&')}` : '';
+    return this.http.get<Test[]>(`${this.baseUrl}/tests/${query}`, { headers: this.getHeaders() });
   }
 
   getTest(id: number): Observable<Test> {
@@ -136,6 +158,10 @@ export class ApiService {
 
   createTest(test: TestCreate): Observable<Test> {
     return this.http.post<Test>(`${this.baseUrl}/tests/`, test, { headers: this.getHeaders() });
+  }
+
+  updateTest(id: number, test: TestCreate): Observable<Test> {
+    return this.http.put<Test>(`${this.baseUrl}/tests/${id}`, test, { headers: this.getHeaders() });
   }
 
   deleteTest(id: number): Observable<any> {
@@ -205,9 +231,21 @@ export class ApiService {
     return this.http.delete(`${this.baseUrl}/elements/${id}`, { headers: this.getHeaders() });
   }
 
+  addElementToTest(elementId: number, testId: number): Observable<PageElement> {
+    return this.http.post<PageElement>(`${this.baseUrl}/elements/${elementId}/tests/${testId}`, {}, { headers: this.getHeaders() });
+  }
+
+  removeElementFromTest(elementId: number, testId: number): Observable<PageElement> {
+    return this.http.delete<PageElement>(`${this.baseUrl}/elements/${elementId}/tests/${testId}`, { headers: this.getHeaders() });
+  }
+
   // Actions
-  getActions(): Observable<Action[]> {
-    return this.http.get<Action[]>(`${this.baseUrl}/actions/`, { headers: this.getHeaders() });
+  getActions(search?: string, tipo?: string): Observable<Action[]> {
+    const params: string[] = [];
+    if (search) params.push(`search=${encodeURIComponent(search)}`);
+    if (tipo) params.push(`tipo=${tipo}`);
+    const query = params.length ? `?${params.join('&')}` : '';
+    return this.http.get<Action[]>(`${this.baseUrl}/actions/${query}`, { headers: this.getHeaders() });
   }
 
   getAction(id: number): Observable<Action> {
@@ -304,6 +342,22 @@ export class ApiService {
 
   getPendingExecution(hostname: string): Observable<PendingExecution> {
     return this.http.get<PendingExecution>(`${this.baseUrl}/agents/${hostname}/pending`, { headers: this.getHeaders() });
+  }
+
+  getExecutions(planId?: number, agentId?: number): Observable<PlanExecution[]> {
+    const params: string[] = [];
+    if (planId) params.push(`plan_id=${planId}`);
+    if (agentId) params.push(`agent_id=${agentId}`);
+    const query = params.length ? `?${params.join('&')}` : '';
+    return this.http.get<PlanExecution[]>(`${this.baseUrl}/executions/${query}`, { headers: this.getHeaders() });
+  }
+
+  getExecution(id: number): Observable<PlanExecution> {
+    return this.http.get<PlanExecution>(`${this.baseUrl}/executions/${id}`, { headers: this.getHeaders() });
+  }
+
+  downloadExecutionFile(id: number, type: 'report' | 'evidence'): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/executions/${id}/${type}`, { headers: this.getHeaders(), responseType: 'blob' as any });
   }
 
   isAuthenticated(): boolean {

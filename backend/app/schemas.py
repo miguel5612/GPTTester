@@ -20,6 +20,12 @@ class Role(RoleBase):
 class TestBase(BaseModel):
     name: str
     description: Optional[str] = None
+    priority: Optional[str] = None
+    status: Optional[str] = None
+    given: Optional[str] = None
+    when: Optional[str] = None
+    then: Optional[str] = None
+    test_plan_id: Optional[int] = None
 
 class TestCreate(TestBase):
     pass
