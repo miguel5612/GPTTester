@@ -220,7 +220,7 @@
           },
           {
             "key": "Authorization",
-            "value": "Bearer {{token
+            "value": "Bearer {{token}}"
           }
         ],
         "url": {
@@ -233,7 +233,7 @@
           ]
         },
         "body": {
-          "mode": "urlencoded",
+          "mode": "urlencoded"
         }
       },
       "response": []
