@@ -357,7 +357,10 @@ export class ApiService {
   }
 
   downloadExecutionFile(id: number, type: 'report' | 'evidence'): Observable<Blob> {
-    return this.http.get(`${this.baseUrl}/executions/${id}/${type}`, { headers: this.getHeaders(), responseType: 'blob' as any });
+    return this.http.get(`${this.baseUrl}/executions/${id}/${type}`, {
+      headers: this.getHeaders(),
+      responseType: 'blob'
+    });
   }
 
   isAuthenticated(): boolean {
