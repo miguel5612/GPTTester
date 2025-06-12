@@ -215,6 +215,14 @@ export class ApiService {
     return this.http.delete(`${this.baseUrl}/elements/${id}`, { headers: this.getHeaders() });
   }
 
+  addElementToTest(elementId: number, testId: number): Observable<PageElement> {
+    return this.http.post<PageElement>(`${this.baseUrl}/elements/${elementId}/tests/${testId}`, {}, { headers: this.getHeaders() });
+  }
+
+  removeElementFromTest(elementId: number, testId: number): Observable<PageElement> {
+    return this.http.delete<PageElement>(`${this.baseUrl}/elements/${elementId}/tests/${testId}`, { headers: this.getHeaders() });
+  }
+
   // Actions
   getActions(): Observable<Action[]> {
     return this.http.get<Action[]>(`${this.baseUrl}/actions/`, { headers: this.getHeaders() });
