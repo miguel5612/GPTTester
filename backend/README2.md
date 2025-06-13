@@ -42,6 +42,11 @@ Al iniciar la aplicación se crean automáticamente los roles:
 - Gerente de servicios
 
 También se genera el usuario inicial `admin` con la contraseña `admin` perteneciente al rol **Administrador**.
+Además, se crean tres usuarios predeterminados:
+
+- `architect` con rol **Arquitecto de Automatización** (contraseña `architect`)
+- `service_manager` con rol **Gerente de servicios** (contraseña `service_manager`)
+- `test_automator` con rol **Automatizador de Pruebas** (contraseña `test_automator`)
 
 Ahora cada rol puede tener permisos asociados a las páginas del frontend. Usa los siguientes endpoints para administrarlos:
 
@@ -51,7 +56,7 @@ Ahora cada rol puede tener permisos asociados a las páginas del frontend. Usa l
 
 ## Clientes y proyectos
 
-Los clientes y proyectos pueden gestionarse únicamente por usuarios con rol **Administrador**. Un cliente puede tener varios proyectos y ambos pueden inactivarse. Los analistas se asignan a los proyectos y solamente los analistas asignados (o los usuarios Administrador) pueden consultarlos.
+Los clientes pueden ser creados y actualizados por usuarios con rol **Administrador** o **Gerente de servicios**, mientras que la eliminación sigue reservada al **Administrador**. Un cliente puede tener varios proyectos y ambos pueden inactivarse. Los analistas se asignan a los proyectos y solamente los analistas asignados (o los usuarios Administrador) pueden consultarlos.
 
 Endpoints principales:
 

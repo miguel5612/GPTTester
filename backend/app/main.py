@@ -36,6 +36,21 @@ def init_data():
             )
             db.add(admin)
             db.commit()
+
+        # create additional default users if they do not exist
+        defaults = {
+            "architect": "Arquitecto de Automatización",
+            "service_manager": "Gerente de servicios",
+            "test_automator": "Automatizador de Pruebas",
+        }
+        for username, role_name in defaults.items():
+            if not db.query(models.User).filter(models.User.username == username).first():
+                role = db.query(models.Role).filter(models.Role.name == role_name).first()
+                if role:
+                    hashed = deps.get_password_hash(username)
+                    user = models.User(username=username, hashed_password=hashed, role=role)
+                    db.add(user)
+        db.commit()
     finally:
         db.close()
 
