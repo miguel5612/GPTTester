@@ -38,6 +38,8 @@ Al iniciar la aplicación se crean automáticamente los roles:
 - Arquitecto de Automatización
 - Automation Engineer
 - Analista de Pruebas con skill de automatización
+- Automatizador de Pruebas
+- Gerente de servicios
 
 También se genera el usuario inicial `admin` con la contraseña `admin` perteneciente al rol **Administrador**.
 

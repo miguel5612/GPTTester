@@ -164,7 +164,25 @@ export class LoginComponent {
 
     this.apiService.login(this.credentials).subscribe({
       next: () => {
-        this.router.navigate(['/dashboard']);
+        this.apiService.getCurrentUser().subscribe({
+          next: (user) => {
+            const role = user.role?.name || '';
+            this.isLoading = false;
+            if (role === 'Administrador') {
+              this.router.navigate(['/users']);
+            } else if (role === 'Arquitecto de Automatización' || role === 'Automation Engineer') {
+              this.router.navigate(['/actions']);
+            } else if (role === 'Gerente de servicios') {
+              this.router.navigate(['/client-admin']);
+            } else {
+              this.router.navigate(['/dashboard']);
+            }
+          },
+          error: () => {
+            this.isLoading = false;
+            this.router.navigate(['/dashboard']);
+          }
+        });
       },
       error: (error) => {
         this.isLoading = false;
