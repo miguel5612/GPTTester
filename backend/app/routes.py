@@ -802,6 +802,66 @@ def delete_assignment(
     db.commit()
     return {"ok": True}
 
+# CRUD for actors
+@router.post("/actors/", response_model=schemas.Actor)
+def create_actor(
+    actor: schemas.ActorCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    if not db.query(models.Client).filter(models.Client.id == actor.client_id).first():
+        raise HTTPException(status_code=404, detail="Client not found")
+    db_actor = models.Actor(name=actor.name, client_id=actor.client_id)
+    db.add(db_actor)
+    db.commit()
+    db.refresh(db_actor)
+    return db_actor
+
+
+@router.get("/actors/", response_model=list[schemas.Actor])
+def read_actors(
+    client_id: int | None = None,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    query = db.query(models.Actor)
+    if client_id is not None:
+        query = query.filter(models.Actor.client_id == client_id)
+    return query.all()
+
+
+@router.put("/actors/{actor_id}", response_model=schemas.Actor)
+def update_actor(
+    actor_id: int,
+    actor_in: schemas.ActorCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    actor = db.query(models.Actor).filter(models.Actor.id == actor_id).first()
+    if not actor:
+        raise HTTPException(status_code=404, detail="Actor not found")
+    if not db.query(models.Client).filter(models.Client.id == actor_in.client_id).first():
+        raise HTTPException(status_code=404, detail="Client not found")
+    actor.name = actor_in.name
+    actor.client_id = actor_in.client_id
+    db.commit()
+    db.refresh(actor)
+    return actor
+
+
+@router.delete("/actors/{actor_id}")
+def delete_actor(
+    actor_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    actor = db.query(models.Actor).filter(models.Actor.id == actor_id).first()
+    if not actor:
+        raise HTTPException(status_code=404, detail="Actor not found")
+    db.delete(actor)
+    db.commit()
+    return {"ok": True}
+
 # CRUD for execution agents
 @router.post("/agents/", response_model=schemas.Agent)
 def create_agent(

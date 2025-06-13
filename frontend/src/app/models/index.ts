@@ -26,6 +26,12 @@ export interface Project {
   analysts: User[];
 }
 
+export interface Actor {
+  id: number;
+  name: string;
+  client_id: number;
+}
+
 export interface Test {
   id: number;
   name: string;
@@ -193,6 +199,11 @@ export interface ActionAssignmentCreate {
   element_id: number;
   test_id: number;
   parametros?: { [key: string]: string };
+}
+
+export interface ActorCreate {
+  name: string;
+  client_id: number;
 }
 
 export interface AgentCreate {

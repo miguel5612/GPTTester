@@ -70,6 +70,17 @@ class Client(Base):
     name = Column(String, unique=True, nullable=False)
     is_active = Column(Boolean, default=True)
     projects = relationship("Project", back_populates="client")
+    actors = relationship("Actor", back_populates="client")
+
+
+class Actor(Base):
+    __tablename__ = "actors"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
+
+    client = relationship("Client", back_populates="actors")
 
 
 class Project(Base):
