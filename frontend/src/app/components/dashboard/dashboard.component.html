@@ -255,10 +255,34 @@
         <button class="flow-btn" routerLink="/execution">
           <span>▶️</span> Centro de Ejecución
         </button>
+        <button class="flow-btn" routerLink="/users" *ngIf="currentUser?.role?.name === 'Administrador'">
+          <span>👤</span> Usuarios
+        </button>
         <button class="flow-btn" (click)="resetFlow()">
           <span>🔄</span> Nuevo Flujo
         </button>
       </div>
+    </div>
+
+    <div class="section" *ngIf="currentUser?.role?.name === 'Administrador'">
+      <h2>Usuarios</h2>
+      <table class="table">
+        <thead>
+          <tr><th>Usuario</th><th>Último Login</th><th>Activo</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of users">
+            <td>{{ u.username }}</td>
+            <td>{{ u.last_login ? (u.last_login | date:'short') : '-' }}</td>
+            <td>{{ u.is_active ? 'Sí' : 'No' }}</td>
+            <td>
+              <button class="btn btn-sm btn-secondary" (click)="toggleUser(u)" [disabled]="u.id === currentUser?.id">
+                {{ u.is_active ? 'Desactivar' : 'Activar' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
   </ng-container>

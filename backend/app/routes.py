@@ -160,6 +160,24 @@ def set_user_role(
     return user
 
 
+@router.put("/users/{user_id}/active", response_model=schemas.User)
+def set_user_active(
+    user_id: int,
+    active: schemas.UserActiveUpdate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.id == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot modify your own status")
+    user.is_active = active.is_active
+    db.commit()
+    db.refresh(user)
+    return user
+
+
 @router.post("/token")
 def login_for_access_token(
     request: Request,
@@ -175,6 +193,8 @@ def login_for_access_token(
     user = deps.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Invalid username or password")
+    user.last_login = datetime.utcnow()
+    db.commit()
     token = deps.create_access_token({"sub": user.username})
     return {"access_token": token, "token_type": "bearer"}
 

@@ -31,6 +31,7 @@ class User(Base):
     username = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     role_id = Column(Integer, ForeignKey("roles.id"))
+    last_login = Column(DateTime, nullable=True)
     is_active = Column(Boolean, default=True)
     role = relationship("Role")
     tests = relationship("TestCase", back_populates="owner")

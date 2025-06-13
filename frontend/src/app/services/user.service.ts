@@ -22,4 +22,8 @@ export class UserService {
   updateUserRole(id: number, role: UserRoleUpdate): Observable<User> {
     return this.api.updateUserRole(id, role);
   }
+
+  updateUserActive(id: number, isActive: boolean): Observable<User> {
+    return this.api.updateUserActive(id, isActive);
+  }
 }

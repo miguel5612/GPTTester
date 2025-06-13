@@ -64,8 +64,12 @@ class UserCreate(UserBase):
 class UserRoleUpdate(BaseModel):
     role_id: int
 
+class UserActiveUpdate(BaseModel):
+    is_active: bool
+
 class User(UserBase):
     id: int
+    last_login: Optional[datetime] = None
     is_active: bool
     role: Role
     tests: List[Test] = []

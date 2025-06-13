@@ -79,6 +79,10 @@ export class ApiService {
     return this.http.put<User>(`${this.baseUrl}/users/${userId}/role`, roleUpdate, { headers: this.getHeaders() });
   }
 
+  updateUserActive(userId: number, isActive: boolean): Observable<User> {
+    return this.http.put<User>(`${this.baseUrl}/users/${userId}/active`, { is_active: isActive }, { headers: this.getHeaders() });
+  }
+
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.baseUrl}/users/`, { headers: this.getHeaders() });
   }

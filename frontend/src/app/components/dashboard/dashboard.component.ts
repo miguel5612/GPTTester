@@ -14,6 +14,7 @@ import { User, Test, Action, Agent, Client, Project } from '../../models';
 })
 export class DashboardComponent implements OnInit {
   currentUser: User | null = null;
+  users: User[] = [];
   tests: Test[] = [];
   actions: Action[] = [];
   agents: Agent[] = [];
@@ -73,6 +74,9 @@ export class DashboardComponent implements OnInit {
       this.apiService.getCurrentUser().subscribe({
         next: (user) => {
           this.currentUser = user;
+          if (user.role?.name === 'Administrador') {
+            this.apiService.getUsers().subscribe(us => this.users = us);
+          }
         },
         error: (error) => {
           console.error('Error loading user data:', error);
@@ -210,5 +214,9 @@ export class DashboardComponent implements OnInit {
   createNewActor() {
     // Navigate to actor creation or open modal
     console.log('Create new actor');
+  }
+
+  toggleUser(user: User) {
+    this.apiService.updateUserActive(user.id, !user.is_active).subscribe(u => user.is_active = u.is_active);
   }
 }
