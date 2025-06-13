@@ -90,6 +90,7 @@ class ClientCreate(ClientBase):
 class Client(ClientBase):
     id: int
     is_active: bool
+    analysts: List[User] = []
 
     class Config:
         orm_mode = True

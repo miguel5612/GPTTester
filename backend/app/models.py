@@ -40,6 +40,11 @@ class User(Base):
         secondary="project_analysts",
         back_populates="analysts",
     )
+    clients = relationship(
+        "Client",
+        secondary="client_analysts",
+        back_populates="analysts",
+    )
 
 class TestCase(Base):
     __tablename__ = "tests"
@@ -77,6 +82,14 @@ project_analysts = Table(
 )
 
 
+client_analysts = Table(
+    "client_analysts",
+    Base.metadata,
+    Column("client_id", Integer, ForeignKey("clients.id"), primary_key=True),
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+)
+
+
 class Client(Base):
     __tablename__ = "clients"
 
@@ -85,6 +98,11 @@ class Client(Base):
     is_active = Column(Boolean, default=True)
     projects = relationship("Project", back_populates="client")
     actors = relationship("Actor", back_populates="client")
+    analysts = relationship(
+        "User",
+        secondary=client_analysts,
+        back_populates="clients",
+    )
 
 
 class Actor(Base):
