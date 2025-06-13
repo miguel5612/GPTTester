@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { ClientService } from '../../services/client.service';
+import { ProjectService } from '../../services/project.service';
 import { Client, Project, User } from '../../models';
 import { ClientFormComponent } from './client-form.component';
+import { ProjectAnalystsComponent } from './project-analysts.component';
 
 @Component({
   selector: 'app-client-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, ClientFormComponent],
+  imports: [CommonModule, FormsModule, ClientFormComponent, ProjectAnalystsComponent],
   template: `
     <div class="main-panel">
       <h1>Administración de Clientes</h1>
@@ -26,11 +28,13 @@ import { ClientFormComponent } from './client-form.component';
             <span *ngFor="let a of p.analysts; let i = index">
               {{ a.username }}<span *ngIf="i < p.analysts.length - 1">, </span>
             </span>
+            <button class="btn btn-sm btn-info ms-2" (click)="manageAnalysts(p)">Analistas</button>
           </li>
         </ul>
       </div>
 
       <app-client-form *ngIf="showForm" [client]="editing" (saved)="onSaved()" (cancel)="showForm=false"></app-client-form>
+      <app-project-analysts *ngIf="selectedProject" [projectId]="selectedProject.id" (updated)="loadData()" (close)="selectedProject=null"></app-project-analysts>
     </div>
   `
 })
@@ -40,8 +44,13 @@ export class ClientAdminComponent implements OnInit {
   users: User[] = [];
   showForm = false;
   editing: Client | null = null;
+  selectedProject: Project | null = null;
 
-  constructor(private api: ApiService, private clientService: ClientService) {}
+  constructor(
+    private api: ApiService,
+    private clientService: ClientService,
+    private projectService: ProjectService
+  ) {}
 
   ngOnInit() {
     this.loadData();
@@ -49,7 +58,7 @@ export class ClientAdminComponent implements OnInit {
 
   loadData() {
     this.clientService.getClients().subscribe(cs => (this.clients = cs));
-    this.api.getProjects().subscribe(ps => (this.projects = ps));
+    this.projectService.getProjects().subscribe(ps => (this.projects = ps));
     this.api.getUsers().subscribe(us => (this.users = us));
   }
 
@@ -71,6 +80,10 @@ export class ClientAdminComponent implements OnInit {
     if (confirm('¿Eliminar cliente?')) {
       this.clientService.deleteClient(c.id).subscribe(() => this.loadData());
     }
+  }
+
+  manageAnalysts(p: Project) {
+    this.selectedProject = p;
   }
 
   onSaved() {
