@@ -3,11 +3,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { 
-  User, Role, Client, Project, Test, TestPlan, Page, PageElement, 
+  User, Role, Client, Project, Test, TestPlan, Page, PageElement,
   Action, ActionAssignment, Agent, ExecutionPlan, PlanExecution,
   UserCreate, RoleCreate, ClientCreate, ProjectCreate, TestCreate,
   TestPlanCreate, PageCreate, PageElementCreate, ActionCreate,
-  ActionAssignmentCreate, AgentCreate, ExecutionPlanCreate,
+  ActionAssignmentCreate, Actor, ActorCreate, AgentCreate, ExecutionPlanCreate,
   LoginRequest, LoginResponse, UserRoleUpdate, PendingExecution
 } from '../models';
 
@@ -283,6 +283,24 @@ export class ApiService {
 
   deleteAssignment(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/assignments/${id}`, { headers: this.getHeaders() });
+  }
+
+  // Actors
+  getActors(clientId?: number): Observable<Actor[]> {
+    const query = clientId ? `?client_id=${clientId}` : '';
+    return this.http.get<Actor[]>(`${this.baseUrl}/actors/${query}`, { headers: this.getHeaders() });
+  }
+
+  createActor(actor: ActorCreate): Observable<Actor> {
+    return this.http.post<Actor>(`${this.baseUrl}/actors/`, actor, { headers: this.getHeaders() });
+  }
+
+  updateActor(id: number, actor: ActorCreate): Observable<Actor> {
+    return this.http.put<Actor>(`${this.baseUrl}/actors/${id}`, actor, { headers: this.getHeaders() });
+  }
+
+  deleteActor(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/actors/${id}`, { headers: this.getHeaders() });
   }
 
   // Agents

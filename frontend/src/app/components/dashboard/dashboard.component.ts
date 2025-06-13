@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
-import { User, Test, Action, Agent } from '../../models';
+import { User, Test, Action, Agent, Client, Project } from '../../models';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,6 +17,10 @@ export class DashboardComponent implements OnInit {
   tests: Test[] = [];
   actions: Action[] = [];
   agents: Agent[] = [];
+  clients: Client[] = [];
+  projects: Project[] = [];
+  selectedClient: Client | null = null;
+  selectedProject: Project | null = null;
   
   // Flow builder state
   selectedTest: Test | null = null;
@@ -33,6 +37,32 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.loadUserData();
+    this.loadClients();
+  }
+
+  loadClients() {
+    this.apiService.getClients().subscribe({
+      next: clients => this.clients = clients,
+      error: err => console.error('Error loading clients:', err)
+    });
+  }
+
+  selectClient(c: Client) {
+    this.selectedClient = c;
+    this.loadProjects(c.id);
+  }
+
+  loadProjects(clientId: number) {
+    this.apiService.getProjects().subscribe({
+      next: projects => {
+        this.projects = projects.filter(p => p.client_id === clientId);
+      },
+      error: err => console.error('Error loading projects:', err)
+    });
+  }
+
+  selectProject(p: Project) {
+    this.selectedProject = p;
     this.loadTests();
     this.loadActions();
     this.loadAgents();

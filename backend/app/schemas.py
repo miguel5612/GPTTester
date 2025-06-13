@@ -93,6 +93,22 @@ class Project(ProjectBase):
         orm_mode = True
 
 
+class ActorBase(BaseModel):
+    name: str
+    client_id: int
+
+
+class ActorCreate(ActorBase):
+    pass
+
+
+class Actor(ActorBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
 class TestPlanBase(BaseModel):
     nombre: str = Field(..., min_length=5)
     objetivo: Optional[str] = None
