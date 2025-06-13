@@ -108,6 +108,18 @@ export class ApiService {
     return this.http.delete(`${this.baseUrl}/clients/${id}`, { headers: this.getHeaders() });
   }
 
+  assignClientAnalyst(clientId: number, userId: number, dedication?: number): Observable<Client> {
+    let url = `${this.baseUrl}/clients/${clientId}/analysts/${userId}`;
+    if (dedication !== undefined) {
+      url += `?dedication=${dedication}`;
+    }
+    return this.http.post<Client>(url, {}, { headers: this.getHeaders() });
+  }
+
+  unassignClientAnalyst(clientId: number, userId: number): Observable<Client> {
+    return this.http.delete<Client>(`${this.baseUrl}/clients/${clientId}/analysts/${userId}`, { headers: this.getHeaders() });
+  }
+
   // Proyectos
   getProjects(): Observable<Project[]> {
     return this.http.get<Project[]>(`${this.baseUrl}/projects/`, { headers: this.getHeaders() });
