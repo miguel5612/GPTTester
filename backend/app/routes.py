@@ -203,7 +203,7 @@ def login_for_access_token(
 def create_client(
     client: schemas.ClientCreate,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = deps.require_role(["Administrador"]),
+    current_user: models.User = deps.require_role(["Administrador", "Gerente de servicios"]),
 ):
     if db.query(models.Client).filter(models.Client.name == client.name).first():
         raise HTTPException(status_code=400, detail="Client already exists")
@@ -217,9 +217,21 @@ def create_client(
 @router.get("/clients/", response_model=list[schemas.Client])
 def read_clients(
     db: Session = Depends(deps.get_db),
-    current_user: models.User = deps.require_role(["Administrador"]),
+    current_user: models.User = Depends(deps.get_current_user),
 ):
-    return db.query(models.Client).all()
+    if current_user.role and current_user.role.name in ["Administrador", "Gerente de servicios"]:
+        return db.query(models.Client).all()
+    rows = (
+        db.query(models.Client, models.client_analysts.c.dedication)
+        .join(models.client_analysts)
+        .filter(models.client_analysts.c.user_id == current_user.id)
+        .all()
+    )
+    clients = []
+    for client, dedication in rows:
+        setattr(client, "dedication", dedication)
+        clients.append(client)
+    return clients
 
 
 @router.put("/clients/{client_id}", response_model=schemas.Client)
@@ -227,7 +239,7 @@ def update_client(
     client_id: int,
     client: schemas.ClientCreate,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = deps.require_role(["Administrador"]),
+    current_user: models.User = deps.require_role(["Administrador", "Gerente de servicios"]),
 ):
     db_client = db.query(models.Client).filter(models.Client.id == client_id).first()
     if db_client is None:
@@ -250,6 +262,72 @@ def delete_client(
     db_client.is_active = False
     db.commit()
     return {"ok": True}
+
+
+@router.post("/clients/{client_id}/analysts/{user_id}", response_model=schemas.Client)
+def assign_client_analyst(
+    client_id: int,
+    user_id: int,
+    dedication: int = 100,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador", "Gerente de servicios"]),
+):
+    client = db.query(models.Client).filter(models.Client.id == client_id).first()
+    if client is None:
+        raise HTTPException(status_code=404, detail="Client not found")
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    existing = (
+        db.query(models.client_analysts)
+        .filter(
+            models.client_analysts.c.client_id == client_id,
+            models.client_analysts.c.user_id == user_id,
+        )
+        .first()
+    )
+    if existing:
+        db.execute(
+            models.client_analysts.update()
+            .where(
+                models.client_analysts.c.client_id == client_id,
+                models.client_analysts.c.user_id == user_id,
+            )
+            .values(dedication=dedication)
+        )
+    else:
+        db.execute(
+            models.client_analysts.insert().values(
+                client_id=client_id, user_id=user_id, dedication=dedication
+            )
+        )
+    db.commit()
+    db.refresh(client)
+    return client
+
+
+@router.delete("/clients/{client_id}/analysts/{user_id}", response_model=schemas.Client)
+def unassign_client_analyst(
+    client_id: int,
+    user_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador", "Gerente de servicios"]),
+):
+    client = db.query(models.Client).filter(models.Client.id == client_id).first()
+    if client is None:
+        raise HTTPException(status_code=404, detail="Client not found")
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.execute(
+        models.client_analysts.delete().where(
+            models.client_analysts.c.client_id == client_id,
+            models.client_analysts.c.user_id == user_id,
+        )
+    )
+    db.commit()
+    db.refresh(client)
+    return client
 
 
 @router.post("/projects/", response_model=schemas.Project)
