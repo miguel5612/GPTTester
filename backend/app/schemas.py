@@ -302,3 +302,12 @@ class PendingExecution(BaseModel):
     plan: ExecutionPlan
     test: Test
     assignments: list[AssignmentDetail]
+
+
+class ClientDetail(Client):
+    projects: List[Project] = []
+
+
+class Metrics(BaseModel):
+    clients: List[ClientDetail]
+    flows: List[Test]

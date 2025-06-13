@@ -59,6 +59,7 @@ Ahora cada rol puede tener permisos asociados a las páginas del frontend. Usa l
 Los clientes pueden ser creados y actualizados por usuarios con rol **Administrador** o **Gerente de servicios**, mientras que la eliminación sigue reservada al **Administrador**. Ahora el **Gerente de servicios** también puede asignar analistas a los clientes. Un cliente puede tener varios proyectos y ambos pueden inactivarse. Los analistas se asignan a los proyectos y solamente los analistas asignados (o los usuarios Administrador) pueden consultarlos.
 Los roles **Analista de Pruebas** y **Automatizador de Pruebas** pueden consultar los clientes que tengan asignados y ver la dedicación indicada para cada uno.
 
+
 Endpoints principales:
 
 - `POST /clients/` crear cliente
@@ -186,6 +187,14 @@ Endpoints principales:
 - `DELETE /executionplans/{id}` eliminar plan
 - `POST /executionplans/{id}/run` disparar la ejecución y registrar el estado inicial. Si el agente ya tiene una ejecución pendiente se rechaza la petición.
 - `GET /agents/{hostname}/pending` un agente autenticado consulta su próxima ejecución pendiente y recibe el plan, caso de prueba, elementos y acciones con parámetros
+
+### Métricas
+
+El rol **Arquitecto de Automatización** puede consultar un resumen general de clientes, proyectos, analistas asignados y flujos de pruebas.
+
+Endpoints principales:
+
+- `GET /metrics/overview` obtener el listado de clientes con sus proyectos y analistas junto con todos los flujos registrados
 
 ## Colección Postman
 
