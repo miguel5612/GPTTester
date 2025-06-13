@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from . import models, deps
 from .database import engine, SessionLocal
 from .routes import router
+from fastapi.middleware.cors import CORSMiddleware
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -36,3 +37,10 @@ init_data()
 
 app = FastAPI(title="Test Automation API")
 app.include_router(router)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # O especifica ['http://localhost:4200'] para mayor seguridad
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
