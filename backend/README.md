@@ -41,6 +41,12 @@ Al iniciar la aplicación se crean automáticamente los roles:
 
 También se genera el usuario inicial `admin` con la contraseña `admin` perteneciente al rol **Administrador**.
 
+Ahora cada rol puede tener permisos asociados a las páginas del frontend. Usa los siguientes endpoints para administrarlos:
+
+- `GET /roles/{id}/permissions` listar permisos de un rol
+- `POST /roles/{id}/permissions` agregar un permiso enviando `{ "page": "nombre" }`
+- `DELETE /roles/{id}/permissions/{page}` eliminar un permiso
+
 ## Clientes y proyectos
 
 Los clientes y proyectos pueden gestionarse únicamente por usuarios con rol **Administrador**. Un cliente puede tener varios proyectos y ambos pueden inactivarse. Los analistas se asignan a los proyectos y solamente los analistas asignados (o los usuarios Administrador) pueden consultarlos.

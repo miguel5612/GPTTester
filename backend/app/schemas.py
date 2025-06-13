@@ -17,6 +17,22 @@ class Role(RoleBase):
     class Config:
         orm_mode = True
 
+
+class PermissionBase(BaseModel):
+    page: str
+
+
+class PermissionCreate(PermissionBase):
+    pass
+
+
+class Permission(PermissionBase):
+    id: int
+    role_id: int
+
+    class Config:
+        orm_mode = True
+
 class TestBase(BaseModel):
     name: str
     description: Optional[str] = None

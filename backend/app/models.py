@@ -11,6 +11,19 @@ class Role(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False)
 
+
+class PagePermission(Base):
+    __tablename__ = "permissions"
+    __table_args__ = (
+        UniqueConstraint("role_id", "page", name="uix_role_page"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
+    page = Column(String, nullable=False)
+
+    role = relationship("Role", backref="permissions")
+
 class User(Base):
     __tablename__ = "users"
 
