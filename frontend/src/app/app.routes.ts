@@ -55,6 +55,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/agents/agents.component').then(m => m.AgentsComponent)
   },
   {
+    path: 'client-admin',
+    loadComponent: () => import('./components/client-admin/client-admin.component').then(m => m.ClientAdminComponent)
+  },
+  {
     path: 'actors',
     loadComponent: () => import('./components/actors/actors.component').then(m => m.ActorsComponent)
   },

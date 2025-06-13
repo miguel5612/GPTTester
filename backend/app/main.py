@@ -15,7 +15,8 @@ def init_data():
             "Arquitecto de Automatización",
             "Automation Engineer",
             "Automatizador de Pruebas",
-            "Analista de Pruebas con skill de automatización"            
+            "Analista de Pruebas con skill de automatización",
+            "Gerente de servicios",
         ]
         for name in predefined:
             if not db.query(models.Role).filter(models.Role.name == name).first():
@@ -24,9 +25,15 @@ def init_data():
 
         admin = db.query(models.User).filter(models.User.username == "admin").first()
         if not admin:
-            admin_role = db.query(models.Role).filter(models.Role.name == "Administrador").first()
+            admin_role = (
+                db.query(models.Role)
+                .filter(models.Role.name == "Administrador")
+                .first()
+            )
             hashed = deps.get_password_hash("admin")
-            admin = models.User(username="admin", hashed_password=hashed, role=admin_role)
+            admin = models.User(
+                username="admin", hashed_password=hashed, role=admin_role
+            )
             db.add(admin)
             db.commit()
     finally:
