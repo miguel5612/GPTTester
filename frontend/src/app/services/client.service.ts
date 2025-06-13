@@ -22,4 +22,12 @@ export class ClientService {
   deleteClient(id: number): Observable<any> {
     return this.api.deleteClient(id);
   }
+
+  assignAnalyst(clientId: number, userId: number, dedication?: number): Observable<Client> {
+    return this.api.assignClientAnalyst(clientId, userId, dedication);
+  }
+
+  unassignAnalyst(clientId: number, userId: number): Observable<Client> {
+    return this.api.unassignClientAnalyst(clientId, userId);
+  }
 }
