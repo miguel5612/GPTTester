@@ -57,6 +57,57 @@ def delete_role(role_id: int, db: Session = Depends(deps.get_db), current_user: 
     db.commit()
     return {"ok": True}
 
+
+@router.get("/roles/{role_id}/permissions", response_model=list[schemas.Permission])
+def read_role_permissions(
+    role_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    role = db.query(models.Role).filter(models.Role.id == role_id).first()
+    if role is None:
+        raise HTTPException(status_code=404, detail="Role not found")
+    return role.permissions
+
+
+@router.post("/roles/{role_id}/permissions", response_model=schemas.Permission)
+def add_role_permission(
+    role_id: int,
+    perm: schemas.PermissionCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    if not db.query(models.Role).filter(models.Role.id == role_id).first():
+        raise HTTPException(status_code=404, detail="Role not found")
+    if db.query(models.PagePermission).filter(
+        models.PagePermission.role_id == role_id,
+        models.PagePermission.page == perm.page,
+    ).first():
+        raise HTTPException(status_code=400, detail="Permission already exists")
+    db_perm = models.PagePermission(role_id=role_id, page=perm.page)
+    db.add(db_perm)
+    db.commit()
+    db.refresh(db_perm)
+    return db_perm
+
+
+@router.delete("/roles/{role_id}/permissions/{page}")
+def delete_role_permission(
+    role_id: int,
+    page: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    perm = db.query(models.PagePermission).filter(
+        models.PagePermission.role_id == role_id,
+        models.PagePermission.page == page,
+    ).first()
+    if perm is None:
+        raise HTTPException(status_code=404, detail="Permission not found")
+    db.delete(perm)
+    db.commit()
+    return {"ok": True}
+
 @router.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(deps.get_db)):
     try:
@@ -1095,6 +1146,20 @@ def get_pending_execution(
 @router.get("/users/me/", response_model=schemas.User)
 def read_users_me(current_user: models.User = Depends(deps.get_current_user)):
     return current_user
+
+
+@router.get("/users/me/permissions", response_model=list[schemas.Permission])
+def read_my_permissions(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    if current_user.role is None:
+        return []
+    return (
+        db.query(models.PagePermission)
+        .filter(models.PagePermission.role_id == current_user.role.id)
+        .all()
+    )
 
 @router.post("/tests/", response_model=schemas.Test)
 def create_test(test: schemas.TestCreate, db: Session = Depends(deps.get_db), current_user: models.User = Depends(deps.get_current_user)):

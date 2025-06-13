@@ -61,6 +61,34 @@ def require_role(roles: list[str]):
     return Depends(dependency)
 
 
+def require_page_permission(page: str):
+    def dependency(
+        db: Session = Depends(get_db),
+        current_user: models.User = Depends(get_current_user),
+    ):
+        if current_user.role is None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Insufficient permissions",
+            )
+        perm = (
+            db.query(models.PagePermission)
+            .filter(
+                models.PagePermission.role_id == current_user.role.id,
+                models.PagePermission.page == page,
+            )
+            .first()
+        )
+        if not perm:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Insufficient permissions",
+            )
+        return current_user
+
+    return Depends(dependency)
+
+
 def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
