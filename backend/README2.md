@@ -183,6 +183,14 @@ Endpoints principales:
 - `POST /executionplans/{id}/run` disparar la ejecución y registrar el estado inicial. Si el agente ya tiene una ejecución pendiente se rechaza la petición.
 - `GET /agents/{hostname}/pending` un agente autenticado consulta su próxima ejecución pendiente y recibe el plan, caso de prueba, elementos y acciones con parámetros
 
+### Métricas
+
+El rol **Arquitecto de Automatización** puede consultar un resumen general de clientes, proyectos, analistas asignados y flujos de pruebas.
+
+Endpoints principales:
+
+- `GET /metrics/overview` obtener el listado de clientes con sus proyectos y analistas junto con todos los flujos registrados
+
 ## Colección Postman
 
 Para facilitar las pruebas manuales o de integración se incluye el script

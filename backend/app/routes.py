@@ -1301,3 +1301,13 @@ def delete_test(test_id: int, db: Session = Depends(deps.get_db), current_user: 
     db.delete(test)
     db.commit()
     return {"ok": True}
+
+
+@router.get("/metrics/overview", response_model=schemas.Metrics)
+def get_metrics(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador", "Arquitecto de Automatización"]),
+):
+    clients = db.query(models.Client).all()
+    flows = db.query(models.TestCase).all()
+    return schemas.Metrics(clients=clients, flows=flows)
