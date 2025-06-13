@@ -16,7 +16,8 @@ export const routes: Routes = [
   },
   {
     path: 'users',
-    loadComponent: () => import('./components/users/users.component').then(m => m.UsersComponent)
+    loadComponent: () => import('./components/users/users.component').then(m => m.UsersComponent),
+    canActivate: [() => import('./admin.guard').then(m => m.adminGuard)]
   },
   {
     path: 'register',
