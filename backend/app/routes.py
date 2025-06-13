@@ -203,7 +203,7 @@ def login_for_access_token(
 def create_client(
     client: schemas.ClientCreate,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = deps.require_role(["Administrador"]),
+    current_user: models.User = deps.require_role(["Administrador", "Gerente de servicios"]),
 ):
     if db.query(models.Client).filter(models.Client.name == client.name).first():
         raise HTTPException(status_code=400, detail="Client already exists")
@@ -217,7 +217,7 @@ def create_client(
 @router.get("/clients/", response_model=list[schemas.Client])
 def read_clients(
     db: Session = Depends(deps.get_db),
-    current_user: models.User = deps.require_role(["Administrador"]),
+    current_user: models.User = deps.require_role(["Administrador", "Gerente de servicios"]),
 ):
     return db.query(models.Client).all()
 
@@ -227,7 +227,7 @@ def update_client(
     client_id: int,
     client: schemas.ClientCreate,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = deps.require_role(["Administrador"]),
+    current_user: models.User = deps.require_role(["Administrador", "Gerente de servicios"]),
 ):
     db_client = db.query(models.Client).filter(models.Client.id == client_id).first()
     if db_client is None:
