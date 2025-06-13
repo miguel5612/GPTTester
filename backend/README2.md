@@ -56,13 +56,18 @@ Ahora cada rol puede tener permisos asociados a las páginas del frontend. Usa l
 
 ## Clientes y proyectos
 
-Los clientes pueden ser creados y actualizados por usuarios con rol **Administrador** o **Gerente de servicios**, mientras que la eliminación sigue reservada al **Administrador**. Un cliente puede tener varios proyectos y ambos pueden inactivarse. Los analistas se asignan a los proyectos y solamente los analistas asignados (o los usuarios Administrador) pueden consultarlos.
+Los clientes pueden ser creados y actualizados por usuarios con rol **Administrador** o **Gerente de servicios**, mientras que la eliminación sigue reservada al **Administrador**. Ahora el **Gerente de servicios** también puede asignar analistas a los clientes. Un cliente puede tener varios proyectos y ambos pueden inactivarse. Los analistas se asignan a los proyectos y solamente los analistas asignados (o los usuarios Administrador) pueden consultarlos.
+Los roles **Analista de Pruebas** y **Automatizador de Pruebas** pueden consultar los clientes que tengan asignados y ver la dedicación indicada para cada uno.
+
 
 Endpoints principales:
 
 - `POST /clients/` crear cliente
 - `PUT /clients/{id}` actualizar cliente
 - `DELETE /clients/{id}` inactivar cliente
+- `POST /clients/{id}/analysts/{user_id}` asignar analista a cliente (parámetro `dedication` opcional)
+- `DELETE /clients/{id}/analysts/{user_id}` quitar analista de cliente
+- `GET /clients/` listar clientes (para analistas solo los asignados con dedicación)
 - `POST /projects/` crear proyecto vinculado a un cliente
 - `PUT /projects/{id}` actualizar proyecto
 - `DELETE /projects/{id}` inactivar proyecto
