@@ -17,6 +17,7 @@ export interface Client {
   id: number;
   name: string;
   is_active: boolean;
+  analysts: User[];
 }
 
 export interface Project {

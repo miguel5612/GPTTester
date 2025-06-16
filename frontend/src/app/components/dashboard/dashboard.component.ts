@@ -38,12 +38,23 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.loadUserData();
-    this.loadClients();
   }
 
   loadClients() {
     this.apiService.getClients().subscribe({
-      next: clients => this.clients = clients,
+      next: clients => {
+        if (
+          this.currentUser &&
+          this.currentUser.role?.name !== 'Administrador' &&
+          this.currentUser.role?.name !== 'Gerente de servicios'
+        ) {
+          this.clients = clients.filter(c =>
+            c.analysts.some(a => a.id === this.currentUser!.id)
+          );
+        } else {
+          this.clients = clients;
+        }
+      },
       error: err => console.error('Error loading clients:', err)
     });
   }
@@ -77,6 +88,7 @@ export class DashboardComponent implements OnInit {
           if (user.role?.name === 'Administrador') {
             this.apiService.getUsers().subscribe(us => this.users = us);
           }
+          this.loadClients();
         },
         error: (error) => {
           console.error('Error loading user data:', error);

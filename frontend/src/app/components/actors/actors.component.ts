@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Actor, Client } from '../../models';
+import { Actor, Client, User } from '../../models';
 import { ActorService } from '../../services/actor.service';
 import { ApiService } from '../../services/api.service';
 import { ActorFormComponent } from './actor-form.component';
@@ -45,6 +45,7 @@ import { ActorFormComponent } from './actor-form.component';
 export class ActorsComponent implements OnInit {
   actors: Actor[] = [];
   clients: Client[] = [];
+  currentUser: User | null = null;
   selectedClient: number | null = null;
   showForm = false;
   editing: Actor | null = null;
@@ -52,8 +53,27 @@ export class ActorsComponent implements OnInit {
   constructor(private service: ActorService, private api: ApiService) {}
 
   ngOnInit() {
-    this.api.getClients().subscribe(c => this.clients = c);
-    this.load();
+    this.api.getCurrentUser().subscribe(user => {
+      this.currentUser = user;
+      this.loadClients();
+      this.load();
+    });
+  }
+
+  loadClients() {
+    this.api.getClients().subscribe(c => {
+      if (
+        this.currentUser &&
+        this.currentUser.role?.name !== 'Administrador' &&
+        this.currentUser.role?.name !== 'Gerente de servicios'
+      ) {
+        this.clients = c.filter(cl =>
+          cl.analysts.some(a => a.id === this.currentUser!.id)
+        );
+      } else {
+        this.clients = c;
+      }
+    });
   }
 
   load() {

@@ -7,11 +7,12 @@ import { ProjectService } from '../../services/project.service';
 import { Client, Project, User } from '../../models';
 import { ClientFormComponent } from './client-form.component';
 import { ProjectAnalystsComponent } from './project-analysts.component';
+import { ClientAnalystsComponent } from './client-analysts.component';
 
 @Component({
   selector: 'app-client-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, ClientFormComponent, ProjectAnalystsComponent],
+  imports: [CommonModule, FormsModule, ClientFormComponent, ProjectAnalystsComponent, ClientAnalystsComponent],
   template: `
     <div class="main-panel">
       <h1>Administración de Clientes</h1>
@@ -21,6 +22,7 @@ import { ProjectAnalystsComponent } from './project-analysts.component';
           {{ c.name }}
           <button class="btn btn-sm btn-secondary ms-2" (click)="edit(c)">Editar</button>
           <button class="btn btn-sm btn-danger ms-2" (click)="remove(c)">Eliminar</button>
+          <button class="btn btn-sm btn-info ms-2" (click)="manageClientAnalysts(c)">Analistas</button>
         </h3>
         <ul class="list-group">
           <li class="list-group-item" *ngFor="let p of projectsByClient(c.id)">
@@ -35,6 +37,7 @@ import { ProjectAnalystsComponent } from './project-analysts.component';
 
       <app-client-form *ngIf="showForm" [client]="editing" (saved)="onSaved()" (cancel)="showForm=false"></app-client-form>
       <app-project-analysts *ngIf="selectedProject" [projectId]="selectedProject.id" (updated)="loadData()" (close)="selectedProject=null"></app-project-analysts>
+      <app-client-analysts *ngIf="selectedClient" [clientId]="selectedClient.id" (updated)="loadData()" (close)="selectedClient=null"></app-client-analysts>
     </div>
   `
 })
@@ -45,6 +48,7 @@ export class ClientAdminComponent implements OnInit {
   showForm = false;
   editing: Client | null = null;
   selectedProject: Project | null = null;
+  selectedClient: Client | null = null;
 
   constructor(
     private api: ApiService,
@@ -80,6 +84,10 @@ export class ClientAdminComponent implements OnInit {
     if (confirm('¿Eliminar cliente?')) {
       this.clientService.deleteClient(c.id).subscribe(() => this.loadData());
     }
+  }
+
+  manageClientAnalysts(c: Client) {
+    this.selectedClient = c;
   }
 
   manageAnalysts(p: Project) {
