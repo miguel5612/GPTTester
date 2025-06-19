@@ -28,6 +28,7 @@ export const routes: Routes = [
       { path: 'scripts', loadComponent: () => import('./components/scripts/scripts.component').then(m => m.ScriptsComponent) },
       { path: 'bdd-builder', loadComponent: () => import('./components/scripts/bdd-script-wizard.component').then(m => m.BddScriptWizardComponent) },
       { path: 'parameterization/:testId', loadComponent: () => import('./components/parameterization/parameterization.component').then(m => m.ParameterizationComponent) },
+      { path: 'visual-param', loadComponent: () => import('./components/visual-parameterization/visual-parameterization.component').then(m => m.VisualParameterizationComponent) },
       { path: 'pages', loadComponent: () => import('./components/pages/pages.component').then(m => m.PagesComponent) },
       { path: 'elements', loadComponent: () => import('./components/elements/elements.component').then(m => m.ElementsComponent) },
       { path: 'actions', loadComponent: () => import('./components/actions/actions.component').then(m => m.ActionsComponent) },
