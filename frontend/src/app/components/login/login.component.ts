@@ -42,26 +42,24 @@ import { LoginRequest } from '../../models';
               required>
           </div>
           
-          <div class="form-group" *ngIf="errorMessage">
-            <div class="alert alert-error">
-              {{ errorMessage }}
-            </div>
-          </div>
-          
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             class="btn-primary login-btn"
             [disabled]="isLoading">
             <span *ngIf="isLoading">Iniciando sesión...</span>
             <span *ngIf="!isLoading">Iniciar Sesión</span>
           </button>
         </form>
-        
+
         <div class="login-footer">
           <p class="text-secondary">
             Usuario por defecto: <strong>admin</strong><br>
             Contraseña: <strong>admin</strong>
           </p>
+          <button type="button" class="btn-link register-btn" (click)="router.navigate(['/register'])">Crear cuenta</button>
+        </div>
+        <div *ngIf="errorMessage" class="alert alert-error alert-fixed">
+          {{ errorMessage }}
         </div>
       </div>
     </div>
@@ -131,11 +129,25 @@ import { LoginRequest } from '../../models';
       margin-top: 2rem;
       padding-top: 1rem;
       border-top: 1px solid var(--border-color);
-      
+
       p {
         font-size: 0.9rem;
         line-height: 1.5;
       }
+      .register-btn {
+        margin-top: 1rem;
+        background: none;
+        border: none;
+        color: var(--btn-primary);
+        cursor: pointer;
+      }
+    }
+
+    .alert-fixed {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 1000;
     }
   `]
 })
