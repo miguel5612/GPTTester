@@ -5,6 +5,7 @@ import { map, catchError } from 'rxjs/operators';
 import { 
   User, Role, Client, Project, Test, TestPlan, Page, PageElement,
   Action, ActionAssignment, Agent, ExecutionPlan, PlanExecution,
+  ExecutionLog, ExecutionSchedule, ExecutionScheduleCreate,
   UserCreate, RoleCreate, ClientCreate, ProjectCreate, TestCreate,
   TestPlanCreate, PageCreate, PageElementCreate, ActionCreate,
   ActionAssignmentCreate, Actor, ActorCreate, AgentCreate, ExecutionPlanCreate,
@@ -390,8 +391,9 @@ export class ApiService {
     return this.http.delete(`${this.baseUrl}/executionplans/${id}`, { headers: this.getHeaders() });
   }
 
-  runExecutionPlan(id: number): Observable<PlanExecution> {
-    return this.http.post<PlanExecution>(`${this.baseUrl}/executionplans/${id}/run`, {}, { headers: this.getHeaders() });
+  runExecutionPlan(id: number, agentId?: number): Observable<PlanExecution> {
+    const params = agentId ? `?agent_id=${agentId}` : '';
+    return this.http.post<PlanExecution>(`${this.baseUrl}/executionplans/${id}/run${params}`, {}, { headers: this.getHeaders() });
   }
 
   getPendingExecution(hostname: string): Observable<PendingExecution> {
@@ -408,6 +410,22 @@ export class ApiService {
 
   getExecution(id: number): Observable<PlanExecution> {
     return this.http.get<PlanExecution>(`${this.baseUrl}/executions/${id}`, { headers: this.getHeaders() });
+  }
+
+  getExecutionLogs(id: number): Observable<ExecutionLog[]> {
+    return this.http.get<ExecutionLog[]>(`${this.baseUrl}/executions/${id}/logs`, { headers: this.getHeaders() });
+  }
+
+  createSchedule(s: ExecutionScheduleCreate): Observable<ExecutionSchedule> {
+    return this.http.post<ExecutionSchedule>(`${this.baseUrl}/schedules/`, s, { headers: this.getHeaders() });
+  }
+
+  getSchedules(): Observable<ExecutionSchedule[]> {
+    return this.http.get<ExecutionSchedule[]>(`${this.baseUrl}/schedules/`, { headers: this.getHeaders() });
+  }
+
+  deleteSchedule(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/schedules/${id}`, { headers: this.getHeaders() });
   }
 
   downloadExecutionFile(id: number, type: 'report' | 'evidence'): Observable<Blob> {

@@ -1585,6 +1585,7 @@ def delete_execution_plan(
 @router.post("/executionplans/{plan_id}/run", response_model=schemas.PlanExecution)
 def run_execution_plan(
     plan_id: int,
+    agent_id: int | None = None,
     db: Session = Depends(deps.get_db),
     current_user: models.User = deps.require_role(["Administrador"]),
 ):
@@ -1595,10 +1596,13 @@ def run_execution_plan(
     )
     if not plan:
         raise HTTPException(status_code=404, detail="ExecutionPlan not found")
+    selected_agent = agent_id or plan.agent_id
+    if not db.query(models.ExecutionAgent).filter(models.ExecutionAgent.id == selected_agent).first():
+        raise HTTPException(status_code=404, detail="Agent not found")
     pending = (
         db.query(models.PlanExecution)
         .filter(
-            models.PlanExecution.agent_id == plan.agent_id,
+            models.PlanExecution.agent_id == selected_agent,
             models.PlanExecution.status.in_(
                 [
                     models.ExecutionStatus.CALLING.value,
@@ -1612,13 +1616,62 @@ def run_execution_plan(
         raise HTTPException(status_code=400, detail="Agent has a pending execution")
     record = models.PlanExecution(
         plan_id=plan.id,
-        agent_id=plan.agent_id,
+        agent_id=selected_agent,
         status=models.ExecutionStatus.CALLING.value,
     )
     db.add(record)
     db.commit()
     db.refresh(record)
     return record
+
+
+@router.post("/schedules/", response_model=schemas.ExecutionSchedule)
+def create_schedule(
+    schedule: schemas.ExecutionScheduleCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    plan = (
+        db.query(models.ExecutionPlan)
+        .filter(models.ExecutionPlan.id == schedule.plan_id)
+        .first()
+    )
+    if not plan:
+        raise HTTPException(status_code=404, detail="ExecutionPlan not found")
+    if schedule.agent_id is not None:
+        if not db.query(models.ExecutionAgent).filter(models.ExecutionAgent.id == schedule.agent_id).first():
+            raise HTTPException(status_code=404, detail="Agent not found")
+    db_schedule = models.ExecutionSchedule(**schedule.dict())
+    db.add(db_schedule)
+    db.commit()
+    db.refresh(db_schedule)
+    return db_schedule
+
+
+@router.get("/schedules/", response_model=list[schemas.ExecutionSchedule])
+def read_schedules(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    return db.query(models.ExecutionSchedule).all()
+
+
+@router.delete("/schedules/{schedule_id}")
+def delete_schedule(
+    schedule_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    sch = (
+        db.query(models.ExecutionSchedule)
+        .filter(models.ExecutionSchedule.id == schedule_id)
+        .first()
+    )
+    if not sch:
+        raise HTTPException(status_code=404, detail="Schedule not found")
+    db.delete(sch)
+    db.commit()
+    return {"ok": True}
 
 
 @router.get("/executions/", response_model=list[schemas.PlanExecution])
@@ -1752,6 +1805,20 @@ def update_execution_status(
         db.add(log)
     db.commit()
     return {"ok": True}
+
+
+@router.get("/executions/{execution_id}/logs", response_model=list[schemas.ExecutionLog])
+def read_execution_logs(
+    execution_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    return (
+        db.query(models.ExecutionLog)
+        .filter(models.ExecutionLog.execution_id == execution_id)
+        .order_by(models.ExecutionLog.timestamp)
+        .all()
+    )
     try:
         security.rate_limit_login(ip)
     except HTTPException:

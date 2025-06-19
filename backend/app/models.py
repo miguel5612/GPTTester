@@ -268,6 +268,19 @@ class ExecutionStatus(str, enum.Enum):
     FINISHED = "Finalizado"
 
 
+class ExecutionSchedule(Base):
+    __tablename__ = "execution_schedules"
+
+    id = Column(Integer, primary_key=True, index=True)
+    plan_id = Column(Integer, ForeignKey("execution_plans.id"), nullable=False)
+    agent_id = Column(Integer, ForeignKey("agents.id"), nullable=True)
+    run_at = Column(DateTime, nullable=False)
+    executed = Column(Boolean, default=False)
+
+    plan = relationship("ExecutionPlan")
+    agent = relationship("ExecutionAgent")
+
+
 class PlanExecution(Base):
     __tablename__ = "execution_records"
 
