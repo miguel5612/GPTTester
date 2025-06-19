@@ -6,6 +6,7 @@ from datetime import datetime
 import os
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 
 from . import models, schemas, deps, security, executor
 
@@ -1817,7 +1818,12 @@ def read_tests(
         models.TestCase.owner_id == current_user.id
     )
     if search is not None:
-        query = query.filter(models.TestCase.name.ilike(f"%{search}%"))
+        query = query.filter(
+            or_(
+                models.TestCase.name.ilike(f"%{search}%"),
+                models.TestCase.description.ilike(f"%{search}%")
+            )
+        )
     if priority is not None:
         query = query.filter(models.TestCase.priority == priority)
     if status is not None:

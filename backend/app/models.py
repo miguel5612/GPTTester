@@ -68,6 +68,7 @@ class TestCase(Base):
     when = Column(String, nullable=True)
     then = Column(String, nullable=True)
     test_plan_id = Column(Integer, ForeignKey("testplans.id"), nullable=True)
+    actor_id = Column(Integer, ForeignKey("actors.id"), nullable=True)
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="tests")
@@ -81,6 +82,7 @@ class TestCase(Base):
         secondary="test_actions",
         back_populates="tests",
     )
+    actor = relationship("Actor")
     plan = relationship("TestPlan")
 
 

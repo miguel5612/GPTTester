@@ -43,6 +43,7 @@ class TestBase(BaseModel):
     when: Optional[str] = None
     then: Optional[str] = None
     test_plan_id: Optional[int] = None
+    actor_id: Optional[int] = None
 
 
 class TestCreate(TestBase):

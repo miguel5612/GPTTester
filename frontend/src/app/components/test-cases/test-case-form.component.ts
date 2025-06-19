@@ -1,9 +1,11 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Test, TestCreate, TestPlan } from '../../models';
+import { Test, TestCreate, TestPlan, Actor } from '../../models';
 import { TestCaseService } from '../../services/test-case.service';
 import { ApiService } from '../../services/api.service';
+import { ActorService } from '../../services/actor.service';
+import { WorkspaceService } from '../../services/workspace.service';
 
 @Component({
   selector: 'app-test-case-form',
@@ -52,6 +54,13 @@ import { ApiService } from '../../services/api.service';
           </select>
         </div>
         <div class="form-group">
+          <label>Actor</label>
+          <select class="form-control" [(ngModel)]="form.actor_id" name="actor">
+            <option [ngValue]="null">--</option>
+            <option *ngFor="let a of actors" [ngValue]="a.id">{{ a.name }}</option>
+          </select>
+        </div>
+        <div class="form-group">
           <label>Plan de Prueba</label>
           <select class="form-control" [(ngModel)]="form.test_plan_id" name="plan">
             <option [ngValue]="null">--</option>
@@ -78,6 +87,7 @@ export class TestCaseFormComponent {
   @Output() cancel = new EventEmitter<void>();
 
   plans: TestPlan[] = [];
+  actors: Actor[] = [];
 
   form: TestCreate = {
     name: '',
@@ -87,11 +97,20 @@ export class TestCaseFormComponent {
     then: '',
     priority: '',
     status: '',
-    test_plan_id: undefined
+    test_plan_id: undefined,
+    actor_id: undefined
   };
 
-  constructor(private service: TestCaseService, private api: ApiService) {
+  constructor(
+    private service: TestCaseService,
+    private api: ApiService,
+    private actorsService: ActorService,
+    private workspace: WorkspaceService
+  ) {
     this.api.getTestPlans().subscribe(pl => this.plans = pl);
+    if (this.workspace.clientId) {
+      this.actorsService.getActors(this.workspace.clientId).subscribe(a => (this.actors = a));
+    }
   }
 
   ngOnChanges() {
@@ -106,7 +125,8 @@ export class TestCaseFormComponent {
         then: '',
         priority: '',
         status: '',
-        test_plan_id: undefined
+        test_plan_id: undefined,
+        actor_id: undefined
       };
     }
   }
