@@ -72,8 +72,16 @@ class User(UserBase):
     last_login: Optional[datetime] = None
     is_active: bool
     role: Role
-    tests: List[Test] = []
-    projects: List["Project"] = []
+
+    class Config:
+        orm_mode = True
+
+
+class UserSummary(UserBase):
+    id: int
+    last_login: Optional[datetime] = None
+    is_active: bool
+    role: Role
 
     class Config:
         orm_mode = True
@@ -90,7 +98,7 @@ class ClientCreate(ClientBase):
 class Client(ClientBase):
     id: int
     is_active: bool
-    analysts: List[User] = []
+    analysts: List[UserSummary] = []
     dedication: int | None = None
 
     class Config:
@@ -110,7 +118,7 @@ class ProjectCreate(ProjectBase):
 class Project(ProjectBase):
     id: int
     is_active: bool
-    analysts: List[User] = []
+    analysts: List[UserSummary] = []
     scripts_per_day: Optional[int] = None
     test_types: Optional[str] = None
 

@@ -93,6 +93,12 @@ export class ProjectAnalystsComponent implements OnChanges {
 
   toggle(user: User, checked: boolean) {
     if (!this.project) return;
+    const msg = checked ?
+      `\u00bfAsignar analista ${user.username}?` :
+      `\u00bfQuitar analista ${user.username}?`;
+    if (!confirm(msg)) {
+      return;
+    }
     const obs = checked ?
       this.projectService.assignAnalyst(this.project.id, user.id) :
       this.projectService.unassignAnalyst(this.project.id, user.id);
