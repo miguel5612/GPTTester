@@ -180,6 +180,11 @@ Endpoints principales:
 - `POST /agent/status` actualización de estado y logs
 - `POST /agent/result` envío del archivo de resultados
 
+Adicionalmente, existe un canal WebSocket en `/ws/agent` utilizado por los agentes
+para registrarse con sus capacidades y enviar heartbeats de manera continua.
+El backend realiza ping cada 30 segundos y asigna ejecuciones de la cola a
+los agentes conectados.
+
 ### Planes de ejecución
 
 Un plan de ejecución define qué caso de prueba se ejecutará y en qué agente.

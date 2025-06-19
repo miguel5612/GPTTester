@@ -3,6 +3,7 @@ from . import models, deps
 from .gateway import setup_gateway
 from .database import engine, SessionLocal
 from .routes import router
+from .agent_manager import agent_manager
 from fastapi.middleware.cors import CORSMiddleware
 from jose import jwt
 from datetime import datetime
@@ -115,3 +116,8 @@ app.add_middleware(
 )
 
 start_scheduler()
+
+
+@app.on_event("startup")
+async def start_agent_manager():
+    agent_manager.start()
