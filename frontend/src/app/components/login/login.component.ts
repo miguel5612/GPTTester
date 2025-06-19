@@ -56,7 +56,7 @@ import { LoginRequest } from '../../models';
             Usuario por defecto: <strong>admin</strong><br>
             Contraseña: <strong>admin</strong>
           </p>
-          <button type="button" class="btn-link register-btn" (click)="router.navigate(['/register'])">Crear cuenta</button>
+          <button type="button" class="btn-link register-btn" (click)="goToRegister()">Crear cuenta</button>
         </div>
         <div *ngIf="errorMessage" class="alert alert-error alert-fixed">
           {{ errorMessage }}
@@ -202,5 +202,9 @@ export class LoginComponent {
         console.error('Login error:', error);
       }
     });
+  }
+
+  goToRegister() {
+    this.router.navigate(['/register']);
   }
 }
