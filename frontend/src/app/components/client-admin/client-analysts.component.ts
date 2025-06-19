@@ -13,6 +13,7 @@ import { ApiService } from '../../services/api.service';
     <div class="card" *ngIf="client">
       <div class="card-body">
         <h3 class="card-title">Analistas de {{ client.name }}</h3>
+        <input class="form-control mb-2" placeholder="Buscar..." [(ngModel)]="search" (ngModelChange)="onSearch()" />
         <div *ngFor="let u of analysts" class="form-check">
           <input class="form-check-input" type="checkbox" [id]="'ca-'+u.id"
             [checked]="isAssigned(u)"
@@ -21,6 +22,17 @@ import { ApiService } from '../../services/api.service';
             {{ u.username }} ({{ u.role.name }})
           </label>
         </div>
+        <nav class="mt-2">
+          <ul class="pagination mb-0">
+            <li class="page-item" [class.disabled]="page === 1">
+              <button class="page-link" (click)="prev()">Anterior</button>
+            </li>
+            <li class="page-item"><span class="page-link">{{ page }}</span></li>
+            <li class="page-item" [class.disabled]="analysts.length < 10">
+              <button class="page-link" (click)="next()" [disabled]="analysts.length < 10">Siguiente</button>
+            </li>
+          </ul>
+        </nav>
         <button class="btn btn-secondary mt-3" (click)="close.emit()">Cerrar</button>
       </div>
     </div>
@@ -36,6 +48,8 @@ export class ClientAnalystsComponent implements OnChanges {
 
   client: Client | null = null;
   analysts: User[] = [];
+  page = 1;
+  search = '';
 
   constructor(private clientService: ClientService, private api: ApiService) {}
 
@@ -49,12 +63,28 @@ export class ClientAnalystsComponent implements OnChanges {
     this.clientService.getClients().subscribe(cs => {
       this.client = cs.find(c => c.id === this.clientId) || null;
     });
-    this.api.getUsers().subscribe(users => {
-      this.analysts = users.filter(u =>
-        u.role.name === 'Analista de Pruebas con skill de automatización' ||
-        u.role.name === 'Automatizador de Pruebas'
-      );
+    this.api.getAnalysts(this.search, this.page).subscribe(users => {
+      this.analysts = users;
     });
+  }
+
+  onSearch() {
+    this.page = 1;
+    this.load();
+  }
+
+  prev() {
+    if (this.page > 1) {
+      this.page--;
+      this.load();
+    }
+  }
+
+  next() {
+    if (this.analysts.length === 10) {
+      this.page++;
+      this.load();
+    }
   }
 
   isAssigned(u: User): boolean {
