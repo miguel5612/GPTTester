@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Test } from '../../models';
 import { TestCaseService } from '../../services/test-case.service';
-import { ParameterDialogComponent } from './parameter-dialog.component';
+import { Router } from '@angular/router';
 import { TestCaseFormComponent } from '../test-cases/test-case-form.component';
 
 @Component({
   selector: 'app-scripts',
   standalone: true,
-  imports: [CommonModule, FormsModule, ParameterDialogComponent, TestCaseFormComponent],
+  imports: [CommonModule, FormsModule, TestCaseFormComponent],
   template: `
     <div class="main-panel">
       <h1>Gestión de Scripts</h1>
@@ -57,7 +57,6 @@ import { TestCaseFormComponent } from '../test-cases/test-case-form.component';
       <div *ngIf="filtered.length === 0" class="mt-3">No hay scripts.</div>
 
       <app-test-case-form *ngIf="showForm" [test]="editing" (saved)="onSaved()" (cancel)="showForm=false"></app-test-case-form>
-      <app-parameter-dialog *ngIf="showParam" [testId]="paramId!" (saved)="onParamSaved()" (cancel)="showParam=false"></app-parameter-dialog>
     </div>
   `,
   styles: [`
@@ -76,10 +75,8 @@ export class ScriptsComponent implements OnInit {
   showForm = false;
   editing: Test | null = null;
 
-  showParam = false;
-  paramId: number | null = null;
 
-  constructor(private service: TestCaseService) {}
+  constructor(private service: TestCaseService, private router: Router) {}
 
   ngOnInit() {
     this.load();
@@ -105,6 +102,5 @@ export class ScriptsComponent implements OnInit {
 
   onSaved() { this.showForm = false; this.load(); }
 
-  param(t: Test) { this.paramId = t.id; this.showParam = true; }
-  onParamSaved() { this.showParam = false; this.load(); }
+  param(t: Test) { this.router.navigate(['/parameterization', t.id]); }
 }
