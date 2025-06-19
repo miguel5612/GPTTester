@@ -118,6 +118,21 @@ export interface PlanExecution {
   started_at: string;
 }
 
+export interface ExecutionLog {
+  id: number;
+  execution_id: number;
+  message: string;
+  timestamp: string;
+}
+
+export interface ExecutionSchedule {
+  id: number;
+  plan_id: number;
+  run_at: string;
+  agent_id?: number;
+  executed: boolean;
+}
+
 export interface AssignmentDetail {
   action: Action;
   element: PageElement;
@@ -223,6 +238,12 @@ export interface ExecutionPlanCreate {
   nombre: string;
   test_id: number;
   agent_id: number;
+}
+
+export interface ExecutionScheduleCreate {
+  plan_id: number;
+  run_at: string;
+  agent_id?: number;
 }
 
 export interface LoginRequest {

@@ -369,3 +369,21 @@ class ExecutionLog(ExecutionLogBase):
 class ExecutionUpdate(BaseModel):
     status: Optional[str] = None
     log: Optional[str] = None
+
+
+class ExecutionScheduleBase(BaseModel):
+    plan_id: int
+    run_at: datetime
+    agent_id: Optional[int] = None
+
+
+class ExecutionScheduleCreate(ExecutionScheduleBase):
+    pass
+
+
+class ExecutionSchedule(ExecutionScheduleBase):
+    id: int
+    executed: bool
+
+    class Config:
+        orm_mode = True
