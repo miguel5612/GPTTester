@@ -24,13 +24,18 @@
     </nav>
   </div>
 
-  <div *ngIf="selectedClient && !selectedProject">
-    <h2>Proyectos de {{ selectedClient.name }}</h2>
-    <ul class="list-group">
-      <li class="list-group-item" *ngFor="let p of projects">
-        <button class="btn btn-link" (click)="selectProject(p)">{{ p.name }}</button>
-      </li>
-    </ul>
+  <div *ngIf="selectedClient && !selectedProject" class="project-selection">
+    <h2 class="text-center">Proyectos de {{ selectedClient.name }}</h2>
+    <table class="table table-striped w-auto mx-auto">
+      <tbody>
+        <tr *ngFor="let p of projects">
+          <td>{{ p.name }}</td>
+          <td class="text-end">
+            <button class="btn btn-link" (click)="selectProject(p)">Seleccionar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
     <button class="btn btn-secondary mt-2" (click)="selectedClient = null">Volver</button>
   </div>
 
