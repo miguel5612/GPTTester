@@ -100,6 +100,7 @@ class Client(ClientBase):
 class ProjectBase(BaseModel):
     name: str
     client_id: int
+    objetivo: Optional[str] = None
 
 
 class ProjectCreate(ProjectBase):
@@ -110,6 +111,8 @@ class Project(ProjectBase):
     id: int
     is_active: bool
     analysts: List[User] = []
+    scripts_per_day: Optional[int] = None
+    test_types: Optional[str] = None
 
     class Config:
         orm_mode = True

@@ -79,6 +79,8 @@ project_analysts = Table(
     Base.metadata,
     Column("project_id", Integer, ForeignKey("projects.id"), primary_key=True),
     Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("scripts_per_day", Integer, nullable=True),
+    Column("test_types", String, nullable=True),
 )
 
 
@@ -122,6 +124,7 @@ class Project(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
+    objetivo = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
 
     client = relationship("Client", back_populates="projects")
