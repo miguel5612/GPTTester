@@ -1,4 +1,14 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table, Date, DateTime, UniqueConstraint
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Boolean,
+    ForeignKey,
+    Table,
+    Date,
+    DateTime,
+    UniqueConstraint,
+)
 import enum
 from datetime import datetime
 from sqlalchemy.orm import relationship
@@ -14,15 +24,14 @@ class Role(Base):
 
 class PagePermission(Base):
     __tablename__ = "permissions"
-    __table_args__ = (
-        UniqueConstraint("role_id", "page", name="uix_role_page"),
-    )
+    __table_args__ = (UniqueConstraint("role_id", "page", name="uix_role_page"),)
 
     id = Column(Integer, primary_key=True, index=True)
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
     page = Column(String, nullable=False)
 
     role = relationship("Role", backref="permissions")
+
 
 class User(Base):
     __tablename__ = "users"
@@ -45,6 +54,7 @@ class User(Base):
         secondary="client_analysts",
         back_populates="analysts",
     )
+
 
 class TestCase(Base):
     __tablename__ = "tests"
@@ -230,6 +240,7 @@ class ActionAssignment(Base):
     element = relationship("PageElement")
     test = relationship("TestCase")
 
+
 class ExecutionAgent(Base):
     __tablename__ = "agents"
     id = Column(Integer, primary_key=True, index=True)
@@ -256,6 +267,7 @@ class ExecutionStatus(str, enum.Enum):
     RUNNING = "En ejecucion"
     FINISHED = "Finalizado"
 
+
 class PlanExecution(Base):
     __tablename__ = "execution_records"
 
@@ -267,3 +279,16 @@ class PlanExecution(Base):
 
     plan = relationship("ExecutionPlan")
     agent = relationship("ExecutionAgent")
+
+
+class Workspace(Base):
+    __tablename__ = "workspaces"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
+    client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
+
+    user = relationship("User")
+    client = relationship("Client")
+    project = relationship("Project")
