@@ -1,11 +1,27 @@
 <div class="dashboard-container">
-  <div *ngIf="!selectedClient">
-    <h2>Selecciona un Cliente</h2>
-    <ul class="list-group">
-      <li class="list-group-item" *ngFor="let c of clients">
-        <button class="btn btn-link" (click)="selectClient(c)">{{ c.name }}</button>
-      </li>
-    </ul>
+  <div *ngIf="!selectedClient" class="client-selection">
+    <h2 class="text-center">Selecciona un Cliente</h2>
+    <table class="table table-striped w-auto mx-auto">
+      <tbody>
+        <tr *ngFor="let c of paginatedClients()">
+          <td>{{ c.name }}</td>
+          <td class="text-end">
+            <button class="btn btn-link" (click)="selectClient(c)">Seleccionar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <nav>
+      <ul class="pagination justify-content-center mb-0">
+        <li class="page-item" [class.disabled]="clientPage === 1">
+          <button class="page-link" (click)="clientPrev()">Anterior</button>
+        </li>
+        <li class="page-item"><span class="page-link">{{ clientPage }}</span></li>
+        <li class="page-item" [class.disabled]="clientPageEnd">
+          <button class="page-link" (click)="clientNext()" [disabled]="clientPageEnd">Siguiente</button>
+        </li>
+      </ul>
+    </nav>
   </div>
 
   <div *ngIf="selectedClient && !selectedProject">
