@@ -98,6 +98,7 @@ def add_role_permission(
     db_perm = models.PagePermission(role_id=role_id, page=perm.page)
     db.add(db_perm)
     db.commit()
+    deps.invalidate_role_permissions(role_id)
     db.refresh(db_perm)
     return db_perm
 
@@ -121,6 +122,7 @@ def delete_role_permission(
         raise HTTPException(status_code=404, detail="Permission not found")
     db.delete(perm)
     db.commit()
+    deps.invalidate_role_permissions(role_id)
     return {"ok": True}
 
 
@@ -251,7 +253,14 @@ def login_for_access_token(
         raise HTTPException(status_code=400, detail="Invalid username or password")
     user.last_login = datetime.utcnow()
     db.commit()
-    token = deps.create_access_token({"sub": user.username})
+    token = deps.create_access_token(
+        {
+            "sub": user.username,
+            "user_id": user.id,
+            "role_id": user.role.id if user.role else None,
+            "role_name": user.role.name if user.role else None,
+        }
+    )
     return {"access_token": token, "token_type": "bearer"}
 
 
@@ -1724,7 +1733,14 @@ def get_pending_execution(
     user = deps.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Invalid username or password")
-    token = deps.create_access_token({"sub": user.username})
+    token = deps.create_access_token(
+        {
+            "sub": user.username,
+            "user_id": user.id,
+            "role_id": user.role.id if user.role else None,
+            "role_name": user.role.name if user.role else None,
+        }
+    )
     return {"access_token": token, "token_type": "bearer"}
 
 
