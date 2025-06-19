@@ -44,6 +44,7 @@ export interface Test {
   when?: string;
   then?: string;
   test_plan_id?: number;
+  actor_id?: number;
 }
 
 export interface TestPlan {
@@ -159,6 +160,7 @@ export interface TestCreate {
   when?: string;
   then?: string;
   test_plan_id?: number;
+  actor_id?: number;
 }
 
 export interface TestPlanCreate {
