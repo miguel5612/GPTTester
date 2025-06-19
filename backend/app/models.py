@@ -250,6 +250,9 @@ class ExecutionAgent(Base):
     hostname = Column(String, unique=True, nullable=False)
     os = Column(String, nullable=False)
     categoria = Column(String, nullable=True)
+    api_key = Column(String, unique=True, nullable=False)
+    last_seen = Column(DateTime, nullable=True)
+    capabilities = Column(String, nullable=True)
 
 
 class ExecutionPlan(Base):
