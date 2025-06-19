@@ -9,8 +9,6 @@ export interface User {
   last_login?: string;
   is_active: boolean;
   role: Role;
-  tests: Test[];
-  projects: Project[];
 }
 
 export interface Client {
