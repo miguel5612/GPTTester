@@ -43,7 +43,7 @@ import { ApiService } from '../../services/api.service';
 })
 export class ClientAnalystsComponent implements OnChanges {
   @Input() clientId!: number;
-  @Output() updated = new EventEmitter<void>();
+  @Output() updated = new EventEmitter<{ action: string; user: User }>();
   @Output() close = new EventEmitter<void>();
 
   client: Client | null = null;
@@ -99,7 +99,8 @@ export class ClientAnalystsComponent implements OnChanges {
       : this.clientService.unassignAnalyst(this.client.id, user.id);
     obs.subscribe(c => {
       this.client = c;
-      this.updated.emit();
+      const action = checked ? 'added analyst' : 'removed analyst';
+      this.updated.emit({ action, user });
     });
   }
 }
