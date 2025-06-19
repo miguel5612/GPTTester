@@ -1,5 +1,5 @@
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect, Query
 from fastapi.responses import FileResponse
 import json
 from datetime import datetime
@@ -11,6 +11,7 @@ from sqlalchemy import or_
 
 from . import models, schemas, deps, security, executor
 from .agent_manager import agent_manager
+from .execution_monitor import monitor_manager
 
 router = APIRouter()
 
@@ -1906,6 +1907,7 @@ def agent_result(
     with open(path, "wb") as f:
         f.write(file.file.read())
     db.commit()
+    monitor_manager.broadcast_sync(execution_id, {"type": "finish", "status": record.status})
     return {"ok": True}
 
 
@@ -1934,6 +1936,61 @@ def update_execution_status(
         )
         db.add(log)
     db.commit()
+    monitor_manager.broadcast_sync(
+        execution_id,
+        {
+            "type": "update",
+            "status": record.status,
+            "log": update.log,
+            "progress": update.progress,
+            "screenshot": update.screenshot,
+        },
+    )
+    return {"ok": True}
+
+
+@router.post("/executions/{execution_id}/pause")
+def pause_execution(
+    execution_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    record = db.query(models.PlanExecution).filter(models.PlanExecution.id == execution_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Execution not found")
+    record.status = "Pausado"
+    db.commit()
+    monitor_manager.broadcast_sync(execution_id, {"type": "pause", "status": record.status})
+    return {"ok": True}
+
+
+@router.post("/executions/{execution_id}/resume")
+def resume_execution(
+    execution_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    record = db.query(models.PlanExecution).filter(models.PlanExecution.id == execution_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Execution not found")
+    record.status = "En ejecucion"
+    db.commit()
+    monitor_manager.broadcast_sync(execution_id, {"type": "resume", "status": record.status})
+    return {"ok": True}
+
+
+@router.post("/executions/{execution_id}/cancel")
+def cancel_execution(
+    execution_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    record = db.query(models.PlanExecution).filter(models.PlanExecution.id == execution_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Execution not found")
+    record.status = "Cancelado"
+    db.commit()
+    monitor_manager.broadcast_sync(execution_id, {"type": "cancel", "status": record.status})
     return {"ok": True}
 
 
@@ -2168,3 +2225,18 @@ async def agent_websocket(ws: WebSocket):
 @router.get("/agents/metrics")
 def agents_metrics():
     return agent_manager.get_metrics()
+
+
+@router.websocket("/ws/execution/{execution_id}")
+async def execution_websocket(ws: WebSocket, execution_id: int, token: str = Query(...)):
+    try:
+        jwt.decode(token, deps.SECRET_KEY, algorithms=[deps.ALGORITHM])
+    except Exception:
+        await ws.close(code=1008)
+        return
+    await monitor_manager.connect(execution_id, ws)
+    try:
+        while True:
+            await ws.receive_text()
+    except WebSocketDisconnect:
+        await monitor_manager.disconnect(execution_id, ws)

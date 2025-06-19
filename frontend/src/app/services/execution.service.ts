@@ -42,4 +42,8 @@ export class ExecutionService {
   downloadReport(id: number, type: 'report' | 'evidence'): Observable<Blob> {
     return this.api.downloadExecutionFile(id, type);
   }
+
+  pause(id: number) { return this.api.pauseExecution(id); }
+  resume(id: number) { return this.api.resumeExecution(id); }
+  cancel(id: number) { return this.api.cancelExecution(id); }
 }

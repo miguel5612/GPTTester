@@ -36,7 +36,8 @@ export const routes: Routes = [
       { path: 'service-manager', loadComponent: () => import('./components/service-manager/service-manager.component').then(m => m.ServiceManagerComponent) },
       { path: 'client-admin', loadComponent: () => import('./components/client-admin/client-admin.component').then(m => m.ClientAdminComponent) },
       { path: 'actors', loadComponent: () => import('./components/actors/actors.component').then(m => m.ActorsComponent) },
-      { path: 'execution', loadComponent: () => import('./components/execution/execution.component').then(m => m.ExecutionComponent) }
+      { path: 'execution', loadComponent: () => import('./components/execution/execution.component').then(m => m.ExecutionComponent) },
+      { path: 'execution-monitor', loadComponent: () => import('./components/execution/execution-monitor-page.component').then(m => m.ExecutionMonitorPageComponent) }
     ]
   },
   { path: '**', redirectTo: '' }
