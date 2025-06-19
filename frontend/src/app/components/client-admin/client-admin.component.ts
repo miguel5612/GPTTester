@@ -132,7 +132,6 @@ export class ClientAdminComponent implements OnInit {
           : true
       );
   }
-
   filteredHistory() {
     const term = this.search.toLowerCase();
     return this.history.filter(h =>
