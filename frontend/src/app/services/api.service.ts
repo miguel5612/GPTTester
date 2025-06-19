@@ -96,6 +96,7 @@ export class ApiService {
     params.push('limit=10');
     const query = params.length ? `?${params.join('&')}` : '';
     return this.http.get<User[]>(`${this.baseUrl}/analysts/${query}`, { headers: this.getHeaders() });
+
   }
 
   getUser(id: number): Observable<User> {

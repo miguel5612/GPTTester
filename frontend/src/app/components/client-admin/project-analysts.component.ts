@@ -61,7 +61,9 @@ export class ProjectAnalystsComponent implements OnChanges {
 
   load() {
     this.projectService.getProject(this.projectId).subscribe(p => this.project = p);
+
     this.api.getAnalysts(this.search, this.page).subscribe(users => {
+
       this.analysts = users;
     });
   }
