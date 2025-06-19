@@ -20,6 +20,8 @@ export class DashboardComponent implements OnInit {
   agents: Agent[] = [];
   clients: Client[] = [];
   projects: Project[] = [];
+  clientPage = 1;
+  readonly clientPageSize = 10;
   selectedClient: Client | null = null;
   selectedProject: Project | null = null;
   
@@ -48,12 +50,13 @@ export class DashboardComponent implements OnInit {
           this.currentUser.role?.name !== 'Administrador' &&
           this.currentUser.role?.name !== 'Gerente de servicios'
         ) {
-          this.clients = clients.filter(c =>
-            c.analysts.some(a => a.id === this.currentUser!.id)
-          );
+          this.clients = clients
+            .filter(c => c.is_active)
+            .filter(c => c.analysts.some(a => a.id === this.currentUser!.id));
         } else {
-          this.clients = clients;
+          this.clients = clients.filter(c => c.is_active);
         }
+        this.clientPage = 1;
       },
       error: err => console.error('Error loading clients:', err)
     });
@@ -226,6 +229,23 @@ export class DashboardComponent implements OnInit {
   createNewActor() {
     // Navigate to actor creation or open modal
     console.log('Create new actor');
+  }
+
+  paginatedClients(): Client[] {
+    const start = (this.clientPage - 1) * this.clientPageSize;
+    return this.clients.slice(start, start + this.clientPageSize);
+  }
+
+  get clientPageEnd(): boolean {
+    return this.clientPage * this.clientPageSize >= this.clients.length;
+  }
+
+  clientPrev() {
+    if (this.clientPage > 1) this.clientPage--;
+  }
+
+  clientNext() {
+    if (!this.clientPageEnd) this.clientPage++;
   }
 
   toggleUser(user: User) {
