@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
@@ -6,6 +6,7 @@ from passlib.context import CryptContext
 from datetime import datetime
 import logging
 import os
+import time
 
 from . import models, schemas
 from .database import SessionLocal
@@ -17,8 +18,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# In-memory cache for permissions per role
-_permission_cache: dict[int, list[str]] = {}
+# In-memory cache for permissions per role with TTL
+_permission_cache: dict[int, tuple[list[str], float]] = {}
+PERMISSION_TTL = 300  # seconds
 
 logger = logging.getLogger("auth")
 
@@ -46,16 +48,19 @@ def get_role(db: Session, role_id: int):
 
 
 def get_role_permissions(db: Session, role_id: int) -> list[str]:
-    """Return list of permission names for a role, using cache when possible."""
-    perms = _permission_cache.get(role_id)
-    if perms is None:
+    """Return list of permission names for a role, using cache with TTL."""
+    entry = _permission_cache.get(role_id)
+    now = time.time()
+    if entry is None or now > entry[1]:
         perms = [
             p.page
             for p in db.query(models.PagePermission)
             .filter(models.PagePermission.role_id == role_id)
             .all()
         ]
-        _permission_cache[role_id] = perms
+        _permission_cache[role_id] = (perms, now + PERMISSION_TTL)
+    else:
+        perms = entry[0]
     return perms
 
 
@@ -201,3 +206,50 @@ def can_access_project(db: Session, user_id: int, project_id: int) -> bool:
         .first()
         is not None
     )
+
+
+def require_workspace(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+) -> models.Workspace:
+    workspace = (
+        db.query(models.Workspace)
+        .filter(models.Workspace.user_id == current_user.id)
+        .first()
+    )
+    if not workspace:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Workspace not selected")
+    if not can_access_client(db, current_user.id, workspace.client_id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Client access denied")
+    if workspace.project_id and not can_access_project(db, current_user.id, workspace.project_id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Project access denied")
+    request.state.client_id = workspace.client_id
+    request.state.project_id = workspace.project_id
+    return workspace
+
+
+def require_client_access(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+) -> int:
+    client_id = getattr(request.state, "client_id", None)
+    if client_id is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="client_id missing")
+    if not can_access_client(db, current_user.id, client_id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Client access denied")
+    return client_id
+
+
+def require_project_access(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+) -> int:
+    project_id = getattr(request.state, "project_id", None)
+    if project_id is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="project_id missing")
+    if not can_access_project(db, current_user.id, project_id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Project access denied")
+    return project_id

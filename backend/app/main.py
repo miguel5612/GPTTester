@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from . import models, deps
+from .gateway import setup_gateway
 from .database import engine, SessionLocal
 from .routes import router
 from fastapi.middleware.cors import CORSMiddleware
@@ -63,6 +64,7 @@ def init_data():
 init_data()
 
 app = FastAPI(title="Test Automation API")
+setup_gateway(app)
 logger = logging.getLogger("audit")
 logging.basicConfig(level=logging.INFO)
 
@@ -102,32 +104,6 @@ def schedule_worker():
 def start_scheduler():
     thread = threading.Thread(target=schedule_worker, daemon=True)
     thread.start()
-
-
-@app.middleware("http")
-async def audit_log(request: Request, call_next):
-    token = request.headers.get("Authorization", "").replace("Bearer ", "")
-    user = None
-    if token:
-        try:
-            payload = jwt.decode(token, deps.SECRET_KEY, algorithms=[deps.ALGORITHM])
-            user = payload.get("sub")
-        except Exception:
-            user = None
-    endpoint = request.url.path
-    client_id = request.path_params.get("client_id") or request.query_params.get("client_id")
-    project_id = request.path_params.get("project_id") or request.query_params.get("project_id")
-    timestamp = datetime.utcnow().isoformat()
-    logger.info(
-        "user=%s endpoint=%s timestamp=%s client=%s project=%s",
-        user,
-        endpoint,
-        timestamp,
-        client_id,
-        project_id,
-    )
-    response = await call_next(request)
-    return response
 
 app.include_router(router)
 app.add_middleware(
