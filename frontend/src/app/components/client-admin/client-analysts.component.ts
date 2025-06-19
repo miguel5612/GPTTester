@@ -16,7 +16,7 @@ import { ApiService } from '../../services/api.service';
         <div *ngFor="let u of analysts" class="form-check">
           <input class="form-check-input" type="checkbox" [id]="'ca-'+u.id"
             [checked]="isAssigned(u)"
-            (change)="toggle(u, ($event.target as HTMLInputElement).checked)">
+            (change)="toggle(u, $any($event.target).checked)">
           <label class="form-check-label" [for]="'ca-'+u.id">
             {{ u.username }} ({{ u.role.name }})
           </label>
