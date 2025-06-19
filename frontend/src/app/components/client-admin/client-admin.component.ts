@@ -8,11 +8,19 @@ import { Client, Project, User } from '../../models';
 import { ClientFormComponent } from './client-form.component';
 import { ProjectAnalystsComponent } from './project-analysts.component';
 import { ClientAnalystsComponent } from './client-analysts.component';
+import { ClientProjectsComponent } from './client-projects.component';
 
 @Component({
   selector: 'app-client-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, ClientFormComponent, ProjectAnalystsComponent, ClientAnalystsComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ClientFormComponent,
+    ProjectAnalystsComponent,
+    ClientAnalystsComponent,
+    ClientProjectsComponent
+  ],
 
   template: `
     <div class="main-panel">
@@ -39,6 +47,7 @@ import { ClientAnalystsComponent } from './client-analysts.component';
           <button class="btn btn-sm btn-secondary ms-2" (click)="edit(c)">Editar</button>
           <button class="btn btn-sm btn-danger ms-2" (click)="remove(c)">Inactivar</button>
           <button class="btn btn-sm btn-info ms-2" (click)="manageClientAnalysts(c)">Analistas</button>
+          <button class="btn btn-sm btn-warning ms-2" (click)="manageProjects(c)">Proyectos</button>
         </h3>
         <ul class="list-group">
           <li class="list-group-item" *ngFor="let p of projectsByClient(c.id)">
@@ -91,6 +100,17 @@ import { ClientAnalystsComponent } from './client-analysts.component';
         </div>
       </div>
       <div class="modal-backdrop fade show" *ngIf="selectedClient"></div>
+
+      <div class="modal fade show d-block" tabindex="-1" *ngIf="projectClient" (click)="projectClient=null">
+        <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
+          <div class="modal-content">
+            <div class="modal-body">
+              <app-client-projects [clientId]="projectClient.id" (updated)="onProjectsUpdated()" (close)="projectClient=null"></app-client-projects>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show" *ngIf="projectClient"></div>
   `
 })
 export class ClientAdminComponent implements OnInit {
@@ -100,6 +120,7 @@ export class ClientAdminComponent implements OnInit {
   editing: Client | null = null;
   selectedProject: Project | null = null;
   selectedClient: Client | null = null;
+  projectClient: Client | null = null;
   search = '';
   tab: 'active' | 'inactive' | 'history' = 'active';
   history: { client: string; action: string }[] = [];
@@ -188,6 +209,10 @@ export class ClientAdminComponent implements OnInit {
     this.selectedClient = c;
   }
 
+  manageProjects(c: Client) {
+    this.projectClient = c;
+  }
+
   onProjectAnalystsUpdated(e: { action: string; user: User }) {
     if (this.selectedProject) {
       const clientName = this.clients.find(cl => cl.id === this.selectedProject!.client_id)?.name || '';
@@ -201,6 +226,10 @@ export class ClientAdminComponent implements OnInit {
       this.history.push({ client: this.selectedClient.name, action: `${e.action} (${e.user.username})` });
       this.loadData();
     }
+  }
+
+  onProjectsUpdated() {
+    this.loadData();
   }
 
   onSaved(c: Client) {
