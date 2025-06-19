@@ -11,6 +11,10 @@ export class ClientService {
     return this.api.getClients();
   }
 
+  getAssignedClients(): Observable<Client[]> {
+    return this.api.getAssignedClients();
+  }
+
   createClient(client: ClientCreate): Observable<Client> {
     return this.api.createClient(client);
   }
