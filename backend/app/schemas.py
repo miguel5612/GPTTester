@@ -33,6 +33,7 @@ class Permission(PermissionBase):
     class Config:
         orm_mode = True
 
+
 class TestBase(BaseModel):
     name: str
     description: Optional[str] = None
@@ -43,8 +44,10 @@ class TestBase(BaseModel):
     then: Optional[str] = None
     test_plan_id: Optional[int] = None
 
+
 class TestCreate(TestBase):
     pass
+
 
 class Test(TestBase):
     id: int
@@ -54,8 +57,10 @@ class Test(TestBase):
     class Config:
         orm_mode = True
 
+
 class UserBase(BaseModel):
     username: str
+
 
 class UserCreate(UserBase):
     password: str
@@ -64,8 +69,10 @@ class UserCreate(UserBase):
 class UserRoleUpdate(BaseModel):
     role_id: int
 
+
 class UserActiveUpdate(BaseModel):
     is_active: bool
+
 
 class User(UserBase):
     id: int
@@ -242,6 +249,7 @@ class ActionAssignment(ActionAssignmentBase):
     class Config:
         orm_mode = True
 
+
 class AgentBase(BaseModel):
     alias: str = Field(..., min_length=1)
     hostname: str = Field(..., min_length=1)
@@ -250,8 +258,8 @@ class AgentBase(BaseModel):
 
     @root_validator(skip_on_failure=True)
     def validate_fields(cls, values):
-        os_val = values.get('os')
-        categoria = values.get('categoria')
+        os_val = values.get("os")
+        categoria = values.get("categoria")
         allowed = ["Windows", "Linux", "Mac", "Android", "iOS"]
         if os_val not in allowed:
             raise ValueError("Invalid operating system")
@@ -262,8 +270,10 @@ class AgentBase(BaseModel):
                 raise ValueError("categoria only allowed for Android/iOS agents")
         return values
 
+
 class AgentCreate(AgentBase):
     pass
+
 
 class Agent(AgentBase):
     id: int
@@ -287,6 +297,7 @@ class ExecutionPlan(ExecutionPlanBase):
 
     class Config:
         orm_mode = True
+
 
 class PlanExecutionBase(BaseModel):
     plan_id: int
@@ -322,3 +333,20 @@ class ClientDetail(Client):
 class Metrics(BaseModel):
     clients: List[ClientDetail]
     flows: List[Test]
+
+
+class WorkspaceBase(BaseModel):
+    client_id: int
+    project_id: Optional[int] = None
+
+
+class WorkspaceCreate(WorkspaceBase):
+    pass
+
+
+class Workspace(WorkspaceBase):
+    id: int
+    user_id: int
+
+    class Config:
+        orm_mode = True
