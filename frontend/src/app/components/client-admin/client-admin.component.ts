@@ -7,12 +7,12 @@ import { ProjectService } from '../../services/project.service';
 import { Client, Project, User } from '../../models';
 import { ClientFormComponent } from './client-form.component';
 import { ProjectAnalystsComponent } from './project-analysts.component';
-import { ClientAnalystsComponent } from './client-analysts.component';
 
 @Component({
   selector: 'app-client-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, ClientFormComponent, ProjectAnalystsComponent, ClientAnalystsComponent],
+  imports: [CommonModule, FormsModule, ClientFormComponent, ProjectAnalystsComponent],
+
   template: `
     <div class="main-panel">
       <h1>Administración de Clientes</h1>
@@ -37,7 +37,6 @@ import { ClientAnalystsComponent } from './client-analysts.component';
 
       <app-client-form *ngIf="showForm" [client]="editing" (saved)="onSaved()" (cancel)="showForm=false"></app-client-form>
       <app-project-analysts *ngIf="selectedProject" [projectId]="selectedProject.id" (updated)="loadData()" (close)="selectedProject=null"></app-project-analysts>
-      <app-client-analysts *ngIf="selectedClient" [clientId]="selectedClient.id" (updated)="loadData()" (close)="selectedClient=null"></app-client-analysts>
     </div>
   `
 })
@@ -84,10 +83,6 @@ export class ClientAdminComponent implements OnInit {
     if (confirm('¿Eliminar cliente?')) {
       this.clientService.deleteClient(c.id).subscribe(() => this.loadData());
     }
-  }
-
-  manageClientAnalysts(c: Client) {
-    this.selectedClient = c;
   }
 
   manageAnalysts(p: Project) {
