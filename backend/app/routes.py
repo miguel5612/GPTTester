@@ -1,8 +1,9 @@
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse
 import json
 from datetime import datetime
+from uuid import uuid4
 import os
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -11,6 +12,12 @@ from sqlalchemy import or_
 from . import models, schemas, deps, security, executor
 
 router = APIRouter()
+
+
+def get_agent_from_key(
+    db: Session, api_key: str
+) -> models.ExecutionAgent | None:
+    return db.query(models.ExecutionAgent).filter(models.ExecutionAgent.api_key == api_key).first()
 
 
 @router.post("/roles/", response_model=schemas.Role)
@@ -1778,6 +1785,127 @@ def get_pending_execution(
         test=schemas.Test.from_orm(test),
         assignments=details,
     )
+
+
+@router.post("/agent/register", response_model=schemas.AgentRegisterResponse)
+def agent_register(
+    agent: schemas.AgentRegister,
+    db: Session = Depends(deps.get_db),
+):
+    existing = (
+        db.query(models.ExecutionAgent)
+        .filter(models.ExecutionAgent.hostname == agent.hostname)
+        .first()
+    )
+    if existing:
+        raise HTTPException(status_code=400, detail="Hostname already registered")
+    api_key = uuid4().hex
+    db_agent = models.ExecutionAgent(
+        alias=agent.alias,
+        hostname=agent.hostname,
+        os=agent.os,
+        categoria=agent.categoria,
+        api_key=api_key,
+        last_seen=datetime.utcnow(),
+        capabilities=agent.capabilities,
+    )
+    db.add(db_agent)
+    db.commit()
+    db.refresh(db_agent)
+    return schemas.AgentRegisterResponse(api_key=api_key, agent_id=db_agent.id)
+
+
+@router.post("/agent/heartbeat")
+def agent_heartbeat(
+    api_key: str,
+    db: Session = Depends(deps.get_db),
+):
+    agent = get_agent_from_key(db, api_key)
+    if not agent:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    agent.last_seen = datetime.utcnow()
+    db.commit()
+    return {"ok": True}
+
+
+@router.get("/agent/pending")
+def agent_pending(api_key: str, db: Session = Depends(deps.get_db)):
+    agent = get_agent_from_key(db, api_key)
+    if not agent:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    record = (
+        db.query(models.PlanExecution)
+        .filter(
+            models.PlanExecution.agent_id == agent.id,
+            models.PlanExecution.status.in_(
+                [
+                    models.ExecutionStatus.CALLING.value,
+                    models.ExecutionStatus.RUNNING.value,
+                ]
+            ),
+        )
+        .order_by(models.PlanExecution.started_at)
+        .first()
+    )
+    if not record:
+        raise HTTPException(status_code=404, detail="No pending execution")
+    test = record.plan.test
+    payload = executor.prepare_execution_payload(db, test.id)
+    return {"execution_id": record.id, "payload": payload}
+
+
+@router.post("/agent/status")
+def agent_status(
+    update: schemas.AgentStatusUpdate,
+    api_key: str,
+    db: Session = Depends(deps.get_db),
+):
+    agent = get_agent_from_key(db, api_key)
+    if not agent:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    record = (
+        db.query(models.PlanExecution)
+        .filter(models.PlanExecution.id == update.execution_id)
+        .first()
+    )
+    if not record or record.agent_id != agent.id:
+        raise HTTPException(status_code=404, detail="Execution not found")
+    if update.status:
+        record.status = update.status
+    if update.log:
+        log = models.ExecutionLog(
+            execution_id=update.execution_id,
+            message=update.log,
+        )
+        db.add(log)
+    db.commit()
+    return {"ok": True}
+
+
+@router.post("/agent/result")
+def agent_result(
+    execution_id: int,
+    file: UploadFile,
+    api_key: str,
+    db: Session = Depends(deps.get_db),
+):
+    agent = get_agent_from_key(db, api_key)
+    if not agent:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    record = (
+        db.query(models.PlanExecution)
+        .filter(models.PlanExecution.id == execution_id)
+        .first()
+    )
+    if not record or record.agent_id != agent.id:
+        raise HTTPException(status_code=404, detail="Execution not found")
+    record.status = models.ExecutionStatus.FINISHED.value
+    filename = f"result_{execution_id}.zip"
+    path = os.path.join("/tmp", filename)
+    with open(path, "wb") as f:
+        f.write(file.file.read())
+    db.commit()
+    return {"ok": True}
 
 
 @router.post("/executions/{execution_id}/update")

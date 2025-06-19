@@ -165,6 +165,8 @@ Los agentes representan máquinas o dispositivos en los que se ejecutan las prue
 - `os` (Windows, Linux, Mac, Android, iOS)
 - `categoria` opcional `granja móvil` para dispositivos Android/iOS
 
+Al registrarse en `/agent/register` el backend genera una API key que el agente debe usar en los demás endpoints de comunicación.
+
 Endpoints principales:
 
 - `POST /agents/` crear agente
@@ -172,6 +174,11 @@ Endpoints principales:
 - `GET /agents/{id}` obtener agente
 - `PUT /agents/{id}` actualizar agente
 - `DELETE /agents/{id}` eliminar agente
+- `POST /agent/register` registro automático de un agente y obtención de API key
+- `POST /agent/heartbeat` notificación de vida usando la API key
+- `GET /agent/pending` consulta de la ejecución pendiente con API key
+- `POST /agent/status` actualización de estado y logs
+- `POST /agent/result` envío del archivo de resultados
 
 ### Planes de ejecución
 
@@ -187,6 +194,8 @@ Endpoints principales:
 - `DELETE /executionplans/{id}` eliminar plan
 - `POST /executionplans/{id}/run` disparar la ejecución y registrar el estado inicial. Si el agente ya tiene una ejecución pendiente se rechaza la petición.
 - `GET /agents/{hostname}/pending` un agente autenticado consulta su próxima ejecución pendiente y recibe el plan, caso de prueba, elementos y acciones con parámetros
+
+Además, el helper `prepare_execution_payload(test_id)` genera el script compilado, datos de contexto y configuración necesarios que el backend envía al agente.
 
 ### Métricas
 

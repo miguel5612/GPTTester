@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
+
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
@@ -25,6 +26,12 @@ def execute_test(db: Session, test_id: int, agent_id: int) -> dict:
     script = "\n".join(lines)
     payload = {"test_id": test_id, "agent_id": agent_id, "script": script}
     return payload
+
+
+def prepare_execution_payload(db: Session, test_id: int) -> dict:
+    """Return script, context and configuration for execution."""
+    base = execute_test(db, test_id, agent_id=0)
+    return {"script": base["script"], "context": {}, "config": {}}
 
 
 def get_available_agent(db: Session, categoria: str | None = None) -> models.ExecutionAgent | None:

@@ -283,6 +283,24 @@ class Agent(AgentBase):
         orm_mode = True
 
 
+class AgentRegister(AgentBase):
+    capabilities: Optional[str] = None
+
+
+class AgentRegisterResponse(BaseModel):
+    api_key: str
+    agent_id: int
+
+
+class AgentStatusUpdate(BaseModel):
+    execution_id: int
+    status: Optional[str] = None
+    log: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
+
 class ExecutionPlanBase(BaseModel):
     nombre: str
     test_id: int
