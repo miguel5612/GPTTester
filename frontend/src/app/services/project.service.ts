@@ -31,8 +31,8 @@ export class ProjectService {
     return this.api.deleteProject(id);
   }
 
-  assignAnalyst(projectId: number, userId: number): Observable<Project> {
-    return this.api.assignAnalyst(projectId, userId);
+  assignAnalyst(projectId: number, userId: number, scriptsPerDay?: number): Observable<Project> {
+    return this.api.assignAnalyst(projectId, userId, scriptsPerDay);
   }
 
   unassignAnalyst(projectId: number, userId: number): Observable<Project> {

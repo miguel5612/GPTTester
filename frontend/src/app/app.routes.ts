@@ -64,6 +64,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/client-admin/client-projects.component').then(m => m.ClientProjectsComponent)
   },
   {
+    path: 'service-manager',
+    loadComponent: () => import('./components/service-manager/service-manager.component').then(m => m.ServiceManagerComponent)
+  },
+  {
     path: 'client-admin',
     loadComponent: () => import('./components/client-admin/client-admin.component').then(m => m.ClientAdminComponent)
   },

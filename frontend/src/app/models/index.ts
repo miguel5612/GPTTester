@@ -24,6 +24,9 @@ export interface Project {
   client_id: number;
   is_active: boolean;
   analysts: User[];
+  objetivo?: string;
+  scripts_per_day?: number;
+  test_types?: string;
 }
 
 export interface Actor {
@@ -148,6 +151,7 @@ export interface ClientCreate {
 export interface ProjectCreate {
   name: string;
   client_id: number;
+  objetivo?: string;
 }
 
 export interface TestCreate {

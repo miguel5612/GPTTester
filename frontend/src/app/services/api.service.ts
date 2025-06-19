@@ -161,8 +161,12 @@ export class ApiService {
     return this.http.get<Project[]>(`${this.baseUrl}/projects/by-client/${clientId}`, { headers: this.getHeaders() });
   }
 
-  assignAnalyst(projectId: number, userId: number): Observable<Project> {
-    return this.http.post<Project>(`${this.baseUrl}/projects/${projectId}/analysts/${userId}`, {}, { headers: this.getHeaders() });
+  assignAnalyst(projectId: number, userId: number, scriptsPerDay?: number): Observable<Project> {
+    let url = `${this.baseUrl}/projects/${projectId}/analysts/${userId}`;
+    if (scriptsPerDay !== undefined) {
+      url += `?scripts_per_day=${scriptsPerDay}`;
+    }
+    return this.http.post<Project>(url, {}, { headers: this.getHeaders() });
   }
 
   unassignAnalyst(projectId: number, userId: number): Observable<Project> {
