@@ -359,11 +359,15 @@ def unassign_client_analyst(
 def create_project(
     project: schemas.ProjectCreate,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = deps.require_role(["Administrador"]),
+    current_user: models.User = deps.require_role(["Administrador", "Gerente de servicios"]),
 ):
     if not db.query(models.Client).filter(models.Client.id == project.client_id).first():
         raise HTTPException(status_code=404, detail="Client not found")
-    db_project = models.Project(name=project.name, client_id=project.client_id)
+    db_project = models.Project(
+        name=project.name,
+        client_id=project.client_id,
+        objetivo=project.objetivo,
+    )
     db.add(db_project)
     db.commit()
     db.refresh(db_project)
@@ -375,14 +379,24 @@ def read_projects(
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_user),
 ):
-    if current_user.role and current_user.role.name == "Administrador":
+    if current_user.role and current_user.role.name in ["Administrador", "Gerente de servicios"]:
         return db.query(models.Project).all()
-    return (
-        db.query(models.Project)
+    rows = (
+        db.query(
+            models.Project,
+            models.project_analysts.c.scripts_per_day,
+            models.project_analysts.c.test_types,
+        )
         .join(models.project_analysts)
         .filter(models.project_analysts.c.user_id == current_user.id)
         .all()
     )
+    projects = []
+    for project, scripts, types in rows:
+        setattr(project, "scripts_per_day", scripts)
+        setattr(project, "test_types", types)
+        projects.append(project)
+    return projects
 
 
 @router.get("/projects/{project_id}", response_model=schemas.Project)
@@ -395,16 +409,23 @@ def read_project(
     project = query.first()
     if project is None:
         raise HTTPException(status_code=404, detail="Project not found")
-    if (
-        current_user.role and current_user.role.name == "Administrador"
-    ) or (
-        db.query(models.project_analysts)
+    if current_user.role and current_user.role.name in ["Administrador", "Gerente de servicios"]:
+        return project
+    row = (
+        db.query(
+            models.project_analysts.c.scripts_per_day,
+            models.project_analysts.c.test_types,
+        )
         .filter(
             models.project_analysts.c.project_id == project_id,
             models.project_analysts.c.user_id == current_user.id,
         )
         .first()
-    ):
+    )
+    if row:
+        scripts, types = row
+        setattr(project, "scripts_per_day", scripts)
+        setattr(project, "test_types", types)
         return project
     raise HTTPException(status_code=403, detail="Insufficient permissions")
 
@@ -414,7 +435,7 @@ def update_project(
     project_id: int,
     project: schemas.ProjectCreate,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = deps.require_role(["Administrador"]),
+    current_user: models.User = deps.require_role(["Administrador", "Gerente de servicios"]),
 ):
     db_project = db.query(models.Project).filter(models.Project.id == project_id).first()
     if db_project is None:
@@ -423,6 +444,7 @@ def update_project(
         raise HTTPException(status_code=404, detail="Client not found")
     db_project.name = project.name
     db_project.client_id = project.client_id
+    db_project.objetivo = project.objetivo
     db.commit()
     db.refresh(db_project)
     return db_project
@@ -432,7 +454,7 @@ def update_project(
 def delete_project(
     project_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = deps.require_role(["Administrador"]),
+    current_user: models.User = deps.require_role(["Administrador", "Gerente de servicios"]),
 ):
     db_project = db.query(models.Project).filter(models.Project.id == project_id).first()
     if db_project is None:
@@ -446,8 +468,10 @@ def delete_project(
 def assign_analyst(
     project_id: int,
     user_id: int,
+    scripts_per_day: int = 0,
+    test_types: str | None = None,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = deps.require_role(["Administrador"]),
+    current_user: models.User = deps.require_role(["Administrador", "Gerente de servicios"]),
 ):
     project = db.query(models.Project).filter(models.Project.id == project_id).first()
     if project is None:
@@ -455,9 +479,33 @@ def assign_analyst(
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    if user not in project.analysts:
-        project.analysts.append(user)
-        db.commit()
+    existing = (
+        db.query(models.project_analysts)
+        .filter(
+            models.project_analysts.c.project_id == project_id,
+            models.project_analysts.c.user_id == user_id,
+        )
+        .first()
+    )
+    if existing:
+        db.execute(
+            models.project_analysts.update()
+            .where(
+                models.project_analysts.c.project_id == project_id,
+                models.project_analysts.c.user_id == user_id,
+            )
+            .values(scripts_per_day=scripts_per_day, test_types=test_types)
+        )
+    else:
+        db.execute(
+            models.project_analysts.insert().values(
+                project_id=project_id,
+                user_id=user_id,
+                scripts_per_day=scripts_per_day,
+                test_types=test_types,
+            )
+        )
+    db.commit()
     db.refresh(project)
     return project
 
@@ -467,7 +515,7 @@ def unassign_analyst(
     project_id: int,
     user_id: int,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = deps.require_role(["Administrador"]),
+    current_user: models.User = deps.require_role(["Administrador", "Gerente de servicios"]),
 ):
     project = db.query(models.Project).filter(models.Project.id == project_id).first()
     if project is None:
