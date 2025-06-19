@@ -48,6 +48,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/scripts/scripts.component').then(m => m.ScriptsComponent)
   },
   {
+    path: 'parameterization/:testId',
+    loadComponent: () => import('./components/parameterization/parameterization.component').then(m => m.ParameterizationComponent)
+  },
+  {
     path: 'pages',
     loadComponent: () => import('./components/pages/pages.component').then(m => m.PagesComponent)
   },
