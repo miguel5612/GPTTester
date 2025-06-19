@@ -17,7 +17,9 @@ import { ClientAnalystsComponent } from './client-analysts.component';
   template: `
     <div class="main-panel">
       <h1>Administración de Clientes</h1>
-      <input class="form-control mb-2" placeholder="Buscar..." [(ngModel)]="search" />
+      <label class="form-label w-100 mb-2">Buscar:
+        <input class="form-control" placeholder="Buscar..." [(ngModel)]="search" />
+      </label>
       <ul class="nav nav-tabs mb-3">
         <li class="nav-item">
           <a class="nav-link" [class.active]="tab==='active'" (click)="tab='active'">Activos</a>
@@ -50,14 +52,45 @@ import { ClientAnalystsComponent } from './client-analysts.component';
         </div>
       </div>
       <div *ngIf="tab==='history'">
-        <ul class="list-group">
-          <li class="list-group-item" *ngFor="let h of history">{{ h.client }} - {{ h.action }}</li>
+        <ul class="list-group mb-2">
+          <li class="list-group-item" *ngFor="let h of paginatedHistory()">{{ h.client }} - {{ h.action }}</li>
         </ul>
+        <nav>
+          <ul class="pagination mb-0">
+            <li class="page-item" [class.disabled]="historyPage === 1">
+              <button class="page-link" (click)="historyPrev()">Anterior</button>
+            </li>
+            <li class="page-item"><span class="page-link">{{ historyPage }}</span></li>
+            <li class="page-item" [class.disabled]="historyPageEnd">
+              <button class="page-link" (click)="historyNext()" [disabled]="historyPageEnd">Siguiente</button>
+            </li>
+          </ul>
+        </nav>
       </div>
 
       <app-client-form *ngIf="showForm" [client]="editing" (saved)="onSaved($event)" (cancel)="showForm=false"></app-client-form>
-      <app-project-analysts *ngIf="selectedProject" [projectId]="selectedProject.id" (updated)="onProjectAnalystsUpdated($event)" (close)="selectedProject=null"></app-project-analysts>
-      <app-client-analysts *ngIf="selectedClient" [clientId]="selectedClient.id" (updated)="onClientAnalystsUpdated($event)" (close)="selectedClient=null"></app-client-analysts>
+
+      <div class="modal fade show d-block" tabindex="-1" *ngIf="selectedProject" (click)="selectedProject=null">
+        <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
+          <div class="modal-content">
+            <div class="modal-body">
+              <app-project-analysts [projectId]="selectedProject.id" (updated)="onProjectAnalystsUpdated($event)" (close)="selectedProject=null"></app-project-analysts>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show" *ngIf="selectedProject"></div>
+
+      <div class="modal fade show d-block" tabindex="-1" *ngIf="selectedClient" (click)="selectedClient=null">
+        <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
+          <div class="modal-content">
+            <div class="modal-body">
+              <app-client-analysts [clientId]="selectedClient.id" (updated)="onClientAnalystsUpdated($event)" (close)="selectedClient=null"></app-client-analysts>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show" *ngIf="selectedClient"></div>
   `
 })
 export class ClientAdminComponent implements OnInit {
@@ -70,6 +103,7 @@ export class ClientAdminComponent implements OnInit {
   search = '';
   tab: 'active' | 'inactive' | 'history' = 'active';
   history: { client: string; action: string }[] = [];
+  historyPage = 1;
 
   constructor(
     private api: ApiService,
@@ -97,6 +131,30 @@ export class ClientAdminComponent implements OnInit {
           ? !c.is_active
           : true
       );
+  }
+  filteredHistory() {
+    const term = this.search.toLowerCase();
+    return this.history.filter(h =>
+      h.client.toLowerCase().includes(term) || h.action.toLowerCase().includes(term)
+    );
+  }
+
+  paginatedHistory() {
+    const list = this.filteredHistory();
+    const start = (this.historyPage - 1) * 15;
+    return list.slice(start, start + 15);
+  }
+
+  get historyPageEnd(): boolean {
+    return this.historyPage * 15 >= this.filteredHistory().length;
+  }
+
+  historyPrev() {
+    if (this.historyPage > 1) this.historyPage--;
+  }
+
+  historyNext() {
+    if (!this.historyPageEnd) this.historyPage++;
   }
 
   projectsByClient(clientId: number): Project[] {
