@@ -87,8 +87,16 @@ export class ApiService {
     return this.http.get<User[]>(`${this.baseUrl}/users/`, { headers: this.getHeaders() });
   }
 
-  getAnalysts(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.baseUrl}/analysts/`, { headers: this.getHeaders() });
+  getAnalysts(search?: string, page = 1): Observable<User[]> {
+    const params: string[] = [];
+    if (search) {
+      params.push(`search=${encodeURIComponent(search)}`);
+    }
+    params.push(`skip=${(page - 1) * 10}`);
+    params.push('limit=10');
+    const query = params.length ? `?${params.join('&')}` : '';
+    return this.http.get<User[]>(`${this.baseUrl}/analysts/${query}`, { headers: this.getHeaders() });
+
   }
 
   getUser(id: number): Observable<User> {

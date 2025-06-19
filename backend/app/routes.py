@@ -135,19 +135,27 @@ def read_users(db: Session = Depends(deps.get_db), current_user: models.User = d
 
 @router.get("/analysts/", response_model=list[schemas.User])
 def read_analysts(
+    search: str | None = None,
+    skip: int = 0,
+    limit: int = 10,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = deps.require_role(["Administrador", "Gerente de servicios"]),
+    current_user: models.User = deps.require_role([
+        "Administrador",
+        "Gerente de servicios",
+    ]),
 ):
     analyst_roles = [
         "Analista de Pruebas con skill de automatización",
         "Automatizador de Pruebas",
     ]
-    return (
+    query = (
         db.query(models.User)
         .join(models.Role)
         .filter(models.Role.name.in_(analyst_roles))
-        .all()
     )
+    if search:
+        query = query.filter(models.User.username.ilike(f"%{search}%"))
+    return query.offset(skip).limit(limit).all()
 
 
 @router.get("/users/{user_id}", response_model=schemas.User)
