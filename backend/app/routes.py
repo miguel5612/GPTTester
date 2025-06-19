@@ -7,7 +7,7 @@ import os
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from . import models, schemas, deps, security
+from . import models, schemas, deps, security, executor
 
 router = APIRouter()
 
@@ -1724,6 +1724,34 @@ def get_pending_execution(
         test=schemas.Test.from_orm(test),
         assignments=details,
     )
+
+
+@router.post("/executions/{execution_id}/update")
+def update_execution_status(
+    execution_id: int,
+    update: schemas.ExecutionUpdate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    record = (
+        db.query(models.PlanExecution)
+        .filter(models.PlanExecution.id == execution_id)
+        .first()
+    )
+    if not record:
+        raise HTTPException(status_code=404, detail="Execution not found")
+    if current_user.username != record.agent.hostname:
+        raise HTTPException(status_code=403, detail="Insufficient permissions")
+    if update.status:
+        record.status = update.status
+    if update.log:
+        log = models.ExecutionLog(
+            execution_id=execution_id,
+            message=update.log,
+        )
+        db.add(log)
+    db.commit()
+    return {"ok": True}
     try:
         security.rate_limit_login(ip)
     except HTTPException:

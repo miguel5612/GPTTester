@@ -281,6 +281,17 @@ class PlanExecution(Base):
     agent = relationship("ExecutionAgent")
 
 
+class ExecutionLog(Base):
+    __tablename__ = "execution_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    execution_id = Column(Integer, ForeignKey("execution_records.id"), nullable=False)
+    message = Column(String, nullable=False)
+    timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    execution = relationship("PlanExecution", backref="logs")
+
+
 class Workspace(Base):
     __tablename__ = "workspaces"
 

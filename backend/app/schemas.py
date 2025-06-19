@@ -350,3 +350,21 @@ class Workspace(WorkspaceBase):
 
     class Config:
         orm_mode = True
+
+
+class ExecutionLogBase(BaseModel):
+    execution_id: int
+    message: str
+    timestamp: datetime
+
+
+class ExecutionLog(ExecutionLogBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class ExecutionUpdate(BaseModel):
+    status: Optional[str] = None
+    log: Optional[str] = None
