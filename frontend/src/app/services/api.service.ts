@@ -87,6 +87,10 @@ export class ApiService {
     return this.http.get<User[]>(`${this.baseUrl}/users/`, { headers: this.getHeaders() });
   }
 
+  getAnalysts(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.baseUrl}/analysts/`, { headers: this.getHeaders() });
+  }
+
   getUser(id: number): Observable<User> {
     return this.http.get<User>(`${this.baseUrl}/users/${id}`, { headers: this.getHeaders() });
   }

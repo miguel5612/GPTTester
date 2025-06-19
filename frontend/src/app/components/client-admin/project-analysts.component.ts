@@ -47,11 +47,8 @@ export class ProjectAnalystsComponent implements OnChanges {
 
   load() {
     this.projectService.getProject(this.projectId).subscribe(p => this.project = p);
-    this.api.getUsers().subscribe(users => {
-      this.analysts = users.filter(u =>
-        u.role.name === 'Analista de Pruebas con skill de automatización' ||
-        u.role.name === 'Automatizador de Pruebas'
-      );
+    this.api.getAnalysts().subscribe(users => {
+      this.analysts = users;
     });
   }
 
