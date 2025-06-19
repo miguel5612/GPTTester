@@ -12,6 +12,7 @@ import { ProjectAnalystsComponent } from './project-analysts.component';
   selector: 'app-client-admin',
   standalone: true,
   imports: [CommonModule, FormsModule, ClientFormComponent, ProjectAnalystsComponent],
+
   template: `
     <div class="main-panel">
       <h1>Administración de Clientes</h1>
@@ -21,6 +22,7 @@ import { ProjectAnalystsComponent } from './project-analysts.component';
           {{ c.name }}
           <button class="btn btn-sm btn-secondary ms-2" (click)="edit(c)">Editar</button>
           <button class="btn btn-sm btn-danger ms-2" (click)="remove(c)">Eliminar</button>
+          <button class="btn btn-sm btn-info ms-2" (click)="manageClientAnalysts(c)">Analistas</button>
         </h3>
         <ul class="list-group">
           <li class="list-group-item" *ngFor="let p of projectsByClient(c.id)">
@@ -45,6 +47,7 @@ export class ClientAdminComponent implements OnInit {
   showForm = false;
   editing: Client | null = null;
   selectedProject: Project | null = null;
+  selectedClient: Client | null = null;
 
   constructor(
     private api: ApiService,
