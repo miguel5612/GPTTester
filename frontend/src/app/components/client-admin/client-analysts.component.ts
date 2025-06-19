@@ -49,11 +49,8 @@ export class ClientAnalystsComponent implements OnChanges {
     this.clientService.getClients().subscribe(cs => {
       this.client = cs.find(c => c.id === this.clientId) || null;
     });
-    this.api.getUsers().subscribe(users => {
-      this.analysts = users.filter(u =>
-        u.role.name === 'Analista de Pruebas con skill de automatización' ||
-        u.role.name === 'Automatizador de Pruebas'
-      );
+    this.api.getAnalysts().subscribe(users => {
+      this.analysts = users;
     });
   }
 

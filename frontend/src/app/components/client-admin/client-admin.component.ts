@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
 import { ClientService } from '../../services/client.service';
 import { ProjectService } from '../../services/project.service';
-import { Client, Project, User } from '../../models';
+import { Client, Project } from '../../models';
 import { ClientFormComponent } from './client-form.component';
 import { ProjectAnalystsComponent } from './project-analysts.component';
 import { ClientAnalystsComponent } from './client-analysts.component';
@@ -45,7 +45,6 @@ import { ClientAnalystsComponent } from './client-analysts.component';
 export class ClientAdminComponent implements OnInit {
   clients: Client[] = [];
   projects: Project[] = [];
-  users: User[] = [];
   showForm = false;
   editing: Client | null = null;
   selectedProject: Project | null = null;
@@ -64,7 +63,6 @@ export class ClientAdminComponent implements OnInit {
   loadData() {
     this.clientService.getClients().subscribe(cs => (this.clients = cs));
     this.projectService.getProjects().subscribe(ps => (this.projects = ps));
-    this.api.getUsers().subscribe(us => (this.users = us));
   }
 
   projectsByClient(clientId: number): Project[] {
