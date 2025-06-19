@@ -1,5 +1,5 @@
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 import json
 from datetime import datetime
@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
 from . import models, schemas, deps, security, executor
+from .agent_manager import agent_manager
 
 router = APIRouter()
 
@@ -2140,3 +2141,30 @@ def get_current_workspace(
     if not workspace:
         raise HTTPException(status_code=404, detail="Workspace not found")
     return workspace
+
+
+@router.websocket("/ws/agent")
+async def agent_websocket(ws: WebSocket):
+    await ws.accept()
+    init = await ws.receive_json()
+    agent = await agent_manager.register_agent(ws, init)
+    try:
+        while True:
+            data = await ws.receive_json()
+            msg_type = data.get("type")
+            if msg_type == "heartbeat":
+                agent.touch()
+            elif msg_type == "result":
+                agent.executions += 1
+                if data.get("status") == "success":
+                    agent.successes += 1
+                agent.busy = False
+            else:
+                agent.touch()
+    except WebSocketDisconnect:
+        await agent_manager.remove_agent(agent)
+
+
+@router.get("/agents/metrics")
+def agents_metrics():
+    return agent_manager.get_metrics()
