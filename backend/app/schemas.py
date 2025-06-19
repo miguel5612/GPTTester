@@ -387,6 +387,8 @@ class ExecutionLog(ExecutionLogBase):
 class ExecutionUpdate(BaseModel):
     status: Optional[str] = None
     log: Optional[str] = None
+    progress: Optional[int] = None
+    screenshot: Optional[str] = None
 
 
 class ExecutionScheduleBase(BaseModel):

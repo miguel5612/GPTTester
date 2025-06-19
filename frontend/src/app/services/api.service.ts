@@ -439,6 +439,18 @@ export class ApiService {
     });
   }
 
+  pauseExecution(id: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/executions/${id}/pause`, {}, { headers: this.getHeaders() });
+  }
+
+  resumeExecution(id: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/executions/${id}/resume`, {}, { headers: this.getHeaders() });
+  }
+
+  cancelExecution(id: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/executions/${id}/cancel`, {}, { headers: this.getHeaders() });
+  }
+
   isAuthenticated(): boolean {
     return !!this.tokenSubject.value;
   }
