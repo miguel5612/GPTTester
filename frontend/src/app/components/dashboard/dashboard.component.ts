@@ -2,8 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
-import { User, Test, Action, Agent, Client, Project } from '../../models';
+import { ExecutionService } from '../../services/execution.service';
+import { WorkspaceService } from '../../services/workspace.service';
+import { User, Test, Action, Agent, Client, Project, PlanExecution } from '../../models';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,6 +15,11 @@ import { User, Test, Action, Agent, Client, Project } from '../../models';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
+interface MenuItem {
+  label: string;
+  route: string;
+}
+
 export class DashboardComponent implements OnInit {
   currentUser: User | null = null;
   users: User[] = [];
@@ -24,6 +32,11 @@ export class DashboardComponent implements OnInit {
   readonly clientPageSize = 10;
   selectedClient: Client | null = null;
   selectedProject: Project | null = null;
+
+  menu: MenuItem[] = [];
+  scriptsToday = 0;
+  pendingExecutions = 0;
+  lastExecution: PlanExecution | null = null;
   
   // Flow builder state
   selectedTest: Test | null = null;
@@ -36,9 +49,18 @@ export class DashboardComponent implements OnInit {
   currentStep = 0;
   totalSteps = 4;
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private workspace: WorkspaceService,
+    private executionService: ExecutionService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
+    if (!this.workspace.hasWorkspace()) {
+      this.router.navigate(['/workspace-selector']);
+      return;
+    }
     this.loadUserData();
   }
 
@@ -57,6 +79,13 @@ export class DashboardComponent implements OnInit {
           this.clients = clients.filter(c => c.is_active);
         }
         this.clientPage = 1;
+        if (this.workspace.clientId) {
+          const found = this.clients.find(c => c.id === this.workspace.clientId);
+          if (found) {
+            this.selectedClient = found;
+            this.loadProjects(found.id);
+          }
+        }
       },
       error: err => console.error('Error loading clients:', err)
     });
@@ -71,6 +100,16 @@ export class DashboardComponent implements OnInit {
     this.apiService.getProjects().subscribe({
       next: projects => {
         this.projects = projects.filter(p => p.client_id === clientId);
+        if (this.workspace.projectId) {
+          const foundP = projects.find(p => p.id === this.workspace.projectId);
+          if (foundP) {
+            this.selectedProject = foundP;
+            this.loadTests();
+            this.loadActions();
+            this.loadAgents();
+            this.loadSummary();
+          }
+        }
       },
       error: err => console.error('Error loading projects:', err)
     });
@@ -78,9 +117,13 @@ export class DashboardComponent implements OnInit {
 
   selectProject(p: Project) {
     this.selectedProject = p;
+    if (this.selectedClient) {
+      this.workspace.setWorkspace(this.selectedClient.id, p.id);
+    }
     this.loadTests();
     this.loadActions();
     this.loadAgents();
+    this.loadSummary();
   }
 
   loadUserData() {
@@ -91,6 +134,7 @@ export class DashboardComponent implements OnInit {
           if (user.role?.name === 'Administrador') {
             this.apiService.getUsers().subscribe(us => this.users = us);
           }
+          this.setMenuByRole(user.role?.name || '');
           this.loadClients();
         },
         error: (error) => {
@@ -130,6 +174,18 @@ export class DashboardComponent implements OnInit {
       error: (error) => {
         console.error('Error loading agents:', error);
       }
+    });
+  }
+
+  loadSummary() {
+    this.apiService.getTests().subscribe(ts => {
+      this.scriptsToday = ts.length; // placeholder since API lacks dates
+    });
+    this.executionService.getExecutions().subscribe(execs => {
+      this.pendingExecutions = execs.filter(e => e.status !== 'Finalizado').length;
+      this.lastExecution = execs.sort((a, b) =>
+        new Date(b.started_at).getTime() - new Date(a.started_at).getTime()
+      )[0] || null;
     });
   }
 
@@ -250,5 +306,38 @@ export class DashboardComponent implements OnInit {
 
   toggleUser(user: User) {
     this.apiService.updateUserActive(user.id, !user.is_active).subscribe(u => user.is_active = u.is_active);
+  }
+
+  setMenuByRole(role: string) {
+    const gs = [
+      { label: 'Clientes', route: '/client-admin' },
+      { label: 'Proyectos', route: '/projects' },
+      { label: 'Asignar analistas', route: '/client-admin' }
+    ];
+    const analyst = [
+      { label: 'Crear scripts', route: '/test-cases' },
+      { label: 'Parametrizar', route: '/actions' },
+      { label: 'Ejecutar pruebas', route: '/execution' }
+    ];
+    const adminExtra = [{ label: 'Gestión de usuarios', route: '/users' }];
+    const architect = [
+      { label: 'Métricas', route: '/dashboard' },
+      { label: 'Configuración avanzada', route: '/roles' }
+    ];
+
+    if (role === 'Administrador') {
+      this.menu = [...gs, ...analyst, ...architect, ...adminExtra];
+    } else if (role === 'Gerente de servicios') {
+      this.menu = gs;
+    } else if (role === 'Arquitecto de Automatización') {
+      this.menu = architect;
+    } else {
+      this.menu = analyst;
+    }
+  }
+
+  changeWorkspace() {
+    this.workspace.clearWorkspace();
+    this.router.navigate(['/workspace-selector']);
   }
 }

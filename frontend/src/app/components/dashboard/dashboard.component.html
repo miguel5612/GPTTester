@@ -40,17 +40,42 @@
   </div>
 
   <ng-container *ngIf="selectedProject">
-  <!-- Header -->
-  <header class="dashboard-header">
-    <h1 class="fade-in">Analista de Pruebas</h1>
-    <div class="user-info" *ngIf="currentUser">
-      <span class="text-secondary">Bienvenido, {{ currentUser.username }}</span>
-      <span class="badge badge-role">{{ currentUser.role?.name }}</span>
-    </div>
-  </header>
+  <div class="dashboard-layout">
+    <aside class="side-menu" *ngIf="menu.length">
+      <ul>
+        <li *ngFor="let m of menu"><a [routerLink]="m.route">{{ m.label }}</a></li>
+      </ul>
+      <button class="btn btn-sm btn-link" (click)="changeWorkspace()">Cambiar cliente/proyecto</button>
+    </aside>
+    <div class="dashboard-content">
+      <!-- Header -->
+      <header class="dashboard-header">
+        <h1 class="fade-in">Analista de Pruebas</h1>
+        <div class="user-info" *ngIf="currentUser">
+          <span class="text-secondary">{{ currentUser.username }}</span>
+          <span class="badge badge-role">{{ currentUser.role?.name }}</span>
+        </div>
+        <div class="workspace-info">
+          Cliente: {{ selectedClient?.name }} | Proyecto: {{ selectedProject?.name }}
+        </div>
+      </header>
+      <div class="summary-cards">
+        <div class="summary-card">
+          <h3>{{ scriptsToday }}</h3>
+          <p>Scripts hoy</p>
+        </div>
+        <div class="summary-card">
+          <h3>{{ pendingExecutions }}</h3>
+          <p>Ejecuciones pendientes</p>
+        </div>
+        <div class="summary-card">
+          <h3>{{ lastExecution?.started_at ? (lastExecution.started_at | date:'short') : '-' }}</h3>
+          <p>Última ejecución</p>
+        </div>
+      </div>
 
-  <!-- Main Panel -->
-  <div class="main-panel">
+      <!-- Main Panel -->
+      <div class="main-panel">
     
     <!-- Gestión de Actores Section -->
     <div class="section">
@@ -304,6 +329,8 @@
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
     </div>
   </div>
   </ng-container>
