@@ -15,6 +15,10 @@ export class ProjectService {
     return this.api.getProject(id);
   }
 
+  getProjectsByClient(clientId: number): Observable<Project[]> {
+    return this.api.getProjectsByClient(clientId);
+  }
+
   createProject(project: ProjectCreate): Observable<Project> {
     return this.api.createProject(project);
   }

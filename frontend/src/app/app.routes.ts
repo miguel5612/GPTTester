@@ -15,6 +15,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/dashboard/dashboard.component').then(m => m.DashboardComponent)
   },
   {
+    path: 'workspace',
+    loadComponent: () => import('./components/workspace-selector/workspace-selector.component').then(m => m.WorkspaceSelectorComponent)
+  },
+  {
     path: 'users',
     loadComponent: () => import('./components/users/users.component').then(m => m.UsersComponent),
     canActivate: [() => import('./admin.guard').then(m => m.adminGuard)]
