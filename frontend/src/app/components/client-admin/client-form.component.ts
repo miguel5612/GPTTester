@@ -26,7 +26,7 @@ import { ClientService } from '../../services/client.service';
 })
 export class ClientFormComponent implements OnInit {
   @Input() client: Client | null = null;
-  @Output() saved = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<Client>();
   @Output() cancel = new EventEmitter<void>();
 
   form: ClientCreate = { name: '' };
@@ -43,6 +43,6 @@ export class ClientFormComponent implements OnInit {
     const obs = this.client
       ? this.service.updateClient(this.client.id, this.form)
       : this.service.createClient(this.form);
-    obs.subscribe(() => this.saved.emit());
+    obs.subscribe(c => this.saved.emit(c));
   }
 }
