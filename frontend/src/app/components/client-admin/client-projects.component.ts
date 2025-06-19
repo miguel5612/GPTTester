@@ -14,11 +14,12 @@ import { ProjectService } from '../../services/project.service';
       <div class="card-body">
         <h3 class="card-title">Proyectos de {{ client.name }}</h3>
         <form (ngSubmit)="save()" class="mb-3">
-          <div class="input-group">
+          <div class="input-group mb-2">
             <input class="form-control" placeholder="Nombre del proyecto" [(ngModel)]="form.name" name="name" required>
-            <button class="btn btn-primary" type="submit">{{ editing ? 'Actualizar' : 'Crear' }}</button>
-            <button class="btn btn-secondary" type="button" *ngIf="editing" (click)="new()">Cancelar</button>
+            <input class="form-control" placeholder="Objetivo" [(ngModel)]="form.objetivo" name="objetivo">
           </div>
+          <button class="btn btn-primary me-2" type="submit">{{ editing ? 'Actualizar' : 'Crear' }}</button>
+          <button class="btn btn-secondary" type="button" *ngIf="editing" (click)="new()">Cancelar</button>
         </form>
         <ul class="list-group mb-3">
           <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let p of projects">
@@ -42,7 +43,7 @@ export class ClientProjectsComponent implements OnChanges {
   client: Client | null = null;
   projects: Project[] = [];
   editing: Project | null = null;
-  form: ProjectCreate = { name: '', client_id: 0 };
+  form: ProjectCreate = { name: '', client_id: 0, objetivo: '' };
 
   constructor(
     private clientService: ClientService,
@@ -67,12 +68,12 @@ export class ClientProjectsComponent implements OnChanges {
 
   new() {
     this.editing = null;
-    this.form = { name: '', client_id: this.clientId };
+    this.form = { name: '', client_id: this.clientId, objetivo: '' };
   }
 
   edit(p: Project) {
     this.editing = p;
-    this.form = { name: p.name, client_id: this.clientId };
+    this.form = { name: p.name, client_id: this.clientId, objetivo: p.objetivo };
   }
 
   save() {
@@ -82,7 +83,7 @@ export class ClientProjectsComponent implements OnChanges {
     obs.subscribe(() => {
       this.load();
       this.editing = null;
-      this.form = { name: '', client_id: this.clientId };
+      this.form = { name: '', client_id: this.clientId, objetivo: '' };
       this.updated.emit();
     });
   }

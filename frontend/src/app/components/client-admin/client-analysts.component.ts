@@ -14,13 +14,14 @@ import { ApiService } from '../../services/api.service';
       <div class="card-body">
         <h3 class="card-title">Analistas de {{ client.name }}</h3>
         <input class="form-control mb-2" placeholder="Buscar..." [(ngModel)]="search" (ngModelChange)="onSearch()" />
-        <div *ngFor="let u of analysts" class="form-check">
-          <input class="form-check-input" type="checkbox" [id]="'ca-'+u.id"
+        <div *ngFor="let u of analysts" class="form-check d-flex align-items-center mb-1">
+          <input class="form-check-input me-2" type="checkbox" [id]="'ca-'+u.id"
             [checked]="isAssigned(u)"
             (change)="toggle(u, $any($event.target).checked)">
-          <label class="form-check-label" [for]="'ca-'+u.id">
+          <label class="form-check-label me-2" [for]="'ca-'+u.id">
             {{ u.username }} ({{ u.role.name }})
           </label>
+          <input type="number" class="form-control form-control-sm" style="width:80px" [(ngModel)]="dedication[u.id]" placeholder="% dedicación">
         </div>
         <nav class="mt-2">
           <ul class="pagination mb-0">
@@ -48,6 +49,7 @@ export class ClientAnalystsComponent implements OnChanges {
 
   client: Client | null = null;
   analysts: User[] = [];
+  dedication: { [id: number]: number } = {};
   page = 1;
   search = '';
 
@@ -95,7 +97,7 @@ export class ClientAnalystsComponent implements OnChanges {
   toggle(user: User, checked: boolean) {
     if (!this.client) return;
     const obs = checked
-      ? this.clientService.assignAnalyst(this.client.id, user.id)
+      ? this.clientService.assignAnalyst(this.client.id, user.id, this.dedication[user.id] || 100)
       : this.clientService.unassignAnalyst(this.client.id, user.id);
     obs.subscribe(c => {
       this.client = c;

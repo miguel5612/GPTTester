@@ -14,13 +14,14 @@ import { ApiService } from '../../services/api.service';
       <div class="card-body">
         <h3 class="card-title">Analistas de {{ project.name }}</h3>
         <input class="form-control mb-2" placeholder="Buscar..." [(ngModel)]="search" (ngModelChange)="onSearch()" />
-        <div *ngFor="let u of analysts" class="form-check">
-          <input class="form-check-input" type="checkbox" [id]="'an-'+u.id"
+        <div *ngFor="let u of analysts" class="form-check d-flex align-items-center mb-1">
+          <input class="form-check-input me-2" type="checkbox" [id]="'an-'+u.id"
             [checked]="isAssigned(u)"
             (change)="toggle(u, $any($event.target).checked)">
-          <label class="form-check-label" [for]="'an-'+u.id">
+          <label class="form-check-label me-2" [for]="'an-'+u.id">
             {{ u.username }} ({{ u.role.name }})
           </label>
+          <input type="number" class="form-control form-control-sm" style="width:90px" [(ngModel)]="scripts[u.id]" placeholder="scripts/día">
         </div>
         <nav class="mt-2">
           <ul class="pagination mb-0">
@@ -48,6 +49,7 @@ export class ProjectAnalystsComponent implements OnChanges {
 
   project: Project | null = null;
   analysts: User[] = [];
+  scripts: { [id: number]: number } = {};
   page = 1;
   search = '';
 
@@ -100,7 +102,7 @@ export class ProjectAnalystsComponent implements OnChanges {
       return;
     }
     const obs = checked ?
-      this.projectService.assignAnalyst(this.project.id, user.id) :
+      this.projectService.assignAnalyst(this.project.id, user.id, this.scripts[user.id] || 0) :
       this.projectService.unassignAnalyst(this.project.id, user.id);
     obs.subscribe(p => {
       this.project = p;

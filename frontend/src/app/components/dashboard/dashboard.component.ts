@@ -310,9 +310,7 @@ export class DashboardComponent implements OnInit {
 
   setMenuByRole(role: string) {
     const gs = [
-      { label: 'Clientes', route: '/client-admin' },
-      { label: 'Proyectos', route: '/projects' },
-      { label: 'Asignar analistas', route: '/client-admin' }
+      { label: 'Gestión', route: '/service-manager' }
     ];
     const analyst = [
       { label: 'Crear scripts', route: '/test-cases' },
