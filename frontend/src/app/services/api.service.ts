@@ -456,6 +456,11 @@ export class ApiService {
     return this.http.get(`${this.baseUrl}/metrics/dashboard`, { headers: this.getHeaders() });
   }
 
+  downloadK6Script(): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/k6/script`, {
+      headers: this.getHeaders(),
+      responseType: 'blob'
+    });
   // Marketplace
   getMarketplaceComponents(): Observable<MarketplaceComponent[]> {
     return this.http.get<MarketplaceComponent[]>(`${this.baseUrl}/marketplace/components/`, { headers: this.getHeaders() });
@@ -471,6 +476,7 @@ export class ApiService {
 
   deleteMarketplaceComponent(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/marketplace/components/${id}`, { headers: this.getHeaders() });
+
   }
 
   isAuthenticated(): boolean {

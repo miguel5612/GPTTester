@@ -158,7 +158,8 @@ export class MainLayoutComponent implements OnInit {
     const analyst = [
       { label: 'Crear scripts', route: '/test-cases', icon: '📝' },
       { label: 'Parametrizar', route: '/actions', icon: '⚙️' },
-      { label: 'Ejecutar pruebas', route: '/execution', icon: '▶️' }
+      { label: 'Ejecutar pruebas', route: '/execution', icon: '▶️' },
+      { label: 'Performance', route: '/performance', icon: '🚀' }
     ];
     const adminExtra = [{ label: 'Gestión de usuarios', route: '/users', icon: '👥' }];
     const architect = [
