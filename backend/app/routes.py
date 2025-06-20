@@ -2,12 +2,13 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect, Query
 from fastapi.responses import FileResponse
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+from typing import Any, Dict
 from uuid import uuid4
 import os
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 from . import models, schemas, deps, security, executor
 from .agent_manager import agent_manager
@@ -2225,6 +2226,130 @@ async def agent_websocket(ws: WebSocket):
 @router.get("/agents/metrics")
 def agents_metrics():
     return agent_manager.get_metrics()
+
+
+@router.get("/metrics/dashboard")
+def dashboard_metrics(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    now = datetime.utcnow()
+    data: Dict[str, Any] = {}
+
+    tests = (
+        db.query(models.TestCase)
+        .filter(models.TestCase.owner_id == current_user.id)
+        .all()
+    )
+    param_count = len([t for t in tests if t.status == "parametrizado"])
+    ready_count = len([t for t in tests if t.status == "listo"])
+    target = (
+        db.query(func.sum(models.project_analysts.c.scripts_per_day))
+        .filter(models.project_analysts.c.user_id == current_user.id)
+        .scalar()
+    ) or 0
+    executions = (
+        db.query(models.PlanExecution)
+        .order_by(models.PlanExecution.started_at.desc())
+        .limit(5)
+        .all()
+    )
+    data["analyst"] = {
+        "scripts": len(tests),
+        "parametrizing": param_count,
+        "ready": ready_count,
+        "target": target,
+        "executions": [
+            {
+                "id": e.id,
+                "status": e.status,
+                "started_at": e.started_at.isoformat(),
+            }
+            for e in executions
+        ],
+    }
+
+    if current_user.role and current_user.role.name == "Gerente de servicios":
+        client_rows = (
+            db.query(
+                models.Client.id,
+                models.Client.name,
+                func.count(models.TestCase.id).label("scripts"),
+                func.count(models.PlanExecution.id).label("executions"),
+            )
+            .outerjoin(models.Actor, models.Actor.client_id == models.Client.id)
+            .outerjoin(models.TestCase, models.TestCase.actor_id == models.Actor.id)
+            .outerjoin(models.ExecutionPlan, models.ExecutionPlan.test_id == models.TestCase.id)
+            .outerjoin(models.PlanExecution, models.PlanExecution.plan_id == models.ExecutionPlan.id)
+            .group_by(models.Client.id)
+            .all()
+        )
+        team_rows = (
+            db.query(
+                models.User.username,
+                func.count(models.project_analysts.c.project_id),
+            )
+            .join(
+                models.project_analysts,
+                models.project_analysts.c.user_id == models.User.id,
+            )
+            .group_by(models.User.username)
+            .all()
+        )
+        active_projects = (
+            db.query(models.Project)
+            .filter(models.Project.is_active == True)
+            .all()
+        )
+        subq = db.query(models.project_analysts.c.user_id).subquery()
+        unassigned = (
+            db.query(models.User)
+            .filter(models.User.role.has(models.Role.name.like("%Analista%")))
+            .filter(~models.User.id.in_(subq))
+            .all()
+        )
+        data["manager"] = {
+            "clients": [
+                {
+                    "id": r.id,
+                    "name": r.name,
+                    "scripts": r.scripts,
+                    "executions": r.executions,
+                }
+                for r in client_rows
+            ],
+            "team_load": [
+                {"user": r[0], "projects": r[1]} for r in team_rows
+            ],
+            "projects": [
+                {"id": p.id, "name": p.name} for p in active_projects
+            ],
+            "unassigned": [
+                {"id": u.id, "username": u.username} for u in unassigned
+            ],
+        }
+
+    if current_user.role and current_user.role.name in [
+        "Administrador",
+        "Arquitecto de Automatización",
+    ]:
+        agent_metrics = agent_manager.get_metrics()
+        busy = len([a for a in agent_metrics if a.get("busy")])
+        available = len(agent_metrics) - busy
+        queue_len = sum(q.qsize() for q in agent_manager.pending_by_category.values())
+        active_users = (
+            db.query(models.User)
+            .filter(models.User.last_login != None)
+            .filter(models.User.last_login >= now - timedelta(hours=24))
+            .count()
+        )
+        data["admin"] = {
+            "agents": {"available": available, "busy": busy},
+            "active_users": active_users,
+            "queue": queue_len,
+        }
+
+    return data
 
 
 @router.websocket("/ws/execution/{execution_id}")

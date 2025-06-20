@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -20,7 +20,7 @@ interface MenuItem {
   route: string;
 }
 
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   users: User[] = [];
   tests: Test[] = [];
@@ -37,6 +37,10 @@ export class DashboardComponent implements OnInit {
   scriptsToday = 0;
   pendingExecutions = 0;
   lastExecution: PlanExecution | null = null;
+
+  // Unified dashboard metrics
+  metrics: any = {};
+  refreshHandle: any;
   
   // Flow builder state
   selectedTest: Test | null = null;
@@ -62,6 +66,8 @@ export class DashboardComponent implements OnInit {
       return;
     }
     this.loadUserData();
+    this.refreshMetrics();
+    this.refreshHandle = setInterval(() => this.refreshMetrics(), 30000);
   }
 
   loadClients() {
@@ -337,5 +343,29 @@ export class DashboardComponent implements OnInit {
   changeWorkspace() {
     this.workspace.clearWorkspace();
     this.router.navigate(['/workspace-selector']);
+  }
+
+  ngOnDestroy() {
+    if (this.refreshHandle) {
+      clearInterval(this.refreshHandle);
+    }
+  }
+
+  isAnalyst(): boolean {
+    const role = this.currentUser?.role?.name || '';
+    return role.includes('Analista') || role.includes('Automatizador') || role === 'Automation Engineer';
+  }
+
+  isManager(): boolean {
+    return this.currentUser?.role?.name === 'Gerente de servicios';
+  }
+
+  isAdminOrArchitect(): boolean {
+    const role = this.currentUser?.role?.name || '';
+    return role === 'Administrador' || role === 'Arquitecto de Automatización';
+  }
+
+  refreshMetrics() {
+    this.apiService.getDashboardMetrics().subscribe(m => this.metrics = m);
   }
 }

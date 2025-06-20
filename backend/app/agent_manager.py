@@ -137,12 +137,14 @@ class AgentManager:
             self._health_task = asyncio.create_task(self.health_check_loop())
 
     def get_metrics(self) -> list[dict]:
+        """Return runtime statistics for all connected agents."""
         metrics = []
         for agents in self.agents_by_category.values():
             for agent in agents:
                 metrics.append({
                     "category": agent.category,
                     "os": agent.os,
+                    "busy": agent.busy,
                     "uptime": agent.uptime.total_seconds(),
                     "executions": agent.executions,
                     "success_rate": agent.success_rate,
