@@ -11,12 +11,13 @@ export const routes: Routes = [
   },
   {
     path: 'workspace',
-    loadComponent: () => import('./components/workspace-selector/workspace-selector.component').then(m => m.WorkspaceSelectorComponent)
+    loadComponent: () => import('./components/workspace-selector/workspace-selector.component').then(m => m.WorkspaceSelectorComponent),
+    canActivate: [() => import('./auth.guard').then(m => m.authGuard)]
   },
   {
     path: '',
     loadComponent: () => import('./components/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
-    canActivate: [() => import('./workspace.guard').then(m => m.canActivateWorkspace)],
+    canActivate: [() => import('./auth.guard').then(m => m.authGuard), () => import('./workspace.guard').then(m => m.canActivateWorkspace)],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', loadComponent: () => import('./components/dashboard/dashboard.component').then(m => m.DashboardComponent) },

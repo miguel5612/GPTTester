@@ -9,6 +9,7 @@ import { Client, Project } from '../../models';
 import { ClientService } from '../../services/client.service';
 import { ProjectService } from '../../services/project.service';
 import { WorkspaceService } from '../../services/workspace.service';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-workspace-selector',
@@ -21,6 +22,10 @@ import { WorkspaceService } from '../../services/workspace.service';
     MatProgressSpinnerModule
   ],
   template: `
+    <header class="header">
+      <button class="btn-link" (click)="goDashboard()">Dashboard</button>
+      <button class="btn-link" (click)="logout()">Cerrar sesión</button>
+    </header>
     <div class="workspace-container" *ngIf="!isLoading; else loading">
       <h2>Seleccionar Workspace</h2>
       <mat-form-field appearance="fill" class="w-100">
@@ -55,6 +60,12 @@ import { WorkspaceService } from '../../services/workspace.service';
       flex-direction: column;
       gap: 1rem;
     }
+    .header {
+      display: flex;
+      justify-content: flex-end;
+      gap: .5rem;
+      padding: .5rem 1rem;
+    }
     .loading {
       display: flex;
       justify-content: center;
@@ -74,19 +85,29 @@ export class WorkspaceSelectorComponent implements OnInit {
     private clientService: ClientService,
     private projectService: ProjectService,
     private workspace: WorkspaceService,
-    private router: Router
+    private router: Router,
+    private api: ApiService
   ) {}
 
   ngOnInit(): void {
-    this.clientService.getAssignedClients().subscribe({
-      next: clients => {
-        this.clients = clients;
-        if (clients.length === 1) {
-          this.selectedClient = clients[0];
-          this.loadProjects();
-        } else {
-          this.isLoading = false;
-        }
+    this.api.getCurrentUser().subscribe({
+      next: user => {
+        const role = user.role?.name;
+        const list$ = role === 'Gerente de servicios' || role === 'Administrador'
+          ? this.clientService.getClients()
+          : this.clientService.getAssignedClients();
+        list$.subscribe({
+          next: clients => {
+            this.clients = clients;
+            if (clients.length === 1) {
+              this.selectedClient = clients[0];
+              this.loadProjects();
+            } else {
+              this.isLoading = false;
+            }
+          },
+          error: () => (this.isLoading = false)
+        });
       },
       error: () => (this.isLoading = false)
     });
@@ -124,6 +145,20 @@ export class WorkspaceSelectorComponent implements OnInit {
     if (this.selectedClient && this.selectedProject) {
       this.workspace.setWorkspace(this.selectedClient.id, this.selectedProject.id);
       this.router.navigate(['/dashboard']);
+    }
+  }
+
+  logout(): void {
+    this.workspace.clearWorkspace();
+    this.api.logout();
+    this.router.navigate(['/login']);
+  }
+
+  goDashboard(): void {
+    if (this.workspace.hasWorkspace()) {
+      this.router.navigate(['/dashboard']);
+    } else {
+      this.router.navigate(['/']);
     }
   }
 }
