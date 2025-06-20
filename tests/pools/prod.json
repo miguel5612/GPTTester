@@ -1,0 +1,6 @@
+{
+  "users": [
+    {"username": "prod_user", "password": "prod_pass"}
+  ],
+  "base_url": "https://prod.example.com"
+}

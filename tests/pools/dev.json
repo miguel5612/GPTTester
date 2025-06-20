@@ -1,0 +1,6 @@
+{
+  "users": [
+    {"username": "dev_user", "password": "dev_pass"}
+  ],
+  "base_url": "http://localhost:8000"
+}
