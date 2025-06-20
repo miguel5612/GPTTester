@@ -2583,8 +2583,13 @@ def create_secret(
 ):
     if db.query(models.Secret).filter(models.Secret.key == secret.key).first():
         raise HTTPException(status_code=400, detail="Secret already exists")
+# -----------------------------------------------------
     obj = models.Secret(key=secret.key, value=secret.value)
-=======
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
+
 # -----------------------------------------------------
 # Marketplace endpoints
 # -----------------------------------------------------
