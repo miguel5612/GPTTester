@@ -433,6 +433,8 @@ class EnvironmentSchedule(Base):
     environment = relationship("Environment", back_populates="schedules")
 
 
+class MarketplaceComponent(Base):
+    __tablename__ = "marketplace_components"
 # -----------------------------------------------------
 # Intelligent orchestrator models
 # -----------------------------------------------------
@@ -461,6 +463,10 @@ class TestSuite(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
+    code = Column(String, nullable=False)
+    version = Column(String, nullable=False, default="0.1.0")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     suite_type = Column(String, nullable=True)
     shared_context = Column(String, nullable=True)
 
@@ -532,4 +538,5 @@ class TestMerge(Base):
     source_branch = relationship("TestBranch", foreign_keys=[source_branch_id])
     target_branch = relationship("TestBranch", foreign_keys=[target_branch_id])
     commit = relationship("TestCommit")
+
 

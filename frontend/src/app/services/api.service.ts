@@ -9,7 +9,8 @@ import {
   UserCreate, RoleCreate, ClientCreate, ProjectCreate, TestCreate,
   TestPlanCreate, PageCreate, PageElementCreate, ActionCreate,
   ActionAssignmentCreate, Actor, ActorCreate, AgentCreate, ExecutionPlanCreate,
-  LoginRequest, LoginResponse, UserRoleUpdate, PendingExecution
+  LoginRequest, LoginResponse, UserRoleUpdate, PendingExecution,
+  MarketplaceComponent, MarketplaceComponentCreate
 } from '../models';
 
 @Injectable({
@@ -453,6 +454,23 @@ export class ApiService {
 
   getDashboardMetrics(): Observable<any> {
     return this.http.get(`${this.baseUrl}/metrics/dashboard`, { headers: this.getHeaders() });
+  }
+
+  // Marketplace
+  getMarketplaceComponents(): Observable<MarketplaceComponent[]> {
+    return this.http.get<MarketplaceComponent[]>(`${this.baseUrl}/marketplace/components/`, { headers: this.getHeaders() });
+  }
+
+  createMarketplaceComponent(c: MarketplaceComponentCreate): Observable<MarketplaceComponent> {
+    return this.http.post<MarketplaceComponent>(`${this.baseUrl}/marketplace/components/`, c, { headers: this.getHeaders() });
+  }
+
+  updateMarketplaceComponent(id: number, c: MarketplaceComponentCreate): Observable<MarketplaceComponent> {
+    return this.http.put<MarketplaceComponent>(`${this.baseUrl}/marketplace/components/${id}`, c, { headers: this.getHeaders() });
+  }
+
+  deleteMarketplaceComponent(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/marketplace/components/${id}`, { headers: this.getHeaders() });
   }
 
   isAuthenticated(): boolean {
