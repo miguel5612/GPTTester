@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, root_validator
 from typing import List, Optional, Dict, Any
 from datetime import date, datetime
+from enum import Enum
 
 
 class RoleBase(BaseModel):
@@ -502,3 +503,94 @@ class JiraTransition(BaseModel):
 
 class PipelineTrigger(BaseModel):
     url: str
+=======
+
+# -----------------------------------------------------
+# Intelligent orchestrator schemas
+# -----------------------------------------------------
+
+
+class DependencyType(str, Enum):
+    REQUIRES = "REQUIRES"
+    BLOCKS = "BLOCKS"
+    OPTIONAL = "OPTIONAL"
+    DATA_DEPENDENCY = "DATA_DEPENDENCY"
+
+
+class TestDependencyBase(BaseModel):
+    test_id: int
+    depends_on_id: int
+    type: DependencyType = DependencyType.REQUIRES
+    suite_id: Optional[int] = None
+
+
+class TestDependency(TestDependencyBase):
+    id: int
+
+class BranchCreate(BaseModel):
+    name: str
+
+
+class TestBranch(BranchCreate):
+    id: int
+    test_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class CommitCreate(BaseModel):
+    branch_id: int
+    message: str
+
+
+class TestCommit(BaseModel):
+    id: int
+    branch_id: int
+    version_id: int
+    author_id: int
+    message: str
+    timestamp: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class TestSuiteBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    suite_type: Optional[str] = None
+    shared_context: Optional[str] = None
+
+
+class TestSuiteCreate(TestSuiteBase):
+    tests: List[int] = []
+
+
+class TestSuite(TestSuiteBase):
+    id: int
+    tests: List[Test] = []
+class MergeCreate(BaseModel):
+    source_branch_id: int
+    target_branch_id: int
+
+
+class TestMerge(BaseModel):
+    id: int
+    source_branch_id: int
+    target_branch_id: int
+    commit_id: int
+    timestamp: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class TestVersion(BaseModel):
+    id: int
+    test_id: int
+    snapshot: str
+    created_at: datetime
+
+    class Config:
+        orm_mode = True

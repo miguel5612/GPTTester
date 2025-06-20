@@ -22,3 +22,6 @@ La API incluye endpoints de vista previa para conectarse con Jira u otros servic
 
 Configura las variables `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` y `JIRA_PROJECT_KEY` para habilitar estas integraciones.
 
+## Wiki colaborativa
+
+Este repositorio incluye un directorio [`wiki`](wiki/) que funciona como espacio de documentación colaborativa. Cualquier rol puede proponer mejoras o nuevas herramientas para el agente registrando sus ideas en [`wiki/ideas.md`](wiki/ideas.md).
