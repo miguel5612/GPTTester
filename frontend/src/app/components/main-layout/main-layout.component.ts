@@ -21,7 +21,7 @@ interface MenuItem {
     <div class="layout-container" [class.sidebar-open]="sidebarOpen">
       <header class="header">
         <button class="hamburger" (click)="toggleSidebar()">☰</button>
-        <div class="logo">Analista de Pruebas</div>
+        <div class="logo">{{ headerTitle }}</div>
         <div class="workspace-info" *ngIf="clientName && projectName">
           <span class="chip">{{ clientName }}</span>
           <span class="chip">{{ projectName }}</span>
@@ -91,6 +91,7 @@ export class MainLayoutComponent implements OnInit {
   userMenuOpen = false;
   clientName = '';
   projectName = '';
+  headerTitle = 'GPTTester';
 
   constructor(
     private api: ApiService,
@@ -113,6 +114,7 @@ export class MainLayoutComponent implements OnInit {
     if (this.api.isAuthenticated()) {
       this.api.getCurrentUser().subscribe(u => {
         this.currentUser = u;
+        this.headerTitle = u.role?.name || this.headerTitle;
         this.setMenuByRole(u.role?.name || '');
       });
     }
@@ -154,7 +156,10 @@ export class MainLayoutComponent implements OnInit {
   }
 
   setMenuByRole(role: string) {
-    const gs = [{ label: 'Gestión', route: '/service-manager', icon: '📊' }];
+    const gs = [
+      { label: 'Gestión', route: '/service-manager', icon: '📊' },
+      { label: 'Indicadores', route: '/bi', icon: '📈' }
+    ];
     const analyst = [
       { label: 'Crear scripts', route: '/test-cases', icon: '📝' },
       { label: 'Parametrizar', route: '/actions', icon: '⚙️' },
