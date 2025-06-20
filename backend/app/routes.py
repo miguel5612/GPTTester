@@ -2458,3 +2458,65 @@ def get_data_object_history(object_id: int, db: Session = Depends(deps.get_db)):
         schemas.DataObjectHistory(id=h.id, action=h.action, timestamp=h.timestamp)
         for h in obj.history
     ]
+
+
+# -----------------------------------------------------
+# Environment management endpoints
+# -----------------------------------------------------
+
+@router.get("/environments/{project_id}", response_model=list[schemas.Environment])
+def read_environments(project_id: int, db: Session = Depends(deps.get_db)):
+    envs = db.query(models.Environment).filter(models.Environment.project_id == project_id).all()
+    return envs
+
+
+@router.put("/environments/{env_id}/credentials", response_model=schemas.Environment)
+def update_env_credentials(
+    env_id: int,
+    creds: schemas.EnvironmentCredentialBase,
+    db: Session = Depends(deps.get_db),
+):
+    env = db.query(models.Environment).filter(models.Environment.id == env_id).first()
+    if not env:
+        raise HTTPException(status_code=404, detail="Environment not found")
+    if env.credentials:
+        env.credentials.username = creds.username
+        env.credentials.password = deps.get_password_hash(creds.password)
+    else:
+        cred = models.EnvironmentCredential(
+            environment_id=env.id,
+            username=creds.username,
+            password=deps.get_password_hash(creds.password),
+        )
+        db.add(cred)
+    db.commit()
+    db.refresh(env)
+    return env
+
+
+@router.get("/environments/{env_id}/availability")
+def check_environment_availability(env_id: int, db: Session = Depends(deps.get_db)):
+    env = db.query(models.Environment).filter(models.Environment.id == env_id).first()
+    if not env:
+        raise HTTPException(status_code=404, detail="Environment not found")
+    now = datetime.utcnow()
+    schedules = [s for s in env.schedules if s.start_time <= now <= s.end_time]
+    available = not any(s.blackout for s in schedules)
+    return {"available": available}
+
+
+@router.post("/environments/{env_id}/promote", response_model=schemas.Environment)
+def promote_environment(env_id: int, db: Session = Depends(deps.get_db)):
+    order = [models.EnvironmentType.QA.value, models.EnvironmentType.UAT.value, models.EnvironmentType.PREPROD.value, models.EnvironmentType.PROD.value]
+    env = db.query(models.Environment).filter(models.Environment.id == env_id).first()
+    if not env:
+        raise HTTPException(status_code=404, detail="Environment not found")
+    try:
+        index = order.index(env.name)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid environment stage")
+    if index + 1 < len(order):
+        env.name = order[index + 1]
+    db.commit()
+    db.refresh(env)
+    return env

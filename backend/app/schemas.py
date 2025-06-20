@@ -433,3 +433,59 @@ class DataObjectHistory(BaseModel):
 
 class DataObjectAction(BaseModel):
     id: int
+
+
+class EnvironmentConfigBase(BaseModel):
+    settings: Optional[str] = None
+
+
+class EnvironmentConfig(EnvironmentConfigBase):
+    id: int
+    environment_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class EnvironmentCredentialBase(BaseModel):
+    username: str
+    password: str
+
+
+class EnvironmentCredential(EnvironmentCredentialBase):
+    id: int
+    environment_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class EnvironmentScheduleBase(BaseModel):
+    start_time: datetime
+    end_time: datetime
+    blackout: bool = False
+
+
+class EnvironmentSchedule(EnvironmentScheduleBase):
+    id: int
+    environment_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class EnvironmentBase(BaseModel):
+    project_id: int
+    name: str
+    capacity_limit: Optional[int] = None
+    is_active: bool = True
+
+
+class Environment(EnvironmentBase):
+    id: int
+    config: Optional[EnvironmentConfig] = None
+    credentials: Optional[EnvironmentCredential] = None
+    schedules: List[EnvironmentSchedule] = []
+
+    class Config:
+        orm_mode = True
