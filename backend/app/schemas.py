@@ -492,6 +492,15 @@ class Environment(EnvironmentBase):
         orm_mode = True
 
 
+class AuditEvent(BaseModel):
+    id: int
+    timestamp: datetime
+    user_id: Optional[int] = None
+    endpoint: str
+    client_id: Optional[int] = None
+    project_id: Optional[int] = None
+    payload: Optional[str] = None
+
 class MarketplaceComponentBase(BaseModel):
     name: str
     description: Optional[str] = None
@@ -572,6 +581,17 @@ class TestCommit(BaseModel):
         orm_mode = True
 
 
+class SecretBase(BaseModel):
+    key: str
+    value: str
+
+
+class SecretCreate(SecretBase):
+    pass
+
+
+class Secret(SecretBase):
+    id: int
 class TestSuiteBase(BaseModel):
     name: str
     description: Optional[str] = None

@@ -2555,6 +2555,37 @@ def promote_environment(env_id: int, db: Session = Depends(deps.get_db)):
     return env
 
 # -----------------------------------------------------
+# Audit and secrets endpoints
+# -----------------------------------------------------
+
+
+@router.get("/audit-events", response_model=list[schemas.AuditEvent])
+def read_audit_events(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    return (
+        db.query(models.AuditEvent)
+        .order_by(models.AuditEvent.timestamp.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+@router.post("/secrets/", response_model=schemas.Secret)
+def create_secret(
+    secret: schemas.SecretCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    if db.query(models.Secret).filter(models.Secret.key == secret.key).first():
+        raise HTTPException(status_code=400, detail="Secret already exists")
+    obj = models.Secret(key=secret.key, value=secret.value)
+=======
+# -----------------------------------------------------
 # Marketplace endpoints
 # -----------------------------------------------------
 
@@ -2718,12 +2749,23 @@ def create_test_branch(
     ):
         raise HTTPException(status_code=400, detail="Branch already exists")
     obj = models.TestBranch(test_id=test_id, name=branch.name)
+
     db.add(obj)
     db.commit()
     db.refresh(obj)
     return obj
 
 
+@router.get("/secrets/{key}", response_model=schemas.Secret)
+def read_secret(
+    key: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    obj = db.query(models.Secret).filter(models.Secret.key == key).first()
+    if not obj:
+        raise HTTPException(status_code=404, detail="Secret not found")
+    return obj
 @router.post("/tests/{test_id}/commit", response_model=schemas.TestCommit)
 def commit_test(
     test_id: int,
