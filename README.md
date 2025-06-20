@@ -11,3 +11,7 @@ contiene una colección lista para importar en Postman y probar todos los endpoi
 ## Autenticación
 
 Regístrate enviando un POST a `/users/` con `username` y `password`. El login se realiza en `/token` utilizando un formulario `application/x-www-form-urlencoded`.
+
+## Wiki colaborativa
+
+Este repositorio incluye un directorio [`wiki`](wiki/) que funciona como espacio de documentación colaborativa. Cualquier rol puede proponer mejoras o nuevas herramientas para el agente registrando sus ideas en [`wiki/ideas.md`](wiki/ideas.md).
