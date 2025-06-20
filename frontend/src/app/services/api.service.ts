@@ -461,6 +461,8 @@ export class ApiService {
       headers: this.getHeaders(),
       responseType: 'blob'
     });
+  }
+
   // Marketplace
   getMarketplaceComponents(): Observable<MarketplaceComponent[]> {
     return this.http.get<MarketplaceComponent[]>(`${this.baseUrl}/marketplace/components/`, { headers: this.getHeaders() });

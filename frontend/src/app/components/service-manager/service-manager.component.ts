@@ -60,7 +60,7 @@ import { ClientProjectsComponent } from '../client-admin/client-projects.compone
           <tbody>
             <tr *ngFor="let a of team()">
               <td>{{a.user.username}}</td>
-              <td>{{a.projects.map(p=>p.name).join(', ')}}</td>
+              <td>{{projectNames(a.projects)}}</td>
               <td>{{a.load}}</td>
               <td>
                 <select class="form-select form-select-sm mb-1" [(ngModel)]="reassignTarget[a.user.id]">
@@ -139,6 +139,10 @@ export class ServiceManagerComponent implements OnInit {
       }
     }
     return Array.from(map.values());
+  }
+
+  projectNames(projects: Project[]): string {
+    return projects.map(p => p.name).join(', ');
   }
 
   reassign(user: User, projectId: number) {
