@@ -2375,3 +2375,86 @@ async def execution_websocket(ws: WebSocket, execution_id: int, token: str = Que
             await ws.receive_text()
     except WebSocketDisconnect:
         await monitor_manager.disconnect(execution_id, ws)
+
+
+@router.get("/data-objects", response_model=list[schemas.DataObject])
+def read_data_objects(
+    type: str,
+    environment: str,
+    state: str = Query("available"),
+    db: Session = Depends(deps.get_db),
+):
+    query = (
+        db.query(models.TestDataObject)
+        .join(models.DataPool)
+        .filter(
+            models.DataPool.type == type,
+            models.DataPool.environment == environment,
+        )
+    )
+    if state == "available":
+        query = query.filter(models.TestDataObject.state == models.DataState.NEW.value)
+    else:
+        query = query.filter(models.TestDataObject.state == state)
+    return [
+        schemas.DataObject(
+            id=o.id,
+            pool_id=o.pool_id,
+            data=json.loads(o.data),
+            state=o.state,
+        )
+        for o in query.all()
+    ]
+
+
+@router.post("/data-objects/reserve", response_model=schemas.DataObject)
+def reserve_data_object(
+    action: schemas.DataObjectAction, db: Session = Depends(deps.get_db)
+):
+    obj = db.query(models.TestDataObject).filter(models.TestDataObject.id == action.id).first()
+    if not obj:
+        raise HTTPException(status_code=404, detail="Data object not found")
+    if obj.state == models.DataState.BLOCKED.value:
+        raise HTTPException(status_code=400, detail="Data object already reserved")
+    obj.state = models.DataState.BLOCKED.value
+    history = models.DataObjectHistory(object_id=obj.id, action="reserve")
+    db.add(history)
+    db.commit()
+    db.refresh(obj)
+    return schemas.DataObject(
+        id=obj.id,
+        pool_id=obj.pool_id,
+        data=json.loads(obj.data),
+        state=obj.state,
+    )
+
+
+@router.post("/data-objects/release", response_model=schemas.DataObject)
+def release_data_object(
+    action: schemas.DataObjectAction, db: Session = Depends(deps.get_db)
+):
+    obj = db.query(models.TestDataObject).filter(models.TestDataObject.id == action.id).first()
+    if not obj:
+        raise HTTPException(status_code=404, detail="Data object not found")
+    obj.state = models.DataState.USED.value
+    history = models.DataObjectHistory(object_id=obj.id, action="release")
+    db.add(history)
+    db.commit()
+    db.refresh(obj)
+    return schemas.DataObject(
+        id=obj.id,
+        pool_id=obj.pool_id,
+        data=json.loads(obj.data),
+        state=obj.state,
+    )
+
+
+@router.get("/data-objects/{object_id}/history", response_model=list[schemas.DataObjectHistory])
+def get_data_object_history(object_id: int, db: Session = Depends(deps.get_db)):
+    obj = db.query(models.TestDataObject).filter(models.TestDataObject.id == object_id).first()
+    if not obj:
+        raise HTTPException(status_code=404, detail="Data object not found")
+    return [
+        schemas.DataObjectHistory(id=h.id, action=h.action, timestamp=h.timestamp)
+        for h in obj.history
+    ]

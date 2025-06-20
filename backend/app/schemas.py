@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, root_validator
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from datetime import date, datetime
 
 
@@ -407,3 +407,29 @@ class ExecutionSchedule(ExecutionScheduleBase):
 
     class Config:
         orm_mode = True
+
+
+class DataObjectBase(BaseModel):
+    pool_id: int
+    data: Dict[str, Any]
+
+
+class DataObject(DataObjectBase):
+    id: int
+    state: str
+
+    class Config:
+        orm_mode = True
+
+
+class DataObjectHistory(BaseModel):
+    id: int
+    action: str
+    timestamp: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class DataObjectAction(BaseModel):
+    id: int
