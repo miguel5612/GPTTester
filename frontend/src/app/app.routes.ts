@@ -31,15 +31,16 @@ export const routes: Routes = [
       { path: 'visual-param', loadComponent: () => import('./components/visual-parameterization/visual-parameterization.component').then(m => m.VisualParameterizationComponent) },
       { path: 'pages', loadComponent: () => import('./components/pages/pages.component').then(m => m.PagesComponent) },
       { path: 'elements', loadComponent: () => import('./components/elements/elements.component').then(m => m.ElementsComponent) },
-      { path: 'actions', loadComponent: () => import('./components/actions/actions.component').then(m => m.ActionsComponent) },
-      { path: 'agents', loadComponent: () => import('./components/agents/agents.component').then(m => m.AgentsComponent) },
-      { path: 'projects', loadComponent: () => import('./components/client-admin/client-projects.component').then(m => m.ClientProjectsComponent) },
-      { path: 'service-manager', loadComponent: () => import('./components/service-manager/service-manager.component').then(m => m.ServiceManagerComponent) },
-      { path: 'client-admin', loadComponent: () => import('./components/client-admin/client-admin.component').then(m => m.ClientAdminComponent) },
-      { path: 'actors', loadComponent: () => import('./components/actors/actors.component').then(m => m.ActorsComponent) },
-      { path: 'execution', loadComponent: () => import('./components/execution/execution.component').then(m => m.ExecutionComponent) },
-      { path: 'execution-monitor', loadComponent: () => import('./components/execution/execution-monitor-page.component').then(m => m.ExecutionMonitorPageComponent) }
-    ]
+        { path: 'actions', loadComponent: () => import('./components/actions/actions.component').then(m => m.ActionsComponent) },
+        { path: 'agents', loadComponent: () => import('./components/agents/agents.component').then(m => m.AgentsComponent) },
+        { path: 'projects', loadComponent: () => import('./components/client-admin/client-projects.component').then(m => m.ClientProjectsComponent) },
+        { path: 'service-manager', loadComponent: () => import('./components/service-manager/service-manager.component').then(m => m.ServiceManagerComponent) },
+        { path: 'client-admin', loadComponent: () => import('./components/client-admin/client-admin.component').then(m => m.ClientAdminComponent) },
+        { path: 'actors', loadComponent: () => import('./components/actors/actors.component').then(m => m.ActorsComponent) },
+        { path: 'performance', loadComponent: () => import('./components/performance/performance.component').then(m => m.PerformanceComponent) },
+        { path: 'execution', loadComponent: () => import('./components/execution/execution.component').then(m => m.ExecutionComponent) },
+        { path: 'execution-monitor', loadComponent: () => import('./components/execution/execution-monitor-page.component').then(m => m.ExecutionMonitorPageComponent) }
+      ]
   },
   { path: '**', redirectTo: '' }
 ];

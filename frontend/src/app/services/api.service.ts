@@ -455,6 +455,13 @@ export class ApiService {
     return this.http.get(`${this.baseUrl}/metrics/dashboard`, { headers: this.getHeaders() });
   }
 
+  downloadK6Script(): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/k6/script`, {
+      headers: this.getHeaders(),
+      responseType: 'blob'
+    });
+  }
+
   isAuthenticated(): boolean {
     return !!this.tokenSubject.value;
   }

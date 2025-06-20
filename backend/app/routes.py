@@ -1,6 +1,7 @@
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect, Query
 from fastapi.responses import FileResponse
+from pathlib import Path
 
 from .report_generator import generate_execution_report, package_evidence
 import json
@@ -1745,6 +1746,16 @@ def get_execution_file(
     if not os.path.exists(path):
         raise HTTPException(status_code=404, detail="File not found")
     return FileResponse(path, filename=filename)
+
+
+@router.get("/k6/script")
+def get_k6_script(
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    path = Path("k6/script.js")
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Script not generated")
+    return FileResponse(path, filename="script.js")
 
 
 @router.get("/agents/{hostname}/pending", response_model=schemas.PendingExecution)
