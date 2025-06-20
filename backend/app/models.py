@@ -15,6 +15,12 @@ from sqlalchemy.orm import relationship
 from .database import Base
 
 
+class DataState(str, enum.Enum):
+    NEW = "nuevo"
+    USED = "usado"
+    BLOCKED = "bloqueado"
+
+
 class Role(Base):
     __tablename__ = "roles"
 
@@ -321,3 +327,44 @@ class Workspace(Base):
     user = relationship("User")
     client = relationship("Client")
     project = relationship("Project")
+
+
+class DataPool(Base):
+    __tablename__ = "data_pools"
+
+    id = Column(Integer, primary_key=True, index=True)
+    type = Column(String, nullable=False)
+    environment = Column(String, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("type", "environment", name="uix_type_env"),
+    )
+
+    objects = relationship("TestDataObject", back_populates="pool")
+
+
+class TestDataObject(Base):
+    __tablename__ = "test_data_objects"
+
+    id = Column(Integer, primary_key=True, index=True)
+    pool_id = Column(Integer, ForeignKey("data_pools.id"), nullable=False)
+    data = Column(String, nullable=False)
+    state = Column(String, nullable=False, default=DataState.NEW.value)
+
+    pool = relationship("DataPool", back_populates="objects")
+    history = relationship(
+        "DataObjectHistory",
+        back_populates="obj",
+        cascade="all, delete-orphan",
+    )
+
+
+class DataObjectHistory(Base):
+    __tablename__ = "data_object_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    object_id = Column(Integer, ForeignKey("test_data_objects.id"), nullable=False)
+    action = Column(String, nullable=False)
+    timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    obj = relationship("TestDataObject", back_populates="history")
