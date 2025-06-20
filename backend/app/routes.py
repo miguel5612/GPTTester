@@ -4,6 +4,7 @@ from fastapi.responses import FileResponse
 
 from .report_generator import generate_execution_report, package_evidence
 import json
+import difflib
 from datetime import datetime, timedelta
 from typing import Any, Dict
 from uuid import uuid4
@@ -13,6 +14,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
 
 from . import models, schemas, deps, security, executor
+from .orchestrator import build_execution_graph, execute_graph
 from .agent_manager import agent_manager
 from .execution_monitor import monitor_manager
 
@@ -2521,7 +2523,6 @@ def promote_environment(env_id: int, db: Session = Depends(deps.get_db)):
     db.refresh(env)
     return env
 
-
 # -----------------------------------------------------
 # Marketplace endpoints
 # -----------------------------------------------------
@@ -2569,3 +2570,255 @@ def delete_component(component_id: int, db: Session = Depends(deps.get_db)):
     db.delete(comp)
     db.commit()
     return {"ok": True}
+
+from .integrations import JiraIntegration
+
+@router.post("/integrations/jira/issue")
+def create_jira_issue(
+    issue: schemas.JiraIssueCreate,
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    client = JiraIntegration()
+    try:
+        return client.create_issue(issue.summary, issue.description)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@router.post("/integrations/jira/issues/{issue_key}/status")
+def transition_jira_issue(
+    issue_key: str,
+    data: schemas.JiraTransition,
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    client = JiraIntegration()
+    try:
+        client.transition_issue(issue_key, data.transition_id)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    return {"ok": True}
+
+
+@router.post("/integrations/jira/pipeline")
+def trigger_jira_pipeline(
+    info: schemas.PipelineTrigger,
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    client = JiraIntegration()
+    try:
+        client.trigger_pipeline(info.url)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    return {"ok": True}
+
+
+# -----------------------------------------------------
+# Intelligent orchestrator endpoints
+# -----------------------------------------------------
+
+
+@router.post("/suites/create", response_model=schemas.TestSuite)
+def create_suite(suite: schemas.TestSuiteCreate, db: Session = Depends(deps.get_db)):
+    tests = db.query(models.TestCase).filter(models.TestCase.id.in_(suite.tests)).all()
+    if len(tests) != len(suite.tests):
+        raise HTTPException(status_code=404, detail="Some tests not found")
+    db_suite = models.TestSuite(
+        name=suite.name,
+        description=suite.description,
+        suite_type=suite.suite_type,
+        shared_context=suite.shared_context,
+    )
+    db_suite.tests = tests
+    db.add(db_suite)
+    db.commit()
+    db.refresh(db_suite)
+    return db_suite
+
+
+@router.get("/suites/{suite_id}/graph")
+def get_suite_graph(suite_id: int, db: Session = Depends(deps.get_db)):
+    graph = build_execution_graph(db, suite_id)
+    return {
+        "levels": graph.topological_levels(),
+        "blocking": [list(p) for p in graph.get_blocking_pairs()],
+    }
+
+
+@router.post("/suites/{suite_id}/execute")
+async def execute_suite(
+    suite_id: int,
+    retries: int = 0,
+    db: Session = Depends(deps.get_db),
+):
+    graph = build_execution_graph(db, suite_id)
+    results = await execute_graph(graph, retries=retries)
+    return results
+
+
+@router.get("/executions/{suite_id}/dependencies", response_model=list[schemas.TestDependency])
+def read_suite_dependencies(suite_id: int, db: Session = Depends(deps.get_db)):
+    deps_list = (
+        db.query(models.TestDependency)
+        .filter(models.TestDependency.suite_id == suite_id)
+        .all()
+    )
+    return deps_list
+
+# ----- Versioning Endpoints -----
+
+@router.post("/tests/{test_id}/branch", response_model=schemas.TestBranch)
+def create_test_branch(
+    test_id: int,
+    branch: schemas.BranchCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    test = (
+        db.query(models.TestCase)
+        .filter(models.TestCase.id == test_id, models.TestCase.owner_id == current_user.id)
+        .first()
+    )
+    if not test:
+        raise HTTPException(status_code=404, detail="Test not found")
+    if (
+        db.query(models.TestBranch)
+        .filter(models.TestBranch.test_id == test_id, models.TestBranch.name == branch.name)
+        .first()
+    ):
+        raise HTTPException(status_code=400, detail="Branch already exists")
+    obj = models.TestBranch(test_id=test_id, name=branch.name)
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
+@router.post("/tests/{test_id}/commit", response_model=schemas.TestCommit)
+def commit_test(
+    test_id: int,
+    commit: schemas.CommitCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    test = (
+        db.query(models.TestCase)
+        .filter(models.TestCase.id == test_id, models.TestCase.owner_id == current_user.id)
+        .first()
+    )
+    if not test:
+        raise HTTPException(status_code=404, detail="Test not found")
+    branch = (
+        db.query(models.TestBranch)
+        .filter(models.TestBranch.id == commit.branch_id, models.TestBranch.test_id == test_id)
+        .first()
+    )
+    if not branch:
+        raise HTTPException(status_code=404, detail="Branch not found")
+    snapshot = json.dumps({c.name: getattr(test, c.name) for c in test.__table__.columns})
+    version = models.TestVersion(test_id=test_id, snapshot=snapshot)
+    db.add(version)
+    db.commit()
+    db.refresh(version)
+    c = models.TestCommit(
+        branch_id=commit.branch_id,
+        version_id=version.id,
+        author_id=current_user.id,
+        message=commit.message,
+    )
+    db.add(c)
+    db.commit()
+    db.refresh(c)
+    return c
+
+
+@router.post("/tests/{test_id}/merge", response_model=schemas.TestMerge)
+def merge_branches(
+    test_id: int,
+    merge: schemas.MergeCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    source = (
+        db.query(models.TestBranch)
+        .filter(models.TestBranch.id == merge.source_branch_id, models.TestBranch.test_id == test_id)
+        .first()
+    )
+    target = (
+        db.query(models.TestBranch)
+        .filter(models.TestBranch.id == merge.target_branch_id, models.TestBranch.test_id == test_id)
+        .first()
+    )
+    if not source or not target:
+        raise HTTPException(status_code=404, detail="Branch not found")
+    commit = (
+        db.query(models.TestCommit)
+        .filter(models.TestCommit.branch_id == source.id)
+        .order_by(models.TestCommit.timestamp.desc())
+        .first()
+    )
+    if not commit:
+        raise HTTPException(status_code=400, detail="No commits to merge")
+    new_commit = models.TestCommit(
+        branch_id=target.id,
+        version_id=commit.version_id,
+        author_id=current_user.id,
+        message=f"Merge from {source.name}",
+    )
+    db.add(new_commit)
+    db.commit()
+    db.refresh(new_commit)
+    merge_obj = models.TestMerge(
+        source_branch_id=source.id,
+        target_branch_id=target.id,
+        commit_id=new_commit.id,
+    )
+    db.add(merge_obj)
+    db.commit()
+    db.refresh(merge_obj)
+    return merge_obj
+
+
+@router.get("/tests/{test_id}/history", response_model=list[schemas.TestCommit])
+def get_test_history(
+    test_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    return (
+        db.query(models.TestCommit)
+        .join(models.TestBranch)
+        .filter(models.TestBranch.test_id == test_id)
+        .order_by(models.TestCommit.timestamp)
+        .all()
+    )
+
+
+@router.get("/tests/{test_id}/diff")
+def diff_versions(
+    test_id: int,
+    from_version: int = Query(..., alias="from"),
+    to_version: int = Query(..., alias="to"),
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    v1 = (
+        db.query(models.TestVersion)
+        .filter(models.TestVersion.id == from_version, models.TestVersion.test_id == test_id)
+        .first()
+    )
+    v2 = (
+        db.query(models.TestVersion)
+        .filter(models.TestVersion.id == to_version, models.TestVersion.test_id == test_id)
+        .first()
+    )
+    if not v1 or not v2:
+        raise HTTPException(status_code=404, detail="Version not found")
+    diff = "\n".join(
+        difflib.unified_diff(
+            v1.snapshot.splitlines(),
+            v2.snapshot.splitlines(),
+            fromfile=str(from_version),
+            tofile=str(to_version),
+        )
+    )
+    return {"diff": diff}
