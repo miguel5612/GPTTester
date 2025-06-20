@@ -50,7 +50,7 @@
     <div class="dashboard-content">
       <!-- Header -->
       <header class="dashboard-header">
-        <h1 class="fade-in">Analista de Pruebas</h1>
+        <h1 class="fade-in">{{ currentUser?.role?.name }}</h1>
         <div class="user-info" *ngIf="currentUser">
           <span class="text-secondary">{{ currentUser.username }}</span>
           <span class="badge badge-role">{{ currentUser.role?.name }}</span>
@@ -59,19 +59,64 @@
           Cliente: {{ selectedClient?.name }} | Proyecto: {{ selectedProject?.name }}
         </div>
       </header>
-      <div class="summary-cards">
+      <div class="summary-cards" *ngIf="isAnalyst()">
         <div class="summary-card">
-          <h3>{{ scriptsToday }}</h3>
+          <h3>{{ metrics.analyst?.scripts || 0 }}</h3>
           <p>Scripts hoy</p>
         </div>
         <div class="summary-card">
-          <h3>{{ pendingExecutions }}</h3>
-          <p>Ejecuciones pendientes</p>
+          <h3>{{ metrics.analyst?.parametrizing || 0 }}</h3>
+          <p>En parametrización</p>
         </div>
         <div class="summary-card">
-          <h3>{{ lastExecution?.started_at ? (lastExecution.started_at | date:'short') : '-' }}</h3>
-          <p>Última ejecución</p>
+          <h3>{{ metrics.analyst?.ready || 0 }}</h3>
+          <p>Listos para ejecutar</p>
         </div>
+      </div>
+      <div class="progress" *ngIf="isAnalyst()">
+        <div class="progress-bar" [style.width.%]="metrics.analyst?.target ? metrics.analyst.scripts / metrics.analyst.target * 100 : 0"></div>
+      </div>
+      <div class="summary-cards" *ngIf="isManager()">
+        <div class="summary-card" *ngFor="let c of metrics.manager?.clients">
+          <h3>{{ c.scripts }}</h3>
+          <p>{{ c.name }}</p>
+        </div>
+      </div>
+      <div class="summary-cards" *ngIf="isAdminOrArchitect()">
+        <div class="summary-card">
+          <h3>{{ metrics.admin?.agents.available }}</h3>
+          <p>Agentes libres</p>
+        </div>
+        <div class="summary-card">
+          <h3>{{ metrics.admin?.agents.busy }}</h3>
+          <p>Agentes ocupados</p>
+        </div>
+        <div class="summary-card">
+          <h3>{{ metrics.admin?.active_users }}</h3>
+          <p>Usuarios activos 24h</p>
+        </div>
+      </div>
+
+      <div class="section" *ngIf="isManager()">
+        <h2>Carga del equipo</h2>
+        <div class="team-load" *ngFor="let t of metrics.manager?.team_load">
+          <div class="label">{{ t.user }}</div>
+          <div class="bar" [style.width.%]="t.projects * 20"></div>
+        </div>
+      </div>
+
+      <div class="section" *ngIf="isAnalyst()">
+        <h2>Últimas ejecuciones</h2>
+        <table class="table">
+          <thead><tr><th>ID</th><th>Estado</th><th>Inicio</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let e of metrics.analyst?.executions">
+              <td>{{ e.id }}</td>
+              <td>{{ e.status }}</td>
+              <td>{{ e.started_at | date:'short' }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <!-- Main Panel -->

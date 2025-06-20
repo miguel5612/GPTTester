@@ -451,6 +451,10 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/executions/${id}/cancel`, {}, { headers: this.getHeaders() });
   }
 
+  getDashboardMetrics(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/metrics/dashboard`, { headers: this.getHeaders() });
+  }
+
   isAuthenticated(): boolean {
     return !!this.tokenSubject.value;
   }
