@@ -104,6 +104,21 @@ class AuditMiddleware(BaseHTTPMiddleware):
             project_id,
             payload,
         )
+        db = SessionLocal()
+        try:
+            event = models.AuditEvent(
+                user_id=user.id if user else None,
+                endpoint=request.url.path,
+                client_id=client_id,
+                project_id=project_id,
+                payload=json.dumps(payload) if payload is not None else None,
+            )
+            db.add(event)
+            db.commit()
+        except Exception:
+            db.rollback()
+        finally:
+            db.close()
         return response
 
 

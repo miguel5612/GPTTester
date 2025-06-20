@@ -431,3 +431,27 @@ class EnvironmentSchedule(Base):
     blackout = Column(Boolean, default=False)
 
     environment = relationship("Environment", back_populates="schedules")
+
+
+class AuditEvent(Base):
+    __tablename__ = "audit_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    endpoint = Column(String, nullable=False)
+    client_id = Column(Integer, ForeignKey("clients.id"), nullable=True)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
+    payload = Column(String, nullable=True)
+
+    user = relationship("User")
+    client = relationship("Client")
+    project = relationship("Project")
+
+
+class Secret(Base):
+    __tablename__ = "secrets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    key = Column(String, unique=True, nullable=False)
+    value = Column(String, nullable=False)

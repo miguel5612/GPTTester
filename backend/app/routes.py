@@ -2520,3 +2520,51 @@ def promote_environment(env_id: int, db: Session = Depends(deps.get_db)):
     db.commit()
     db.refresh(env)
     return env
+
+
+# -----------------------------------------------------
+# Audit and secrets endpoints
+# -----------------------------------------------------
+
+
+@router.get("/audit-events", response_model=list[schemas.AuditEvent])
+def read_audit_events(
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    return (
+        db.query(models.AuditEvent)
+        .order_by(models.AuditEvent.timestamp.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+
+@router.post("/secrets/", response_model=schemas.Secret)
+def create_secret(
+    secret: schemas.SecretCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    if db.query(models.Secret).filter(models.Secret.key == secret.key).first():
+        raise HTTPException(status_code=400, detail="Secret already exists")
+    obj = models.Secret(key=secret.key, value=secret.value)
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
+@router.get("/secrets/{key}", response_model=schemas.Secret)
+def read_secret(
+    key: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = deps.require_role(["Administrador"]),
+):
+    obj = db.query(models.Secret).filter(models.Secret.key == key).first()
+    if not obj:
+        raise HTTPException(status_code=404, detail="Secret not found")
+    return obj

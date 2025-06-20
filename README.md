@@ -11,3 +11,7 @@ contiene una colección lista para importar en Postman y probar todos los endpoi
 ## Autenticación
 
 Regístrate enviando un POST a `/users/` con `username` y `password`. El login se realiza en `/token` utilizando un formulario `application/x-www-form-urlencoded`.
+
+Para conocer el marco de governance consulta [GOVERNANCE.md](GOVERNANCE.md).
+
+Los administradores pueden revisar los eventos registrados consultando `/audit-events` y gestionar secretos en `/secrets/`.
