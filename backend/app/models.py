@@ -368,3 +368,66 @@ class DataObjectHistory(Base):
     timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     obj = relationship("TestDataObject", back_populates="history")
+
+
+# -----------------------------------------------------
+# Environment management models
+# -----------------------------------------------------
+
+class EnvironmentType(str, enum.Enum):
+    QA = "QA"
+    UAT = "UAT"
+    PREPROD = "PREPROD"
+    PROD = "PROD"
+
+
+class Environment(Base):
+    __tablename__ = "environments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
+    name = Column(String, nullable=False)
+    capacity_limit = Column(Integer, nullable=True)
+    is_active = Column(Boolean, default=True)
+
+    project = relationship("Project", backref="environments")
+    config = relationship(
+        "EnvironmentConfig", uselist=False, back_populates="environment"
+    )
+    credentials = relationship(
+        "EnvironmentCredential", uselist=False, back_populates="environment"
+    )
+    schedules = relationship("EnvironmentSchedule", back_populates="environment")
+
+
+class EnvironmentConfig(Base):
+    __tablename__ = "environment_configs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    environment_id = Column(Integer, ForeignKey("environments.id"), nullable=False)
+    settings = Column(String, nullable=True)
+
+    environment = relationship("Environment", back_populates="config")
+
+
+class EnvironmentCredential(Base):
+    __tablename__ = "environment_credentials"
+
+    id = Column(Integer, primary_key=True, index=True)
+    environment_id = Column(Integer, ForeignKey("environments.id"), nullable=False)
+    username = Column(String, nullable=False)
+    password = Column(String, nullable=False)
+
+    environment = relationship("Environment", back_populates="credentials")
+
+
+class EnvironmentSchedule(Base):
+    __tablename__ = "environment_schedules"
+
+    id = Column(Integer, primary_key=True, index=True)
+    environment_id = Column(Integer, ForeignKey("environments.id"), nullable=False)
+    start_time = Column(DateTime, nullable=False)
+    end_time = Column(DateTime, nullable=False)
+    blackout = Column(Boolean, default=False)
+
+    environment = relationship("Environment", back_populates="schedules")
