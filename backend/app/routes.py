@@ -2520,3 +2520,52 @@ def promote_environment(env_id: int, db: Session = Depends(deps.get_db)):
     db.commit()
     db.refresh(env)
     return env
+
+
+# -----------------------------------------------------
+# Marketplace endpoints
+# -----------------------------------------------------
+
+
+@router.post("/marketplace/components/", response_model=schemas.MarketplaceComponent)
+def create_component(component: schemas.MarketplaceComponentCreate, db: Session = Depends(deps.get_db)):
+    db_obj = models.MarketplaceComponent(**component.dict())
+    db.add(db_obj)
+    db.commit()
+    db.refresh(db_obj)
+    return db_obj
+
+
+@router.get("/marketplace/components/", response_model=list[schemas.MarketplaceComponent])
+def read_components(skip: int = 0, limit: int = 10, db: Session = Depends(deps.get_db)):
+    return db.query(models.MarketplaceComponent).offset(skip).limit(limit).all()
+
+
+@router.get("/marketplace/components/{component_id}", response_model=schemas.MarketplaceComponent)
+def read_component(component_id: int, db: Session = Depends(deps.get_db)):
+    comp = db.query(models.MarketplaceComponent).filter(models.MarketplaceComponent.id == component_id).first()
+    if not comp:
+        raise HTTPException(status_code=404, detail="Component not found")
+    return comp
+
+
+@router.put("/marketplace/components/{component_id}", response_model=schemas.MarketplaceComponent)
+def update_component(component_id: int, component_in: schemas.MarketplaceComponentCreate, db: Session = Depends(deps.get_db)):
+    comp = db.query(models.MarketplaceComponent).filter(models.MarketplaceComponent.id == component_id).first()
+    if not comp:
+        raise HTTPException(status_code=404, detail="Component not found")
+    for field, value in component_in.dict().items():
+        setattr(comp, field, value)
+    db.commit()
+    db.refresh(comp)
+    return comp
+
+
+@router.delete("/marketplace/components/{component_id}")
+def delete_component(component_id: int, db: Session = Depends(deps.get_db)):
+    comp = db.query(models.MarketplaceComponent).filter(models.MarketplaceComponent.id == component_id).first()
+    if not comp:
+        raise HTTPException(status_code=404, detail="Component not found")
+    db.delete(comp)
+    db.commit()
+    return {"ok": True}

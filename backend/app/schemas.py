@@ -489,3 +489,23 @@ class Environment(EnvironmentBase):
 
     class Config:
         orm_mode = True
+
+
+class MarketplaceComponentBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    code: str
+    version: str = "0.1.0"
+
+
+class MarketplaceComponentCreate(MarketplaceComponentBase):
+    pass
+
+
+class MarketplaceComponent(MarketplaceComponentBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True

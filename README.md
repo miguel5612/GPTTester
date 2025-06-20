@@ -7,6 +7,7 @@ Para conocer los detalles de instalación y uso del backend revisa `backend/READ
 La carpeta `postman` se genera automáticamente ejecutando `python generate_postman.py` y
 contiene una colección lista para importar en Postman y probar todos los endpoints.
 - `historias_bdd` para la trazabilidad a BDD
+- Marketplace de componentes disponible en `/marketplace/components/`
 - 
 ## Autenticación
 

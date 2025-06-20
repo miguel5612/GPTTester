@@ -431,3 +431,15 @@ class EnvironmentSchedule(Base):
     blackout = Column(Boolean, default=False)
 
     environment = relationship("Environment", back_populates="schedules")
+
+
+class MarketplaceComponent(Base):
+    __tablename__ = "marketplace_components"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    code = Column(String, nullable=False)
+    version = Column(String, nullable=False, default="0.1.0")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -256,6 +256,23 @@ export interface LoginResponse {
   token_type: string;
 }
 
+export interface MarketplaceComponent {
+  id: number;
+  name: string;
+  description?: string;
+  code: string;
+  version: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MarketplaceComponentCreate {
+  name: string;
+  description?: string;
+  code: string;
+  version?: string;
+}
+
 export interface ApiResponse<T> {
   data?: T;
   error?: string;
