@@ -225,3 +225,14 @@ Se crearán los archivos `postman/collection.json` y `postman/environment.json`
 que puedes importar directamente en Postman. La colección contiene ejemplos de
 cada endpoint y variables de entorno como `base_url` y `token` para que puedas
 ejecutar las peticiones rápidamente.
+
+## Integración con Jira
+
+Existe un cliente básico para Jira que permite crear issues, transicionar su estado y lanzar pipelines externos. Los endpoints disponibles son:
+
+- `POST /integrations/jira/issue`
+- `POST /integrations/jira/issues/{issue_key}/status`
+- `POST /integrations/jira/pipeline`
+
+Configura las variables `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` y `JIRA_PROJECT_KEY` antes de usar estas llamadas.
+

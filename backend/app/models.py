@@ -455,3 +455,111 @@ class Secret(Base):
     id = Column(Integer, primary_key=True, index=True)
     key = Column(String, unique=True, nullable=False)
     value = Column(String, nullable=False)
+
+class MarketplaceComponent(Base):
+    __tablename__ = "marketplace_components"
+# -----------------------------------------------------
+# Intelligent orchestrator models
+# -----------------------------------------------------
+
+
+class DependencyType(str, enum.Enum):
+    """Types of dependencies between tests."""
+
+    REQUIRES = "REQUIRES"
+    BLOCKS = "BLOCKS"
+    OPTIONAL = "OPTIONAL"
+    DATA_DEPENDENCY = "DATA_DEPENDENCY"
+
+
+suite_tests = Table(
+    "suite_tests",
+    Base.metadata,
+    Column("suite_id", Integer, ForeignKey("test_suites.id"), primary_key=True),
+    Column("test_id", Integer, ForeignKey("tests.id"), primary_key=True),
+)
+
+
+class TestSuite(Base):
+    __tablename__ = "test_suites"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    code = Column(String, nullable=False)
+    version = Column(String, nullable=False, default="0.1.0")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    suite_type = Column(String, nullable=True)
+    shared_context = Column(String, nullable=True)
+
+    tests = relationship(
+        "TestCase",
+        secondary=suite_tests,
+        backref="suites",
+    )
+
+
+class TestDependency(Base):
+    __tablename__ = "test_dependencies"
+
+    id = Column(Integer, primary_key=True, index=True)
+    suite_id = Column(Integer, ForeignKey("test_suites.id"), nullable=True)
+    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
+    depends_on_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
+    type = Column(String, nullable=False, default=DependencyType.REQUIRES.value)
+
+    suite = relationship("TestSuite")
+    test = relationship("TestCase", foreign_keys=[test_id])
+    depends_on = relationship("TestCase", foreign_keys=[depends_on_id])
+
+class TestBranch(Base):
+    __tablename__ = "test_branches"
+
+    id = Column(Integer, primary_key=True, index=True)
+    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
+    name = Column(String, nullable=False)
+
+    test = relationship("TestCase", backref="branches")
+
+
+class TestVersion(Base):
+    __tablename__ = "test_versions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
+    snapshot = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    test = relationship("TestCase", backref="versions")
+
+
+class TestCommit(Base):
+    __tablename__ = "test_commits"
+
+    id = Column(Integer, primary_key=True, index=True)
+    branch_id = Column(Integer, ForeignKey("test_branches.id"), nullable=False)
+    version_id = Column(Integer, ForeignKey("test_versions.id"), nullable=False)
+    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    message = Column(String, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    branch = relationship("TestBranch", backref="commits")
+    version = relationship("TestVersion")
+    author = relationship("User")
+
+
+class TestMerge(Base):
+    __tablename__ = "test_merges"
+
+    id = Column(Integer, primary_key=True, index=True)
+    source_branch_id = Column(Integer, ForeignKey("test_branches.id"), nullable=False)
+    target_branch_id = Column(Integer, ForeignKey("test_branches.id"), nullable=False)
+    commit_id = Column(Integer, ForeignKey("test_commits.id"), nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    source_branch = relationship("TestBranch", foreign_keys=[source_branch_id])
+    target_branch = relationship("TestBranch", foreign_keys=[target_branch_id])
+    commit = relationship("TestCommit")
+
+
