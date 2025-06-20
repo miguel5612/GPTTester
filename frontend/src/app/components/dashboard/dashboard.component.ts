@@ -8,6 +8,11 @@ import { ExecutionService } from '../../services/execution.service';
 import { WorkspaceService } from '../../services/workspace.service';
 import { User, Test, Action, Agent, Client, Project, PlanExecution } from '../../models';
 
+interface MenuItem {
+  label: string;
+  route: string;
+}
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -15,10 +20,6 @@ import { User, Test, Action, Agent, Client, Project, PlanExecution } from '../..
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-interface MenuItem {
-  label: string;
-  route: string;
-}
 
 export class DashboardComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;

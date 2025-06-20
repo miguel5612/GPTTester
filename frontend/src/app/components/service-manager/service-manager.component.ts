@@ -80,9 +80,9 @@ import { ClientProjectsComponent } from '../client-admin/client-projects.compone
         <p>Capacidad del equipo: {{teamCapacity}}</p>
       </div>
 
-      <app-client-analysts [clientId]="selectedClient?.id" (updated)="loadData()" (close)="selectedClient=null" *ngIf="selectedClient"></app-client-analysts>
-      <app-project-analysts [projectId]="selectedProject?.id" (updated)="loadData()" (close)="selectedProject=null" *ngIf="selectedProject"></app-project-analysts>
-      <app-client-projects [clientId]="projectClient?.id" (updated)="loadData()" (close)="projectClient=null" *ngIf="projectClient"></app-client-projects>
+      <app-client-analysts [clientId]="selectedClient!.id" (updated)="loadData()" (close)="selectedClient=null" *ngIf="selectedClient"></app-client-analysts>
+      <app-project-analysts [projectId]="selectedProject!.id" (updated)="loadData()" (close)="selectedProject=null" *ngIf="selectedProject"></app-project-analysts>
+      <app-client-projects [clientId]="projectClient!.id" (updated)="loadData()" (close)="projectClient=null" *ngIf="projectClient"></app-client-projects>
     </div>
   `
 })

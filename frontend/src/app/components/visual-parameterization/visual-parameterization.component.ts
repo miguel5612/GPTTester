@@ -72,13 +72,13 @@ interface Step {
                 <input class="form-control form-control-sm mb-2" [(ngModel)]="s.condition" placeholder="Expresión">
                 <div class="ms-3">
                   <small>Then:</small>
-                  <div cdkDropList [cdkDropListData]="s.steps" class="nested" (cdkDropListDropped)="dropNested($event, s.steps)">
+                  <div cdkDropList [cdkDropListData]="s.steps" class="nested" (cdkDropListDropped)="dropNested($event, s.steps!)">
                     <div *ngFor="let c of s.steps" cdkDrag class="nested-item">
                       {{ displayStep(c) }}
                     </div>
                   </div>
                   <small>Else:</small>
-                  <div cdkDropList [cdkDropListData]="s.elseSteps" class="nested" (cdkDropListDropped)="dropNested($event, s.elseSteps)">
+                  <div cdkDropList [cdkDropListData]="s.elseSteps" class="nested" (cdkDropListDropped)="dropNested($event, s.elseSteps!)">
                     <div *ngFor="let c of s.elseSteps" cdkDrag class="nested-item">
                       {{ displayStep(c) }}
                     </div>
@@ -92,7 +92,7 @@ interface Step {
                   <button class="btn btn-sm btn-danger" (click)="removeStep(i)">x</button>
                 </div>
                 <input type="number" class="form-control form-control-sm mb-2" [(ngModel)]="s.repeat" placeholder="Repeticiones">
-                <div cdkDropList [cdkDropListData]="s.steps" class="nested" (cdkDropListDropped)="dropNested($event, s.steps)">
+                <div cdkDropList [cdkDropListData]="s.steps" class="nested" (cdkDropListDropped)="dropNested($event, s.steps!)">
                   <div *ngFor="let c of s.steps" cdkDrag class="nested-item">
                     {{ displayStep(c) }}
                   </div>
