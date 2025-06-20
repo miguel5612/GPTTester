@@ -1,6 +1,8 @@
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect, Query
 from fastapi.responses import FileResponse
+
+from .report_generator import generate_execution_report, package_evidence
 import json
 from datetime import datetime
 from uuid import uuid4
@@ -1731,6 +1733,14 @@ def get_execution_file(
         raise HTTPException(status_code=404, detail="Execution not found")
     filename = f"{file_type}_{execution_id}.{'pdf' if file_type == 'report' else 'zip'}"
     path = os.path.join("/tmp", filename)
+    if not os.path.exists(path):
+        try:
+            if file_type == "report":
+                path = generate_execution_report(db, execution_id)
+            else:
+                path = package_evidence(db, execution_id)
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=str(exc))
     if not os.path.exists(path):
         raise HTTPException(status_code=404, detail="File not found")
     return FileResponse(path, filename=filename)
