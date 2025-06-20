@@ -513,6 +513,31 @@ class TestDependencyBase(BaseModel):
 
 class TestDependency(TestDependencyBase):
     id: int
+=======
+class BranchCreate(BaseModel):
+    name: str
+
+
+class TestBranch(BranchCreate):
+    id: int
+    test_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class CommitCreate(BaseModel):
+    branch_id: int
+    message: str
+
+
+class TestCommit(BaseModel):
+    id: int
+    branch_id: int
+    version_id: int
+    author_id: int
+    message: str
+    timestamp: datetime
 
     class Config:
         orm_mode = True
@@ -532,6 +557,27 @@ class TestSuiteCreate(TestSuiteBase):
 class TestSuite(TestSuiteBase):
     id: int
     tests: List[Test] = []
+class MergeCreate(BaseModel):
+    source_branch_id: int
+    target_branch_id: int
+
+
+class TestMerge(BaseModel):
+    id: int
+    source_branch_id: int
+    target_branch_id: int
+    commit_id: int
+    timestamp: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class TestVersion(BaseModel):
+    id: int
+    test_id: int
+    snapshot: str
+    created_at: datetime
 
     class Config:
         orm_mode = True

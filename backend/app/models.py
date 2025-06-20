@@ -483,3 +483,53 @@ class TestDependency(Base):
     suite = relationship("TestSuite")
     test = relationship("TestCase", foreign_keys=[test_id])
     depends_on = relationship("TestCase", foreign_keys=[depends_on_id])
+
+class TestBranch(Base):
+    __tablename__ = "test_branches"
+
+    id = Column(Integer, primary_key=True, index=True)
+    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
+    name = Column(String, nullable=False)
+
+    test = relationship("TestCase", backref="branches")
+
+
+class TestVersion(Base):
+    __tablename__ = "test_versions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
+    snapshot = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    test = relationship("TestCase", backref="versions")
+
+
+class TestCommit(Base):
+    __tablename__ = "test_commits"
+
+    id = Column(Integer, primary_key=True, index=True)
+    branch_id = Column(Integer, ForeignKey("test_branches.id"), nullable=False)
+    version_id = Column(Integer, ForeignKey("test_versions.id"), nullable=False)
+    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    message = Column(String, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    branch = relationship("TestBranch", backref="commits")
+    version = relationship("TestVersion")
+    author = relationship("User")
+
+
+class TestMerge(Base):
+    __tablename__ = "test_merges"
+
+    id = Column(Integer, primary_key=True, index=True)
+    source_branch_id = Column(Integer, ForeignKey("test_branches.id"), nullable=False)
+    target_branch_id = Column(Integer, ForeignKey("test_branches.id"), nullable=False)
+    commit_id = Column(Integer, ForeignKey("test_commits.id"), nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    source_branch = relationship("TestBranch", foreign_keys=[source_branch_id])
+    target_branch = relationship("TestBranch", foreign_keys=[target_branch_id])
+    commit = relationship("TestCommit")
+
