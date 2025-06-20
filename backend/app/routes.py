@@ -2311,6 +2311,21 @@ def dashboard_metrics(
             .filter(models.Project.is_active == True)
             .all()
         )
+        analyst_rows = (
+            db.query(
+                models.User.username,
+                func.count(models.TestCase.id).label("scripts"),
+            )
+            .join(models.TestCase, models.TestCase.owner_id == models.User.id)
+            .group_by(models.User.id)
+            .order_by(func.count(models.TestCase.id).desc())
+            .all()
+        )
+        agent_metrics = agent_manager.get_metrics()
+        total_exec = sum(m.get("executions", 0) for m in agent_metrics)
+        total_success = sum(int(m.get("executions", 0) * m.get("success_rate", 0)) for m in agent_metrics)
+        failed_exec = total_exec - total_success
+        best_analyst = analyst_rows[0][0] if analyst_rows else None
         subq = db.query(models.project_analysts.c.user_id).subquery()
         unassigned = (
             db.query(models.User)
@@ -2337,6 +2352,11 @@ def dashboard_metrics(
             "unassigned": [
                 {"id": u.id, "username": u.username} for u in unassigned
             ],
+            "analysts": [
+                {"name": r[0], "scripts": r[1]} for r in analyst_rows
+            ],
+            "best_analyst": best_analyst,
+            "failed_executions": failed_exec,
         }
 
     if current_user.role and current_user.role.name in [
