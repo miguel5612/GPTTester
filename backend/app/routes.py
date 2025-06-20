@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
 
 from . import models, schemas, deps, security, executor
+from .orchestrator import build_execution_graph, execute_graph
 from .agent_manager import agent_manager
 from .execution_monitor import monitor_manager
 
@@ -2520,3 +2521,56 @@ def promote_environment(env_id: int, db: Session = Depends(deps.get_db)):
     db.commit()
     db.refresh(env)
     return env
+
+
+# -----------------------------------------------------
+# Intelligent orchestrator endpoints
+# -----------------------------------------------------
+
+
+@router.post("/suites/create", response_model=schemas.TestSuite)
+def create_suite(suite: schemas.TestSuiteCreate, db: Session = Depends(deps.get_db)):
+    tests = db.query(models.TestCase).filter(models.TestCase.id.in_(suite.tests)).all()
+    if len(tests) != len(suite.tests):
+        raise HTTPException(status_code=404, detail="Some tests not found")
+    db_suite = models.TestSuite(
+        name=suite.name,
+        description=suite.description,
+        suite_type=suite.suite_type,
+        shared_context=suite.shared_context,
+    )
+    db_suite.tests = tests
+    db.add(db_suite)
+    db.commit()
+    db.refresh(db_suite)
+    return db_suite
+
+
+@router.get("/suites/{suite_id}/graph")
+def get_suite_graph(suite_id: int, db: Session = Depends(deps.get_db)):
+    graph = build_execution_graph(db, suite_id)
+    return {
+        "levels": graph.topological_levels(),
+        "blocking": [list(p) for p in graph.get_blocking_pairs()],
+    }
+
+
+@router.post("/suites/{suite_id}/execute")
+async def execute_suite(
+    suite_id: int,
+    retries: int = 0,
+    db: Session = Depends(deps.get_db),
+):
+    graph = build_execution_graph(db, suite_id)
+    results = await execute_graph(graph, retries=retries)
+    return results
+
+
+@router.get("/executions/{suite_id}/dependencies", response_model=list[schemas.TestDependency])
+def read_suite_dependencies(suite_id: int, db: Session = Depends(deps.get_db)):
+    deps_list = (
+        db.query(models.TestDependency)
+        .filter(models.TestDependency.suite_id == suite_id)
+        .all()
+    )
+    return deps_list

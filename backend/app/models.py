@@ -431,3 +431,55 @@ class EnvironmentSchedule(Base):
     blackout = Column(Boolean, default=False)
 
     environment = relationship("Environment", back_populates="schedules")
+
+
+# -----------------------------------------------------
+# Intelligent orchestrator models
+# -----------------------------------------------------
+
+
+class DependencyType(str, enum.Enum):
+    """Types of dependencies between tests."""
+
+    REQUIRES = "REQUIRES"
+    BLOCKS = "BLOCKS"
+    OPTIONAL = "OPTIONAL"
+    DATA_DEPENDENCY = "DATA_DEPENDENCY"
+
+
+suite_tests = Table(
+    "suite_tests",
+    Base.metadata,
+    Column("suite_id", Integer, ForeignKey("test_suites.id"), primary_key=True),
+    Column("test_id", Integer, ForeignKey("tests.id"), primary_key=True),
+)
+
+
+class TestSuite(Base):
+    __tablename__ = "test_suites"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    suite_type = Column(String, nullable=True)
+    shared_context = Column(String, nullable=True)
+
+    tests = relationship(
+        "TestCase",
+        secondary=suite_tests,
+        backref="suites",
+    )
+
+
+class TestDependency(Base):
+    __tablename__ = "test_dependencies"
+
+    id = Column(Integer, primary_key=True, index=True)
+    suite_id = Column(Integer, ForeignKey("test_suites.id"), nullable=True)
+    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
+    depends_on_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
+    type = Column(String, nullable=False, default=DependencyType.REQUIRES.value)
+
+    suite = relationship("TestSuite")
+    test = relationship("TestCase", foreign_keys=[test_id])
+    depends_on = relationship("TestCase", foreign_keys=[depends_on_id])

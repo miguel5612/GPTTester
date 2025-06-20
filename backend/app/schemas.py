@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, root_validator
 from typing import List, Optional, Dict, Any
 from datetime import date, datetime
+from enum import Enum
 
 
 class RoleBase(BaseModel):
@@ -486,6 +487,51 @@ class Environment(EnvironmentBase):
     config: Optional[EnvironmentConfig] = None
     credentials: Optional[EnvironmentCredential] = None
     schedules: List[EnvironmentSchedule] = []
+
+    class Config:
+        orm_mode = True
+
+
+# -----------------------------------------------------
+# Intelligent orchestrator schemas
+# -----------------------------------------------------
+
+
+class DependencyType(str, Enum):
+    REQUIRES = "REQUIRES"
+    BLOCKS = "BLOCKS"
+    OPTIONAL = "OPTIONAL"
+    DATA_DEPENDENCY = "DATA_DEPENDENCY"
+
+
+class TestDependencyBase(BaseModel):
+    test_id: int
+    depends_on_id: int
+    type: DependencyType = DependencyType.REQUIRES
+    suite_id: Optional[int] = None
+
+
+class TestDependency(TestDependencyBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class TestSuiteBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    suite_type: Optional[str] = None
+    shared_context: Optional[str] = None
+
+
+class TestSuiteCreate(TestSuiteBase):
+    tests: List[int] = []
+
+
+class TestSuite(TestSuiteBase):
+    id: int
+    tests: List[Test] = []
 
     class Config:
         orm_mode = True
