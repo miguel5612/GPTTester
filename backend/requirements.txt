@@ -8,4 +8,5 @@ python-multipart
 weasyprint
 matplotlib
 jinja2
+requests
 httpx

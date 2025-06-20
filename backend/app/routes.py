@@ -2523,6 +2523,46 @@ def promote_environment(env_id: int, db: Session = Depends(deps.get_db)):
     db.refresh(env)
     return env
 
+from .integrations import JiraIntegration
+
+@router.post("/integrations/jira/issue")
+def create_jira_issue(
+    issue: schemas.JiraIssueCreate,
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    client = JiraIntegration()
+    try:
+        return client.create_issue(issue.summary, issue.description)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@router.post("/integrations/jira/issues/{issue_key}/status")
+def transition_jira_issue(
+    issue_key: str,
+    data: schemas.JiraTransition,
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    client = JiraIntegration()
+    try:
+        client.transition_issue(issue_key, data.transition_id)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    return {"ok": True}
+
+
+@router.post("/integrations/jira/pipeline")
+def trigger_jira_pipeline(
+    info: schemas.PipelineTrigger,
+    current_user: models.User = Depends(deps.get_current_user),
+):
+    client = JiraIntegration()
+    try:
+        client.trigger_pipeline(info.url)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+    return {"ok": True}
+
 
 # -----------------------------------------------------
 # Intelligent orchestrator endpoints

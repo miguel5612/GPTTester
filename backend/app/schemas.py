@@ -491,6 +491,19 @@ class Environment(EnvironmentBase):
     class Config:
         orm_mode = True
 
+class JiraIssueCreate(BaseModel):
+    summary: str
+    description: Optional[str] = None
+
+
+class JiraTransition(BaseModel):
+    issue_key: str
+    transition_id: str
+
+
+class PipelineTrigger(BaseModel):
+    url: str
+=======
 
 # -----------------------------------------------------
 # Intelligent orchestrator schemas
@@ -513,7 +526,7 @@ class TestDependencyBase(BaseModel):
 
 class TestDependency(TestDependencyBase):
     id: int
-=======
+
 class BranchCreate(BaseModel):
     name: str
 
