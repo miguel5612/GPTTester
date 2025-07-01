@@ -48,7 +48,9 @@ def create_access_token(data: dict) -> str:
     return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+def get_current_user(
+    db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -73,13 +75,37 @@ def require_api_permission(route: str, method: str):
         db: Session = Depends(get_db),
     ):
         perms = (
-            db.query(models.ApiPermission)
-            .filter_by(route=route, method=method)
-            .all()
+            db.query(models.ApiPermission).filter_by(route=route, method=method).all()
         )
         if perms:
             allowed = any(p.role_id == current_user.role_id for p in perms)
             if not allowed:
-                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden"
+                )
+
+    return _check
+
+
+def require_admin(current_user: models.User = Depends(get_current_user)):
+    if current_user.role.name != "Administrador":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin only")
+    return current_user
+
+
+def require_page_permission(page: str):
+    def _check(
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        perm = (
+            db.query(models.PagePermission)
+            .filter_by(page=page, role_id=current_user.role_id)
+            .first()
+        )
+        if perm is None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden"
+            )
 
     return _check

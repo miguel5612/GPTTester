@@ -51,6 +51,18 @@ class ApiPermission(BaseModel):
         orm_mode = True
 
 
+class PagePermissionInput(BaseModel):
+    page: str
+    isStartPage: bool = False
+    description: str = ""
+
+
+class ApiPermissionInput(BaseModel):
+    route: str
+    method: str
+    description: str = ""
+
+
 # 5️⃣ Clients
 class Client(BaseModel):
     id: int
