@@ -1,74 +1,61 @@
-import time
-import logging
-import threading
-from jose import jwt
-from .routes import router
-from . import models, deps
-from datetime import datetime
-from .initData import init_data
-from .gateway import setup_gateway
-from fastapi import FastAPI, Request
-from .agent_manager import agent_manager
-from .database import engine, SessionLocal
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
+
+from .database import engine
+from . import models, schemas, deps
+from .crud import create_crud_router
 
 models.Base.metadata.create_all(bind=engine)
 
-init_data()
-
 app = FastAPI(title="Test Automation API")
-setup_gateway(app)
-logger = logging.getLogger("audit")
-logging.basicConfig(level=logging.INFO)
 
-def schedule_worker():
-    while True:
-        db = SessionLocal()
-        try:
-            now = datetime.utcnow()
-            schedules = (
-                db.query(models.ExecutionSchedule)
-                .filter(
-                    models.ExecutionSchedule.run_at <= now,
-                    models.ExecutionSchedule.executed == False,
-                )
-                .all()
-            )
-            for sch in schedules:
-                selected_agent = sch.agent_id or sch.plan.agent_id
-                record = models.PlanExecution(
-                    plan_id=sch.plan_id,
-                    agent_id=selected_agent,
-                    status=models.ExecutionStatus.CALLING.value,
-                )
-                db.add(record)
-                sch.executed = True
-            if schedules:
-                db.commit()
-        except Exception as e:
-            db.rollback()
-            print(f"Scheduler error: {e}")
-        finally:
-            db.close()
-        time.sleep(10)
+@app.post("/token")
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(deps.get_db)):
+    user = deps.authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid credentials")
+    token = deps.create_access_token({"user_id": user.id})
+    return {"access_token": token, "token_type": "bearer"}
 
+# CRUD routers for main entities
+def register_cruds():
+    mappings = [
+        ("roles", models.Role, schemas.Role),
+        ("users", models.User, schemas.User),
+        ("pagepermissions", models.PagePermission, schemas.PagePermission),
+        ("apipermissions", models.ApiPermission, schemas.ApiPermission),
+        ("clients", models.Client, schemas.Client),
+        ("businessagreements", models.BusinessAgreement, schemas.BusinessAgreement),
+        ("digitalassets", models.DigitalAsset, schemas.DigitalAsset),
+        ("userinterfaces", models.UserInterface, schemas.UserInterface),
+        ("elementtypes", models.ElementType, schemas.ElementType),
+        ("elements", models.Element, schemas.Element),
+        ("projects", models.Project, schemas.Project),
+        ("projectemployees", models.ProjectEmployee, schemas.ProjectEmployee),
+        ("actors", models.Actor, schemas.Actor),
+        ("habilities", models.Hability, schemas.Hability),
+        ("interactions", models.Interaction, schemas.Interaction),
+        ("interactionparameters", models.InteractionParameter, schemas.InteractionParameter),
+        ("interactionapprovalstates", models.InteractionApprovalState, schemas.InteractionApprovalState),
+        ("interactionapprovals", models.InteractionApproval, schemas.InteractionApproval),
+        ("tasks", models.Task, schemas.Task),
+        ("taskhaveinteractions", models.TaskHaveInteraction, schemas.TaskHaveInteraction),
+        ("validations", models.Validation, schemas.Validation),
+        ("validationparameters", models.ValidationParameter, schemas.ValidationParameter),
+        ("validationapprovals", models.ValidationApproval, schemas.ValidationApproval),
+        ("questions", models.Question, schemas.Question),
+        ("questionhasvalidations", models.QuestionHasValidation, schemas.QuestionHasValidation),
+        ("scenarios", models.Scenario, schemas.Scenario),
+        ("scenariodata", models.ScenarioData, schemas.ScenarioData),
+        ("rawdata", models.RawData, schemas.RawData),
+        ("fieldtypes", models.FieldType, schemas.FieldType),
+        ("features", models.Feature, schemas.Feature),
+        ("scenariohasfeatures", models.ScenarioHasFeature, schemas.ScenarioHasFeature),
+        ("featuresteps", models.FeatureStep, schemas.FeatureStep),
+        ("scenarioinfo", models.ScenarioInfo, schemas.ScenarioInfo),
+    ]
+    for prefix, model, schema in mappings:
+        app.include_router(create_crud_router(prefix, model, schema))
 
-def start_scheduler():
-    thread = threading.Thread(target=schedule_worker, daemon=True)
-    thread.start()
-
-app.include_router(router)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # O especifica ['http://localhost:4200'] para mayor seguridad
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-start_scheduler()
-
-
-@app.on_event("startup")
-async def start_agent_manager():
-    agent_manager.start()
+register_cruds()
