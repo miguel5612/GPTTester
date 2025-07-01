@@ -5,7 +5,7 @@ from jose import jwt
 from .routes import router
 from . import models, deps
 from datetime import datetime
-from initData import init_data
+from .initData import init_data
 from .gateway import setup_gateway
 from fastapi import FastAPI, Request
 from .agent_manager import agent_manager
@@ -20,7 +20,6 @@ app = FastAPI(title="Test Automation API")
 setup_gateway(app)
 logger = logging.getLogger("audit")
 logging.basicConfig(level=logging.INFO)
-
 
 def schedule_worker():
     while True:

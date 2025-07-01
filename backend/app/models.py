@@ -1,573 +1,336 @@
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    Boolean,
-    ForeignKey,
-    Table,
-    Date,
-    DateTime,
-    UniqueConstraint,
-)
-import enum
-from datetime import datetime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from .database import Base
 
-
-class DataState(str, enum.Enum):
-    NEW = "nuevo"
-    USED = "usado"
-    BLOCKED = "bloqueado"
-
-
+# 1️⃣ Roles
 class Role(Base):
-    __tablename__ = "roles"
-
+    __tablename__ = 'roles'
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, nullable=False)
+    name = Column(String(100), unique=True, nullable=False)
+    description = Column(Text)
+
+    users = relationship("User", back_populates="role")
+    page_permissions = relationship("PagePermission", back_populates="role")
+    api_permissions = relationship("ApiPermission", back_populates="role")
 
 
-class PagePermission(Base):
-    __tablename__ = "permissions"
-    __table_args__ = (UniqueConstraint("role_id", "page", name="uix_role_page"),)
-
-    id = Column(Integer, primary_key=True, index=True)
-    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
-    page = Column(String, nullable=False)
-
-    role = relationship("Role", backref="permissions")
-
-
+# 2️⃣ Users
 class User(Base):
-    __tablename__ = "users"
-
+    __tablename__ = 'users'
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    role_id = Column(Integer, ForeignKey("roles.id"))
-    last_login = Column(DateTime, nullable=True)
+    username = Column(String(100), unique=True, nullable=False)
+    password = Column(String(200), nullable=False)
+    last_login = Column(DateTime)
     is_active = Column(Boolean, default=True)
-    role = relationship("Role")
-    tests = relationship("TestCase", back_populates="owner")
-    projects = relationship(
-        "Project",
-        secondary="project_analysts",
-        back_populates="analysts",
-    )
-    clients = relationship(
-        "Client",
-        secondary="client_analysts",
-        back_populates="analysts",
-    )
+    endSubscriptionDate = Column(DateTime)
+    role_id = Column(Integer, ForeignKey('roles.id'), nullable=False)
+
+    role = relationship("Role", back_populates="users")
 
 
-class TestCase(Base):
-    __tablename__ = "tests"
-
+# 3️⃣ PagePermissions
+class PagePermission(Base):
+    __tablename__ = 'page_permissions'
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    description = Column(String, nullable=True)
-    priority = Column(String, nullable=True)
-    status = Column(String, nullable=True)
-    given = Column(String, nullable=True)
-    when = Column(String, nullable=True)
-    then = Column(String, nullable=True)
-    test_plan_id = Column(Integer, ForeignKey("testplans.id"), nullable=True)
-    actor_id = Column(Integer, ForeignKey("actors.id"), nullable=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
+    page = Column(String(200), nullable=False)
+    role_id = Column(Integer, ForeignKey('roles.id'), nullable=False)
+    isStartPage = Column(Boolean, default=False)
+    description = Column(Text)
 
-    owner = relationship("User", back_populates="tests")
-    elements = relationship(
-        "PageElement",
-        secondary="element_flows",
-        back_populates="tests",
-    )
-    actions = relationship(
-        "AutomationAction",
-        secondary="test_actions",
-        back_populates="tests",
-    )
-    actor = relationship("Actor")
-    plan = relationship("TestPlan")
+    role = relationship("Role", back_populates="page_permissions")
 
 
-project_analysts = Table(
-    "project_analysts",
-    Base.metadata,
-    Column("project_id", Integer, ForeignKey("projects.id"), primary_key=True),
-    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
-    Column("scripts_per_day", Integer, nullable=True),
-    Column("test_types", String, nullable=True),
-)
+# 4️⃣ ApiPermissions
+class ApiPermission(Base):
+    __tablename__ = 'api_permissions'
+    id = Column(Integer, primary_key=True, index=True)
+    route = Column(String(200), nullable=False)
+    method = Column(String(10), nullable=False)
+    role_id = Column(Integer, ForeignKey('roles.id'), nullable=False)
+    description = Column(Text)
+
+    role = relationship("Role", back_populates="api_permissions")
 
 
-client_analysts = Table(
-    "client_analysts",
-    Base.metadata,
-    Column("client_id", Integer, ForeignKey("clients.id"), primary_key=True),
-    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
-    Column("dedication", Integer, nullable=True),
-)
-
-
+# 5️⃣ Clients
 class Client(Base):
-    __tablename__ = "clients"
-
+    __tablename__ = 'clients'
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, nullable=False)
+    idGerente = Column(Integer)
+    name = Column(String(200), nullable=False)
     is_active = Column(Boolean, default=True)
-    projects = relationship("Project", back_populates="client")
-    actors = relationship("Actor", back_populates="client")
-    analysts = relationship(
-        "User",
-        secondary=client_analysts,
-        back_populates="clients",
-    )
+    mision = Column(Text)
+    vision = Column(Text)
+    paginaInicio = Column(String(200))
+    dedication = Column(Integer)
 
 
-class Actor(Base):
-    __tablename__ = "actors"
-
+# 6️⃣ BusinessAgreements
+class BusinessAgreement(Base):
+    __tablename__ = 'business_agreements'
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
+    clientId = Column(Integer, ForeignKey('clients.id'), nullable=False)
+    description = Column(Text)
+    okr = Column(Text)
+    kpi = Column(Text)
 
-    client = relationship("Client", back_populates="actors")
+
+# 7️⃣ DigitalAssets
+class DigitalAsset(Base):
+    __tablename__ = 'digital_assets'
+    id = Column(Integer, primary_key=True, index=True)
+    clientId = Column(Integer, ForeignKey('clients.id'), nullable=False)
+    description = Column(Text)
+    okr = Column(Text)
+    kpi = Column(Text)
 
 
+# 8️⃣ UserInterface
+class UserInterface(Base):
+    __tablename__ = 'user_interfaces'
+    id = Column(Integer, primary_key=True, index=True)
+    digitalAssetsId = Column(Integer, ForeignKey('digital_assets.id'), nullable=False)
+    description = Column(Text)
+    status = Column(Boolean, default=True)
+
+
+# 9️⃣ ElementType
+class ElementType(Base):
+    __tablename__ = 'element_types'
+    id = Column(Integer, primary_key=True, index=True)
+    description = Column(Text)
+    status = Column(Boolean, default=True)
+
+
+# 🔟 Element
+class Element(Base):
+    __tablename__ = 'elements'
+    id = Column(Integer, primary_key=True, index=True)
+    userInterfaceId = Column(Integer, ForeignKey('user_interfaces.id'), nullable=False)
+    elementTypeId = Column(Integer, ForeignKey('element_types.id'), nullable=False)
+    description = Column(Text)
+    status = Column(Boolean, default=True)
+
+
+# 11️⃣ Projects
 class Project(Base):
-    __tablename__ = "projects"
-
+    __tablename__ = 'projects'
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
-    objetivo = Column(String, nullable=True)
+    digitalAssetsId = Column(Integer, ForeignKey('digital_assets.id'), nullable=False)
+    name = Column(String(200), nullable=False)
+    objective = Column(Text)
     is_active = Column(Boolean, default=True)
-
-    client = relationship("Client", back_populates="projects")
-    analysts = relationship(
-        "User",
-        secondary=project_analysts,
-        back_populates="projects",
-    )
+    scripts_per_day = Column(Integer)
 
 
-class TestPlan(Base):
-    __tablename__ = "testplans"
-
+# 12️⃣ ProjectEmployee
+class ProjectEmployee(Base):
+    __tablename__ = 'project_employees'
     id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String, nullable=False)
-    objetivo = Column(String, nullable=True)
-    alcance = Column(String, nullable=True)
-    criterios_entrada = Column(String, nullable=True)
-    criterios_salida = Column(String, nullable=True)
-    estrategia = Column(String, nullable=True)
-    responsables = Column(String, nullable=True)
-    fecha_inicio = Column(Date, nullable=True)
-    fecha_fin = Column(Date, nullable=True)
-    historias_bdd = Column(String, nullable=True)
+    projectId = Column(Integer, ForeignKey('projects.id'), nullable=False)
+    userId = Column(Integer, ForeignKey('users.id'), nullable=False)
+    objective = Column(Text)
+    dedicationHours = Column(Integer)
 
 
-element_flows = Table(
-    "element_flows",
-    Base.metadata,
-    Column("element_id", Integer, ForeignKey("page_elements.id"), primary_key=True),
-    Column("test_id", Integer, ForeignKey("tests.id"), primary_key=True),
-)
-
-
-class Page(Base):
-    __tablename__ = "pages"
-
+# 13️⃣ Actors
+class Actor(Base):
+    __tablename__ = 'actors'
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, nullable=False)
+    name = Column(String(200), nullable=False)
+    habilitiesId = Column(Integer, ForeignKey('habilities.id'), nullable=False)
+    client_id = Column(Integer, ForeignKey('clients.id'), nullable=False)
 
-    elements = relationship("PageElement", back_populates="page")
 
-
-class PageElement(Base):
-    __tablename__ = "page_elements"
-    __table_args__ = (
-        UniqueConstraint("page_id", "name", name="uix_page_element_name"),
-    )
-
+# 14️⃣ Habilities
+class Hability(Base):
+    __tablename__ = 'habilities'
     id = Column(Integer, primary_key=True, index=True)
-    page_id = Column(Integer, ForeignKey("pages.id"), nullable=False)
-    name = Column(String, nullable=False)
-    tipo = Column(String, nullable=False)
-    estrategia = Column(String, nullable=False)
-    valor = Column(String, nullable=False)
-    descripcion = Column(String, nullable=True)
-
-    page = relationship("Page", back_populates="elements")
-    tests = relationship(
-        "TestCase",
-        secondary=element_flows,
-        back_populates="elements",
-    )
+    name = Column(String(200), nullable=False)
 
 
-test_actions = Table(
-    "test_actions",
-    Base.metadata,
-    Column("test_id", Integer, ForeignKey("tests.id"), primary_key=True),
-    Column("action_id", Integer, ForeignKey("actions.id"), primary_key=True),
-)
-
-
-class AutomationAction(Base):
-    __tablename__ = "actions"
-
+# 15️⃣ Interactions
+class Interaction(Base):
+    __tablename__ = 'interactions'
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, nullable=False)
-    tipo = Column(String, nullable=False)
-    codigo = Column(String, nullable=False)
-    argumentos = Column(String, nullable=True)
-
-    tests = relationship(
-        "TestCase",
-        secondary=test_actions,
-        back_populates="actions",
-    )
+    userId = Column(Integer, ForeignKey('users.id'), nullable=False)
+    code = Column(String(100), nullable=False)
+    name = Column(String(200), nullable=False)
+    requireReview = Column(Boolean, default=False)
+    description = Column(Text)
 
 
-class ActionAssignment(Base):
-    __tablename__ = "action_assignments"
-    __table_args__ = (
-        UniqueConstraint("action_id", "element_id", "test_id", name="uix_assign"),
-    )
-
+# 16️⃣ InteractionParameters
+class InteractionParameter(Base):
+    __tablename__ = 'interaction_parameters'
     id = Column(Integer, primary_key=True, index=True)
-    action_id = Column(Integer, ForeignKey("actions.id"), nullable=False)
-    element_id = Column(Integer, ForeignKey("page_elements.id"), nullable=False)
-    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
-    parametros = Column(String, nullable=True)
-
-    action = relationship("AutomationAction")
-    element = relationship("PageElement")
-    test = relationship("TestCase")
+    interactionId = Column(Integer, ForeignKey('interactions.id'), nullable=False)
+    name = Column(String(200), nullable=False)
+    description = Column(Text)
+    direction = Column(Boolean, default=True)
 
 
-class ExecutionAgent(Base):
-    __tablename__ = "agents"
+# 17️⃣ InteractionApprovalState
+class InteractionApprovalState(Base):
+    __tablename__ = 'interaction_approval_states'
     id = Column(Integer, primary_key=True, index=True)
-    alias = Column(String, nullable=False)
-    hostname = Column(String, unique=True, nullable=False)
-    os = Column(String, nullable=False)
-    categoria = Column(String, nullable=True)
-    api_key = Column(String, unique=True, nullable=False)
-    last_seen = Column(DateTime, nullable=True)
-    capabilities = Column(String, nullable=True)
+    name = Column(String(200), nullable=False)
+    description = Column(Text)
 
 
-class ExecutionPlan(Base):
-    __tablename__ = "execution_plans"
-
+# 18️⃣ InteractionApproval
+class InteractionApproval(Base):
+    __tablename__ = 'interaction_approvals'
     id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String, nullable=False)
-    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
-    agent_id = Column(Integer, ForeignKey("agents.id"), nullable=False)
-
-    test = relationship("TestCase")
-    agent = relationship("ExecutionAgent")
-
-
-class ExecutionStatus(str, enum.Enum):
-    CALLING = "Llamando al agente"
-    RUNNING = "En ejecucion"
-    FINISHED = "Finalizado"
+    interactionId = Column(Integer, ForeignKey('interactions.id'), nullable=False)
+    creatorId = Column(Integer, ForeignKey('users.id'), nullable=False)
+    aprovalUserId = Column(Integer, ForeignKey('users.id'), nullable=False)
+    comment = Column(Text)
+    interactionAprovalStateId = Column(Integer, ForeignKey('interaction_approval_states.id'), nullable=False)
+    aprovalDate = Column(DateTime)
+    creationDate = Column(DateTime)
 
 
-class ExecutionSchedule(Base):
-    __tablename__ = "execution_schedules"
-
+# 19️⃣ Task
+class Task(Base):
+    __tablename__ = 'tasks'
     id = Column(Integer, primary_key=True, index=True)
-    plan_id = Column(Integer, ForeignKey("execution_plans.id"), nullable=False)
-    agent_id = Column(Integer, ForeignKey("agents.id"), nullable=True)
-    run_at = Column(DateTime, nullable=False)
-    executed = Column(Boolean, default=False)
-
-    plan = relationship("ExecutionPlan")
-    agent = relationship("ExecutionAgent")
+    name = Column(String(200), nullable=False)
+    description = Column(Text)
+    status = Column(Boolean, default=True)
 
 
-class PlanExecution(Base):
-    __tablename__ = "execution_records"
-
+# 20️⃣ TaskHaveInteraction
+class TaskHaveInteraction(Base):
+    __tablename__ = 'task_have_interactions'
     id = Column(Integer, primary_key=True, index=True)
-    plan_id = Column(Integer, ForeignKey("execution_plans.id"), nullable=False)
-    agent_id = Column(Integer, ForeignKey("agents.id"), nullable=False)
-    status = Column(String, nullable=False, default=ExecutionStatus.CALLING.value)
-    started_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-
-    plan = relationship("ExecutionPlan")
-    agent = relationship("ExecutionAgent")
+    taskId = Column(Integer, ForeignKey('tasks.id'), nullable=False)
+    interactionId = Column(Integer, ForeignKey('interactions.id'), nullable=False)
+    status = Column(Boolean, default=True)
 
 
-class ExecutionLog(Base):
-    __tablename__ = "execution_logs"
-
+# 21️⃣ Validation
+class Validation(Base):
+    __tablename__ = 'validations'
     id = Column(Integer, primary_key=True, index=True)
-    execution_id = Column(Integer, ForeignKey("execution_records.id"), nullable=False)
-    message = Column(String, nullable=False)
-    timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
+    userId = Column(Integer, ForeignKey('users.id'), nullable=False)
+    code = Column(String(100), nullable=False)
+    name = Column(String(200), nullable=False)
+    requireReview = Column(Boolean, default=False)
+    description = Column(Text)
 
-    execution = relationship("PlanExecution", backref="logs")
 
-
-class Workspace(Base):
-    __tablename__ = "workspaces"
-
+# 22️⃣ ValidationParameters
+class ValidationParameter(Base):
+    __tablename__ = 'validation_parameters'
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
-    client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
-    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
-
-    user = relationship("User")
-    client = relationship("Client")
-    project = relationship("Project")
+    interactionId = Column(Integer, ForeignKey('validations.id'), nullable=False)
+    name = Column(String(200), nullable=False)
+    description = Column(Text)
+    direction = Column(Boolean, default=True)
 
 
-class DataPool(Base):
-    __tablename__ = "data_pools"
-
+# 23️⃣ ValidationApproval
+class ValidationApproval(Base):
+    __tablename__ = 'validation_approvals'
     id = Column(Integer, primary_key=True, index=True)
-    type = Column(String, nullable=False)
-    environment = Column(String, nullable=False)
+    validationId = Column(Integer, ForeignKey('validations.id'), nullable=False)
+    creatorId = Column(Integer, ForeignKey('users.id'), nullable=False)
+    aprovalUserId = Column(Integer, ForeignKey('users.id'), nullable=False)
+    comment = Column(Text)
+    interactionAprovalStateId = Column(Integer, ForeignKey('interaction_approval_states.id'), nullable=False)
+    aprovalDate = Column(DateTime)
+    creationDate = Column(DateTime)
 
-    __table_args__ = (
-        UniqueConstraint("type", "environment", name="uix_type_env"),
-    )
 
-    objects = relationship("TestDataObject", back_populates="pool")
-
-
-class TestDataObject(Base):
-    __tablename__ = "test_data_objects"
-
+# 24️⃣ Question
+class Question(Base):
+    __tablename__ = 'questions'
     id = Column(Integer, primary_key=True, index=True)
-    pool_id = Column(Integer, ForeignKey("data_pools.id"), nullable=False)
-    data = Column(String, nullable=False)
-    state = Column(String, nullable=False, default=DataState.NEW.value)
-
-    pool = relationship("DataPool", back_populates="objects")
-    history = relationship(
-        "DataObjectHistory",
-        back_populates="obj",
-        cascade="all, delete-orphan",
-    )
+    name = Column(String(200), nullable=False)
+    description = Column(Text)
+    status = Column(Boolean, default=True)
 
 
-class DataObjectHistory(Base):
-    __tablename__ = "data_object_history"
-
+# 25️⃣ QuestionHasValidation
+class QuestionHasValidation(Base):
+    __tablename__ = 'question_has_validations'
     id = Column(Integer, primary_key=True, index=True)
-    object_id = Column(Integer, ForeignKey("test_data_objects.id"), nullable=False)
-    action = Column(String, nullable=False)
-    timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
-
-    obj = relationship("TestDataObject", back_populates="history")
+    validationId = Column(Integer, ForeignKey('validations.id'), nullable=False)
+    questionId = Column(Integer, ForeignKey('questions.id'), nullable=False)
 
 
-# -----------------------------------------------------
-# Environment management models
-# -----------------------------------------------------
-
-class EnvironmentType(str, enum.Enum):
-    QA = "QA"
-    UAT = "UAT"
-    PREPROD = "PREPROD"
-    PROD = "PROD"
-
-
-class Environment(Base):
-    __tablename__ = "environments"
-
+# 26️⃣ Scenario
+class Scenario(Base):
+    __tablename__ = 'scenarios'
     id = Column(Integer, primary_key=True, index=True)
-    project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
-    name = Column(String, nullable=False)
-    capacity_limit = Column(Integer, nullable=True)
-    is_active = Column(Boolean, default=True)
-
-    project = relationship("Project", backref="environments")
-    config = relationship(
-        "EnvironmentConfig", uselist=False, back_populates="environment"
-    )
-    credentials = relationship(
-        "EnvironmentCredential", uselist=False, back_populates="environment"
-    )
-    schedules = relationship("EnvironmentSchedule", back_populates="environment")
+    name = Column(String(200), nullable=False)
+    description = Column(Text)
+    status = Column(Boolean, default=True)
 
 
-class EnvironmentConfig(Base):
-    __tablename__ = "environment_configs"
-
+# 27️⃣ ScenarioData
+class ScenarioData(Base):
+    __tablename__ = 'scenario_data'
     id = Column(Integer, primary_key=True, index=True)
-    environment_id = Column(Integer, ForeignKey("environments.id"), nullable=False)
-    settings = Column(String, nullable=True)
-
-    environment = relationship("Environment", back_populates="config")
+    idScenario = Column(Integer, ForeignKey('scenarios.id'), nullable=False)
+    status = Column(Boolean, default=True)
 
 
-class EnvironmentCredential(Base):
-    __tablename__ = "environment_credentials"
-
+# 28️⃣ RawData
+class RawData(Base):
+    __tablename__ = 'raw_data'
     id = Column(Integer, primary_key=True, index=True)
-    environment_id = Column(Integer, ForeignKey("environments.id"), nullable=False)
-    username = Column(String, nullable=False)
-    password = Column(String, nullable=False)
+    fieldTypeId = Column(Integer, ForeignKey('field_types.id'), nullable=False)
+    fieldName = Column(String(200), nullable=False)
+    fieldValue = Column(String(500))
+    autoGenerated = Column(Boolean, default=False)
+    scenarioDataId = Column(Integer, ForeignKey('scenario_data.id'), nullable=False)
+    length = Column(String(100))
+    status = Column(Boolean, default=True)
 
-    environment = relationship("Environment", back_populates="credentials")
 
-
-class EnvironmentSchedule(Base):
-    __tablename__ = "environment_schedules"
-
+# 29️⃣ FieldType
+class FieldType(Base):
+    __tablename__ = 'field_types'
     id = Column(Integer, primary_key=True, index=True)
-    environment_id = Column(Integer, ForeignKey("environments.id"), nullable=False)
-    start_time = Column(DateTime, nullable=False)
-    end_time = Column(DateTime, nullable=False)
-    blackout = Column(Boolean, default=False)
-
-    environment = relationship("Environment", back_populates="schedules")
+    name = Column(String(200), nullable=False)
+    format = Column(String(100))
+    description = Column(Text)
+    status = Column(Boolean, default=True)
 
 
-class AuditEvent(Base):
-    __tablename__ = "audit_events"
-
+# 30️⃣ Feature
+class Feature(Base):
+    __tablename__ = 'features'
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    endpoint = Column(String, nullable=False)
-    client_id = Column(Integer, ForeignKey("clients.id"), nullable=True)
-    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
-    payload = Column(String, nullable=True)
-
-    user = relationship("User")
-    client = relationship("Client")
-    project = relationship("Project")
+    name = Column(String(200), nullable=False)
+    description = Column(Text)
+    status = Column(Boolean, default=True)
 
 
-class Secret(Base):
-    __tablename__ = "secrets"
-
+# 31️⃣ ScenarioHasFeature
+class ScenarioHasFeature(Base):
+    __tablename__ = 'scenario_has_features'
     id = Column(Integer, primary_key=True, index=True)
-    key = Column(String, unique=True, nullable=False)
-    value = Column(String, nullable=False)
+    featureId = Column(Integer, ForeignKey('features.id'), nullable=False)
+    scenarioId = Column(Integer, ForeignKey('scenarios.id'), nullable=False)
 
-class MarketplaceComponent(Base):
-    __tablename__ = "marketplace_components"
 
+# 32️⃣ FeatureStep
+class FeatureStep(Base):
+    __tablename__ = 'feature_steps'
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    description = Column(String, nullable=True)
-    code = Column(String, nullable=False)
-    version = Column(String, nullable=False, default="0.1.0")
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-# -----------------------------------------------------
-# Intelligent orchestrator models
-# -----------------------------------------------------
+    GherkinStep = Column(Text, nullable=False)
+    questionId = Column(Integer, ForeignKey('questions.id'))
+    taskId = Column(Integer, ForeignKey('tasks.id'))
 
 
-class DependencyType(str, enum.Enum):
-    """Types of dependencies between tests."""
-
-    REQUIRES = "REQUIRES"
-    BLOCKS = "BLOCKS"
-    OPTIONAL = "OPTIONAL"
-    DATA_DEPENDENCY = "DATA_DEPENDENCY"
-
-
-suite_tests = Table(
-    "suite_tests",
-    Base.metadata,
-    Column("suite_id", Integer, ForeignKey("test_suites.id"), primary_key=True),
-    Column("test_id", Integer, ForeignKey("tests.id"), primary_key=True),
-)
-
-
-class TestSuite(Base):
-    __tablename__ = "test_suites"
-
+# 33️⃣ ScenarioInfo
+class ScenarioInfo(Base):
+    __tablename__ = 'scenario_info'
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    description = Column(String, nullable=True)
-    code = Column(String, nullable=False)
-    version = Column(String, nullable=False, default="0.1.0")
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    suite_type = Column(String, nullable=True)
-    shared_context = Column(String, nullable=True)
-
-    tests = relationship(
-        "TestCase",
-        secondary=suite_tests,
-        backref="suites",
-    )
-
-
-class TestDependency(Base):
-    __tablename__ = "test_dependencies"
-
-    id = Column(Integer, primary_key=True, index=True)
-    suite_id = Column(Integer, ForeignKey("test_suites.id"), nullable=True)
-    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
-    depends_on_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
-    type = Column(String, nullable=False, default=DependencyType.REQUIRES.value)
-
-    suite = relationship("TestSuite")
-    test = relationship("TestCase", foreign_keys=[test_id])
-    depends_on = relationship("TestCase", foreign_keys=[depends_on_id])
-
-class TestBranch(Base):
-    __tablename__ = "test_branches"
-
-    id = Column(Integer, primary_key=True, index=True)
-    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
-    name = Column(String, nullable=False)
-
-    test = relationship("TestCase", backref="branches")
-
-
-class TestVersion(Base):
-    __tablename__ = "test_versions"
-
-    id = Column(Integer, primary_key=True, index=True)
-    test_id = Column(Integer, ForeignKey("tests.id"), nullable=False)
-    snapshot = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    test = relationship("TestCase", backref="versions")
-
-
-class TestCommit(Base):
-    __tablename__ = "test_commits"
-
-    id = Column(Integer, primary_key=True, index=True)
-    branch_id = Column(Integer, ForeignKey("test_branches.id"), nullable=False)
-    version_id = Column(Integer, ForeignKey("test_versions.id"), nullable=False)
-    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    message = Column(String, nullable=False)
-    timestamp = Column(DateTime, default=datetime.utcnow)
-
-    branch = relationship("TestBranch", backref="commits")
-    version = relationship("TestVersion")
-    author = relationship("User")
-
-
-class TestMerge(Base):
-    __tablename__ = "test_merges"
-
-    id = Column(Integer, primary_key=True, index=True)
-    source_branch_id = Column(Integer, ForeignKey("test_branches.id"), nullable=False)
-    target_branch_id = Column(Integer, ForeignKey("test_branches.id"), nullable=False)
-    commit_id = Column(Integer, ForeignKey("test_commits.id"), nullable=False)
-    timestamp = Column(DateTime, default=datetime.utcnow)
-
-    source_branch = relationship("TestBranch", foreign_keys=[source_branch_id])
-    target_branch = relationship("TestBranch", foreign_keys=[target_branch_id])
-    commit = relationship("TestCommit")
-
-
+    featureStepId = Column(Integer, ForeignKey('feature_steps.id'), nullable=False)
+    scenarioId = Column(Integer, ForeignKey('scenarios.id'), nullable=False)
+    order = Column(Integer)
+    status = Column(Boolean, default=True)

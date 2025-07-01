@@ -30,6 +30,18 @@ def init_data():
             ['/interactions',6,1,'Dashboard de resultados'],
             ['/clients',7,1,'Dashboard de resultados'],
         ]
+        for page in predefinedPages:
+            if not db.query(models.PagePermission).filter(
+                (models.PagePermission.page == page[1]) & 
+                (models.PagePermission.role_id == page[2])
+            ).first():
+                db.add(models.PagePermission(
+                    page =  page[1],
+                    role_id =  page[2],
+                    isStartPage =  page[3],
+                    description =  page[4],
+                ))
+        db.commit()
         #Usuario admin
         admin = db.query(models.User).filter(models.User.username == "admin").first()
         if not admin:
