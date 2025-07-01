@@ -151,25 +151,8 @@ export class RegisterComponent {
         const creds: LoginRequest = { username: this.form.username, password: this.form.password };
         this.api.login(creds).subscribe({
           next: () => {
-            this.api.getCurrentUser().subscribe({
-              next: (user) => {
-                const role = user.role?.name || '';
-                this.isLoading = false;
-                if (role === 'Administrador') {
-                  this.router.navigate(['/users']);
-                } else if (role === 'Arquitecto de Automatización' || role === 'Automation Engineer') {
-                  this.router.navigate(['/actions']);
-                } else if (role === 'Gerente de servicios') {
-                  this.router.navigate(['/client-admin']);
-                } else {
-                  this.router.navigate(['/dashboard']);
-                }
-              },
-              error: () => {
-                this.isLoading = false;
-                this.router.navigate(['/dashboard']);
-              }
-            });
+            this.isLoading = false;
+            this.router.navigate(['/clients']);
           },
           error: () => {
             this.isLoading = false;

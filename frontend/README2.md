@@ -2,6 +2,9 @@
 
 Este es el frontend desarrollado en Angular con TypeScript y Bootstrap para el sistema de automatización de pruebas.
 
+### Estado actual
+Por ahora la aplicación solo incluye las pantallas de inicio de sesión, registro y la gestión básica de clientes y actores.
+
 ## Características
 
 - **Framework**: Angular 17 con TypeScript
