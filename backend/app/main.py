@@ -2,11 +2,104 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from .database import engine
+from .database import engine, SessionLocal
 from . import models, schemas, deps
 from .crud import create_crud_router
 
+
+def seed_database() -> None:
+    db = SessionLocal()
+    try:
+        roles = [
+            ("Administrador", "/dashboard"),
+            ("Automation Engineer", "/dashboard"),
+            ("Gerente de servicios", "/clients"),
+            ("Analista de Performance", "/clients"),
+            ("Automatizador de Pruebas", "/clients"),
+            ("Arquitecto de Automatización", "/interactions"),
+            ("Analista de Pruebas con skill de automatización", "/clients"),
+        ]
+
+        role_objs: list[tuple[models.Role, str]] = []
+        for name, start_page in roles:
+            role = db.query(models.Role).filter_by(name=name).first()
+            if not role:
+                role = models.Role(name=name, description=name)
+                db.add(role)
+                db.commit()
+                db.refresh(role)
+            role_objs.append((role, start_page))
+
+        for role, page in role_objs:
+            exists = (
+                db.query(models.PagePermission)
+                .filter_by(role_id=role.id, page=page, isStartPage=True)
+                .first()
+            )
+            if not exists:
+                db.add(
+                    models.PagePermission(
+                        page=page,
+                        role_id=role.id,
+                        isStartPage=True,
+                        description="start",
+                    )
+                )
+
+        role_map = {r.name: r for r, _ in role_objs}
+        perms = [
+            ("/clients", "POST", "Gerente de servicios"),
+            ("/users", "PUT", "Arquitecto de Automatización"),
+            ("/actors", "GET", "Gerente de servicios"),
+            ("/digitalassets", "GET", "Gerente de servicios"),
+        ]
+        for route, method, role_name in perms:
+            role = role_map.get(role_name)
+            if role:
+                if not db.query(models.ApiPermission).filter_by(route=route, method=method, role_id=role.id).first():
+                    db.add(models.ApiPermission(route=route, method=method, role_id=role.id))
+
+        for name in ["web", "movil", "apis", "performance"]:
+            if not db.query(models.Hability).filter_by(name=name).first():
+                db.add(models.Hability(name=name))
+
+        for desc in ["textbox", "button", "combobox", "selector"]:
+            if not db.query(models.ElementType).filter_by(description=desc).first():
+                db.add(models.ElementType(description=desc))
+
+        for name in ["pendiente", "aprobado", "rechazado"]:
+            if not db.query(models.InteractionApprovalState).filter_by(name=name).first():
+                db.add(models.InteractionApprovalState(name=name))
+
+        field_types = [
+            ("numerico", None, "numeric"),
+            ("alfanumerico", None, "alphanumeric"),
+            ("alfabeto", None, "alphabet"),
+            ("uuid", None, "uuid"),
+            ("fecha", "YYYY-MM-DD", "date"),
+        ]
+        for name, fmt, desc in field_types:
+            if not db.query(models.FieldType).filter_by(name=name).first():
+                db.add(models.FieldType(name=name, format=fmt, description=desc))
+
+        admin_role = db.query(models.Role).filter_by(name="Administrador").first()
+        admin_user = db.query(models.User).filter_by(username="admin").first()
+        if admin_role and not admin_user:
+            db.add(
+                models.User(
+                    username="admin",
+                    password=deps.get_password_hash("admin"),
+                    role_id=admin_role.id,
+                )
+            )
+
+        db.commit()
+    finally:
+        db.close()
+
+
 models.Base.metadata.create_all(bind=engine)
+seed_database()
 
 app = FastAPI(title="Test Automation API")
 
