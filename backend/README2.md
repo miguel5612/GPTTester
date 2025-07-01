@@ -53,6 +53,11 @@ Ahora cada rol puede tener permisos asociados a las páginas del frontend. Usa l
 - `GET /roles/{id}/permissions` listar permisos de un rol
 - `POST /roles/{id}/permissions` agregar un permiso enviando `{ "page": "nombre" }`
 - `DELETE /roles/{id}/permissions/{page}` eliminar un permiso
+- `GET /roles/{id}/api-permissions` listar permisos de API de un rol
+- `POST /roles/{id}/api-permissions` agregar permiso enviando `{ "route": "/ruta", "method": "VERB" }`
+- `DELETE /roles/{id}/api-permissions/{perm_id}` eliminar un permiso de API por ID
+- `POST /users/{user_id}/role/{role_id}` asignar un rol a un usuario (solo Administrador)
+- `GET /permissions` obtener las páginas permitidas para el usuario autenticado
 
 ## Clientes y proyectos
 
