@@ -65,3 +65,21 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
     if user is None:
         raise credentials_exception
     return user
+
+
+def require_api_permission(route: str, method: str):
+    def _check(
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        perms = (
+            db.query(models.ApiPermission)
+            .filter_by(route=route, method=method)
+            .all()
+        )
+        if perms:
+            allowed = any(p.role_id == current_user.role_id for p in perms)
+            if not allowed:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+
+    return _check
