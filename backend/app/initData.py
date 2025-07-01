@@ -1,6 +1,6 @@
-from database import SessionLocal
-import models
-import deps
+from .database import SessionLocal
+import .models as models
+import .deps as deps
 
 
 def init_data():
