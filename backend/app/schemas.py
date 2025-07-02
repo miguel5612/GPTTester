@@ -7,7 +7,7 @@ from datetime import datetime
 class Role(BaseModel):
     id: int
     name: str
-    description: str
+    description: Optional[str]
     is_active: bool = True
 
     class Config:
@@ -38,7 +38,7 @@ class PagePermission(BaseModel):
     page: str
     role_id: int
     isStartPage: bool
-    description: str
+    description: Optional[str]
 
     class Config:
         orm_mode = True
@@ -50,7 +50,7 @@ class ApiPermission(BaseModel):
     route: str
     method: str
     role_id: int
-    description: str
+    description: Optional[str]
 
     class Config:
         orm_mode = True
@@ -74,9 +74,9 @@ class Client(BaseModel):
     idGerente: Optional[int]
     name: str
     is_active: bool
-    mision: str
-    vision: str
-    paginaInicio: str
+    mision: Optional[str]
+    vision: Optional[str]
+    paginaInicio: Optional[str]
     dedication: Optional[int]
     analysts: Optional[list[User]] = []
 
@@ -88,9 +88,9 @@ class Client(BaseModel):
 class BusinessAgreement(BaseModel):
     id: int
     clientId: int
-    description: str
-    okr: str
-    kpi: str
+    description: Optional[str]
+    okr: Optional[str]
+    kpi: Optional[str]
 
     class Config:
         orm_mode = True
@@ -110,9 +110,9 @@ class ClientAnalyst(BaseModel):
 class DigitalAsset(BaseModel):
     id: int
     clientId: int
-    description: str
-    okr: str
-    kpi: str
+    description: Optional[str]
+    okr: Optional[str]
+    kpi: Optional[str]
 
     class Config:
         orm_mode = True
@@ -122,7 +122,7 @@ class DigitalAsset(BaseModel):
 class UserInterface(BaseModel):
     id: int
     digitalAssetsId: int
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
@@ -132,7 +132,7 @@ class UserInterface(BaseModel):
 # 9️⃣ ElementType
 class ElementType(BaseModel):
     id: int
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
@@ -144,7 +144,7 @@ class Element(BaseModel):
     id: int
     userInterfaceId: int
     elementTypeId: int
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
@@ -204,7 +204,7 @@ class Interaction(BaseModel):
     code: str
     name: str
     requireReview: bool
-    description: str
+    description: Optional[str]
 
     class Config:
         orm_mode = True
@@ -215,7 +215,7 @@ class InteractionParameter(BaseModel):
     id: int
     interactionId: int
     name: str
-    description: str
+    description: Optional[str]
     direction: bool
 
     class Config:
@@ -226,7 +226,7 @@ class InteractionParameter(BaseModel):
 class InteractionApprovalState(BaseModel):
     id: int
     name: str
-    description: str
+    description: Optional[str]
 
     class Config:
         orm_mode = True
@@ -238,7 +238,7 @@ class InteractionApproval(BaseModel):
     interactionId: int
     creatorId: int
     aprovalUserId: int
-    comment: str
+    comment: Optional[str]
     interactionAprovalStateId: int
     aprovalDate: Optional[datetime]
     creationDate: Optional[datetime]
@@ -293,7 +293,7 @@ class InteractionApprovalUpdate(BaseModel):
 class Task(BaseModel):
     id: int
     name: str
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
@@ -318,7 +318,7 @@ class Validation(BaseModel):
     code: str
     name: str
     requireReview: bool
-    description: str
+    description: Optional[str]
 
     class Config:
         orm_mode = True
@@ -329,7 +329,7 @@ class ValidationParameter(BaseModel):
     id: int
     interactionId: int
     name: str
-    description: str
+    description: Optional[str]
     direction: bool
 
     class Config:
@@ -342,7 +342,7 @@ class ValidationApproval(BaseModel):
     validationId: int
     creatorId: int
     aprovalUserId: int
-    comment: str
+    comment: Optional[str]
     interactionAprovalStateId: int
     aprovalDate: Optional[datetime]
     creationDate: Optional[datetime]
@@ -397,7 +397,7 @@ class ValidationApprovalUpdate(BaseModel):
 class Question(BaseModel):
     id: int
     name: str
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
@@ -418,7 +418,7 @@ class QuestionHasValidation(BaseModel):
 class Scenario(BaseModel):
     id: int
     name: str
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
@@ -455,7 +455,7 @@ class FieldType(BaseModel):
     id: int
     name: str
     format: Optional[str]
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
@@ -466,7 +466,7 @@ class FieldType(BaseModel):
 class Feature(BaseModel):
     id: int
     name: str
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
