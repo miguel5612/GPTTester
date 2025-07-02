@@ -43,11 +43,11 @@ Al iniciar la aplicación se crean automáticamente los roles:
 - Gerente de servicios
 
 También se genera el usuario inicial `admin` con la contraseña `admin` perteneciente al rol **Administrador**.
-Además, se crean tres usuarios predeterminados:
+- Al iniciarse el backend se aseguran además estos usuarios con la contraseña `admin`:
 
-- `architect` con rol **Arquitecto de Automatización** (contraseña `architect`)
-- `service_manager` con rol **Gerente de servicios** (contraseña `service_manager`)
-- `test_automator` con rol **Automatizador de Pruebas** (contraseña `test_automator`)
+- `architect` con rol **Arquitecto de Automatización**
+- `AngelC` con rol **Gerente de servicios**
+- `T23AutoPerson` con rol **Automatizador de Pruebas**
 
 Ahora cada rol puede tener permisos asociados a las páginas del frontend. Usa los siguientes endpoints para administrarlos:
 
