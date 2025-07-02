@@ -17,7 +17,7 @@ import { ApiService } from '../../services/api.service';
       <button class="btn btn-primary mb-2" routerLink="/register">Registrar Usuario</button>
       <table class="table" *ngIf="users.length > 0">
         <thead>
-          <tr><th>Username</th><th>Rol</th><th>Último Login</th><th>Activo</th><th></th></tr>
+          <tr><th>Username</th><th>Rol</th><th>Último Login</th><th>Activo</th></tr>
         </thead>
         <tbody>
           <tr *ngFor="let u of users">
@@ -28,11 +28,11 @@ import { ApiService } from '../../services/api.service';
               </select>
             </td>
             <td>{{ u.last_login ? (u.last_login | date:'short') : '-' }}</td>
-            <td>{{ u.is_active ? 'Sí' : 'No' }}</td>
             <td>
-              <button class="btn btn-sm btn-secondary" (click)="toggleActive(u)" [disabled]="u.id === currentUserId">
-                {{ u.is_active ? 'Desactivar' : 'Activar' }}
-              </button>
+              <input type="checkbox"
+                     [checked]="u.is_active"
+                     (change)="toggleActive(u, $event)"
+                     [disabled]="u.id === currentUserId" />
             </td>
           </tr>
         </tbody>
@@ -68,8 +68,10 @@ export class UsersComponent implements OnInit {
     this.userService.updateUserRole(user.id, { role_id: user.role.id }).subscribe();
   }
 
-  toggleActive(user: User) {
-    this.userService.updateUserActive(user.id, !user.is_active).subscribe(u => user.is_active = u.is_active);
+  toggleActive(user: User, event?: Event) {
+    const checked = event ? (event.target as HTMLInputElement).checked : !user.is_active;
+    this.userService.updateUserActive(user.id, checked)
+      .subscribe(u => user.is_active = u.is_active);
   }
 
   get currentUserId(): number | null {
