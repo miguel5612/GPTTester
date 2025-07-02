@@ -107,14 +107,20 @@ def require_api_permission(route: str, method: str):
         if current_user.role.name == "Administrador":
             return
         perms = (
-            db.query(models.ApiPermission).filter_by(route=route, method=method).all()
+            db.query(models.ApiPermission)
+            .filter_by(route=route, method=method)
+            .all()
         )
-        if perms:
-            allowed = any(p.role_id == current_user.role_id for p in perms)
-            if not allowed:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden"
-                )
+        if not perms:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Forbidden",
+            )
+        allowed = any(p.role_id == current_user.role_id for p in perms)
+        if not allowed:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden"
+            )
 
     return _check
 
@@ -123,6 +129,15 @@ def require_admin(current_user: models.User = Depends(get_current_user)):
     if current_user.role.name != "Administrador":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin only")
     return current_user
+
+
+def require_self_or_admin(
+    item_id: int,
+    current_user: models.User = Depends(get_current_user),
+):
+    if current_user.role.name == "Administrador" or current_user.id == item_id:
+        return current_user
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
 
 
 def require_page_permission(page: str):

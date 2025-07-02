@@ -7,7 +7,7 @@ from datetime import datetime
 class Role(BaseModel):
     id: int
     name: str
-    description: str
+    description: Optional[str]
     is_active: bool = True
 
     class Config:
@@ -38,7 +38,7 @@ class PagePermission(BaseModel):
     page: str
     role_id: int
     isStartPage: bool
-    description: str
+    description: Optional[str]
 
     class Config:
         orm_mode = True
@@ -50,7 +50,7 @@ class ApiPermission(BaseModel):
     route: str
     method: str
     role_id: int
-    description: str
+    description: Optional[str]
 
     class Config:
         orm_mode = True
@@ -74,10 +74,11 @@ class Client(BaseModel):
     idGerente: Optional[int]
     name: str
     is_active: bool
-    mision: str
-    vision: str
-    paginaInicio: str
+    mision: Optional[str]
+    vision: Optional[str]
+    paginaInicio: Optional[str]
     dedication: Optional[int]
+    analysts: Optional[list[User]] = []
 
     class Config:
         orm_mode = True
@@ -87,9 +88,19 @@ class Client(BaseModel):
 class BusinessAgreement(BaseModel):
     id: int
     clientId: int
-    description: str
-    okr: str
-    kpi: str
+    description: Optional[str]
+    okr: Optional[str]
+    kpi: Optional[str]
+
+    class Config:
+        orm_mode = True
+
+
+class ClientAnalyst(BaseModel):
+    id: int
+    clientId: int
+    userId: int
+    dedication: Optional[int]
 
     class Config:
         orm_mode = True
@@ -99,9 +110,9 @@ class BusinessAgreement(BaseModel):
 class DigitalAsset(BaseModel):
     id: int
     clientId: int
-    description: str
-    okr: str
-    kpi: str
+    description: Optional[str]
+    okr: Optional[str]
+    kpi: Optional[str]
 
     class Config:
         orm_mode = True
@@ -111,7 +122,7 @@ class DigitalAsset(BaseModel):
 class UserInterface(BaseModel):
     id: int
     digitalAssetsId: int
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
@@ -121,7 +132,7 @@ class UserInterface(BaseModel):
 # 9️⃣ ElementType
 class ElementType(BaseModel):
     id: int
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
@@ -133,7 +144,7 @@ class Element(BaseModel):
     id: int
     userInterfaceId: int
     elementTypeId: int
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
@@ -148,6 +159,7 @@ class Project(BaseModel):
     objective: Optional[str]
     is_active: bool
     scripts_per_day: Optional[int]
+    analysts: Optional[list[User]] = []
 
     class Config:
         orm_mode = True
@@ -192,7 +204,7 @@ class Interaction(BaseModel):
     code: str
     name: str
     requireReview: bool
-    description: str
+    description: Optional[str]
 
     class Config:
         orm_mode = True
@@ -203,7 +215,7 @@ class InteractionParameter(BaseModel):
     id: int
     interactionId: int
     name: str
-    description: str
+    description: Optional[str]
     direction: bool
 
     class Config:
@@ -214,7 +226,7 @@ class InteractionParameter(BaseModel):
 class InteractionApprovalState(BaseModel):
     id: int
     name: str
-    description: str
+    description: Optional[str]
 
     class Config:
         orm_mode = True
@@ -226,7 +238,7 @@ class InteractionApproval(BaseModel):
     interactionId: int
     creatorId: int
     aprovalUserId: int
-    comment: str
+    comment: Optional[str]
     interactionAprovalStateId: int
     aprovalDate: Optional[datetime]
     creationDate: Optional[datetime]
@@ -235,11 +247,53 @@ class InteractionApproval(BaseModel):
         orm_mode = True
 
 
+class InteractionCreate(BaseModel):
+    userId: int
+    code: str
+    name: str
+    requireReview: bool = False
+    description: str
+
+
+class InteractionUpdate(BaseModel):
+    code: Optional[str] = None
+    name: Optional[str] = None
+    requireReview: Optional[bool] = None
+    description: Optional[str] = None
+
+
+class InteractionParameterCreate(BaseModel):
+    interactionId: int
+    name: str
+    description: str
+    direction: bool = True
+
+
+class InteractionParameterUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    direction: Optional[bool] = None
+
+
+class InteractionApprovalCreate(BaseModel):
+    interactionId: int
+    creatorId: int
+    aprovalUserId: int
+    comment: str
+    interactionAprovalStateId: int
+
+
+class InteractionApprovalUpdate(BaseModel):
+    aprovalUserId: Optional[int] = None
+    comment: Optional[str] = None
+    interactionAprovalStateId: Optional[int] = None
+
+
 # 19️⃣ Task
 class Task(BaseModel):
     id: int
     name: str
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
@@ -264,7 +318,7 @@ class Validation(BaseModel):
     code: str
     name: str
     requireReview: bool
-    description: str
+    description: Optional[str]
 
     class Config:
         orm_mode = True
@@ -275,7 +329,7 @@ class ValidationParameter(BaseModel):
     id: int
     interactionId: int
     name: str
-    description: str
+    description: Optional[str]
     direction: bool
 
     class Config:
@@ -288,7 +342,7 @@ class ValidationApproval(BaseModel):
     validationId: int
     creatorId: int
     aprovalUserId: int
-    comment: str
+    comment: Optional[str]
     interactionAprovalStateId: int
     aprovalDate: Optional[datetime]
     creationDate: Optional[datetime]
@@ -297,11 +351,53 @@ class ValidationApproval(BaseModel):
         orm_mode = True
 
 
+class ValidationCreate(BaseModel):
+    userId: int
+    code: str
+    name: str
+    requireReview: bool = False
+    description: str
+
+
+class ValidationUpdate(BaseModel):
+    code: Optional[str] = None
+    name: Optional[str] = None
+    requireReview: Optional[bool] = None
+    description: Optional[str] = None
+
+
+class ValidationParameterCreate(BaseModel):
+    interactionId: int
+    name: str
+    description: str
+    direction: bool = True
+
+
+class ValidationParameterUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    direction: Optional[bool] = None
+
+
+class ValidationApprovalCreate(BaseModel):
+    validationId: int
+    creatorId: int
+    aprovalUserId: int
+    comment: str
+    interactionAprovalStateId: int
+
+
+class ValidationApprovalUpdate(BaseModel):
+    aprovalUserId: Optional[int] = None
+    comment: Optional[str] = None
+    interactionAprovalStateId: Optional[int] = None
+
+
 # 24️⃣ Question
 class Question(BaseModel):
     id: int
     name: str
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
@@ -322,7 +418,7 @@ class QuestionHasValidation(BaseModel):
 class Scenario(BaseModel):
     id: int
     name: str
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
@@ -359,7 +455,7 @@ class FieldType(BaseModel):
     id: int
     name: str
     format: Optional[str]
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:
@@ -370,7 +466,7 @@ class FieldType(BaseModel):
 class Feature(BaseModel):
     id: int
     name: str
-    description: str
+    description: Optional[str]
     status: bool
 
     class Config:

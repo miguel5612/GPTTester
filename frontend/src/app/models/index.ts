@@ -24,6 +24,7 @@ export interface Project {
   id: number;
   name: string;
   client_id: number;
+  digitalAssetsId: number;
   is_active: boolean;
   analysts: User[];
   objetivo?: string;
@@ -358,4 +359,42 @@ export interface Feature {
   name: string;
   description: string;
   status: boolean;
+}
+
+export interface DigitalAsset {
+  id: number;
+  clientId: number;
+  description: string;
+  okr?: string;
+  kpi?: string;
+}
+
+export interface DigitalAssetCreate {
+  clientId: number;
+  description: string;
+  okr?: string;
+  kpi?: string;
+}
+
+export interface Scenario {
+  id: number;
+  name: string;
+  description?: string;
+  status: boolean;
+}
+
+export interface ScenarioCreate {
+  name: string;
+  description?: string;
+}
+
+export interface ScenarioData {
+  id: number;
+  idScenario: number;
+  status: boolean;
+}
+
+export interface ScenarioDataCreate {
+  idScenario: number;
+  status?: boolean;
 }

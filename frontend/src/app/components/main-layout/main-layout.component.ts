@@ -140,9 +140,12 @@ export class MainLayoutComponent implements OnInit {
       { label: 'Permisos', route: '/permissions', icon: '🔑' },
       { label: 'Agentes', route: '/agents', icon: '🤖' }
     ];
+    const perf = { label: 'Performance', route: '/performance', icon: '🚀' };
 
     if (this.currentUser?.role?.name === 'Administrador') {
-      this.menu = [...admin, ...base, ...extra];
+      this.menu = [...admin, perf, ...base, ...extra];
+    } else if (this.currentUser?.role?.name === 'Analista de Performance') {
+      this.menu = [perf, ...base, ...extra];
     } else {
       this.menu = [...base, ...extra];
     }

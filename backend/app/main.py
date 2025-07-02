@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
 import logging
+
 logging.basicConfig(level=logging.INFO)
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -140,6 +141,7 @@ models.Base.metadata.create_all(bind=engine)
 logger.info("Tables created")
 seed_database()
 
+
 def validate_database() -> None:
     """Ensure critical tables exist and have data."""
     logger.info("Validating seeded tables")
@@ -152,6 +154,7 @@ def validate_database() -> None:
         logger.info("Validation successful: %d roles, %d element types", roles, types)
     finally:
         db.close()
+
 
 validate_database()
 
@@ -184,6 +187,28 @@ def logout(token: str = Depends(deps.oauth2_scheme)):
     return {"ok": True}
 
 
+def _client_with_analysts(client: models.Client, db: Session) -> models.Client:
+    analysts = (
+        db.query(models.User)
+        .join(models.ClientAnalyst, models.ClientAnalyst.userId == models.User.id)
+        .filter(models.ClientAnalyst.clientId == client.id)
+        .all()
+    )
+    client.analysts = analysts
+    return client
+
+
+def _project_with_analysts(project: models.Project, db: Session) -> models.Project:
+    analysts = (
+        db.query(models.User)
+        .join(models.ProjectEmployee, models.ProjectEmployee.userId == models.User.id)
+        .filter(models.ProjectEmployee.projectId == project.id)
+        .all()
+    )
+    project.analysts = analysts
+    return project
+
+
 # CRUD routers for main entities
 def register_cruds():
     mappings = [
@@ -214,12 +239,6 @@ def register_cruds():
             models.InteractionApproval,
             schemas.InteractionApproval,
         ),
-        ("tasks", models.Task, schemas.Task),
-        (
-            "taskhaveinteractions",
-            models.TaskHaveInteraction,
-            schemas.TaskHaveInteraction,
-        ),
         ("validations", models.Validation, schemas.Validation),
         (
             "validationparameters",
@@ -227,29 +246,34 @@ def register_cruds():
             schemas.ValidationParameter,
         ),
         ("validationapprovals", models.ValidationApproval, schemas.ValidationApproval),
-        ("questions", models.Question, schemas.Question),
+        ("tasks", models.Task, schemas.Task),
+
         (
-            "questionhasvalidations",
-            models.QuestionHasValidation,
-            schemas.QuestionHasValidation,
+            "taskhaveinteractions",
+            models.TaskHaveInteraction,
+            schemas.TaskHaveInteraction,
         ),
-        ("scenarios", models.Scenario, schemas.Scenario),
-        ("scenariodata", models.ScenarioData, schemas.ScenarioData),
-        ("rawdata", models.RawData, schemas.RawData),
         ("fieldtypes", models.FieldType, schemas.FieldType),
         ("features", models.Feature, schemas.Feature),
+        ("clientanalysts", models.ClientAnalyst, schemas.ClientAnalyst),
         ("scenariohasfeatures", models.ScenarioHasFeature, schemas.ScenarioHasFeature),
         ("featuresteps", models.FeatureStep, schemas.FeatureStep),
-        ("scenarioinfo", models.ScenarioInfo, schemas.ScenarioInfo),
+        ("scenarioinfo", models.ScenarioInfo, schemas.ScenarioInfo)
     ]
     for prefix, model, schema in mappings:
         app.include_router(create_crud_router(prefix, model, schema))
 
 
-
 register_cruds()
 for r in all_routers:
     app.include_router(r)
+
+from .routes import routers as custom_routers
+
+for r in custom_routers:
+    app.include_router(r)
+from .routes import interactions as interactions_routes
+from .routes import validations as validations_routes
 
 
 @app.get("/users/me/", response_model=schemas.User)
@@ -386,4 +410,98 @@ def update_role_active(
     db.commit()
     db.refresh(role)
     return role
+
+
+@app.post("/clients/{client_id}/analysts/{user_id}", response_model=schemas.Client)
+def assign_client_analyst(
+    client_id: int,
+    user_id: int,
+    dedication: int = 100,
+    db: Session = Depends(deps.get_db),
+):
+    client = db.query(models.Client).filter_by(id=client_id).first()
+    user = db.query(models.User).filter_by(id=user_id).first()
+    if not client or not user:
+        raise HTTPException(status_code=404, detail="Not found")
+    link = (
+        db.query(models.ClientAnalyst)
+        .filter_by(clientId=client_id, userId=user_id)
+        .first()
+    )
+    if not link:
+        link = models.ClientAnalyst(clientId=client_id, userId=user_id, dedication=dedication)
+        db.add(link)
+    else:
+        link.dedication = dedication
+    db.commit()
+    return _client_with_analysts(client, db)
+
+
+@app.delete("/clients/{client_id}/analysts/{user_id}", response_model=schemas.Client)
+def unassign_client_analyst(
+    client_id: int,
+    user_id: int,
+    db: Session = Depends(deps.get_db),
+):
+    link = (
+        db.query(models.ClientAnalyst)
+        .filter_by(clientId=client_id, userId=user_id)
+        .first()
+    )
+    if link:
+        db.delete(link)
+        db.commit()
+    client = db.query(models.Client).filter_by(id=client_id).first()
+    if not client:
+        raise HTTPException(status_code=404, detail="Not found")
+    return _client_with_analysts(client, db)
+
+
+@app.post("/projects/{project_id}/analysts/{user_id}", response_model=schemas.Project)
+def assign_project_analyst(
+    project_id: int,
+    user_id: int,
+    scripts_per_day: int = 0,
+    db: Session = Depends(deps.get_db),
+):
+    project = db.query(models.Project).filter_by(id=project_id).first()
+    user = db.query(models.User).filter_by(id=user_id).first()
+    if not project or not user:
+        raise HTTPException(status_code=404, detail="Not found")
+    link = (
+        db.query(models.ProjectEmployee)
+        .filter_by(projectId=project_id, userId=user_id)
+        .first()
+    )
+    if not link:
+        link = models.ProjectEmployee(
+            projectId=project_id,
+            userId=user_id,
+            dedicationHours=scripts_per_day,
+        )
+        db.add(link)
+    else:
+        link.dedicationHours = scripts_per_day
+    db.commit()
+    return _project_with_analysts(project, db)
+
+
+@app.delete("/projects/{project_id}/analysts/{user_id}", response_model=schemas.Project)
+def unassign_project_analyst(
+    project_id: int,
+    user_id: int,
+    db: Session = Depends(deps.get_db),
+):
+    link = (
+        db.query(models.ProjectEmployee)
+        .filter_by(projectId=project_id, userId=user_id)
+        .first()
+    )
+    if link:
+        db.delete(link)
+        db.commit()
+    project = db.query(models.Project).filter_by(id=project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Not found")
+    return _project_with_analysts(project, db)
 
