@@ -78,6 +78,7 @@ class Client(BaseModel):
     vision: str
     paginaInicio: str
     dedication: Optional[int]
+    analysts: Optional[list[User]] = []
 
     class Config:
         orm_mode = True
@@ -90,6 +91,16 @@ class BusinessAgreement(BaseModel):
     description: str
     okr: str
     kpi: str
+
+    class Config:
+        orm_mode = True
+
+
+class ClientAnalyst(BaseModel):
+    id: int
+    clientId: int
+    userId: int
+    dedication: Optional[int]
 
     class Config:
         orm_mode = True
@@ -148,6 +159,7 @@ class Project(BaseModel):
     objective: Optional[str]
     is_active: bool
     scripts_per_day: Optional[int]
+    analysts: Optional[list[User]] = []
 
     class Config:
         orm_mode = True
