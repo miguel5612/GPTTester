@@ -1,6 +1,7 @@
 export interface Role {
   id: number;
   name: string;
+  is_active: boolean;
 }
 
 export interface User {
@@ -150,6 +151,7 @@ export interface PendingExecution {
 // DTOs para creación
 export interface RoleCreate {
   name: string;
+  is_active?: boolean;
 }
 
 export interface UserCreate {
@@ -272,6 +274,34 @@ export interface MarketplaceComponentCreate {
   description?: string;
   code: string;
   version?: string;
+}
+
+export interface PagePermission {
+  id: number;
+  page: string;
+  role_id: number;
+  isStartPage: boolean;
+  description?: string;
+}
+
+export interface PagePermissionCreate {
+  page: string;
+  isStartPage?: boolean;
+  description?: string;
+}
+
+export interface ApiPermission {
+  id: number;
+  route: string;
+  method: string;
+  role_id: number;
+  description?: string;
+}
+
+export interface ApiPermissionCreate {
+  route: string;
+  method: string;
+  description?: string;
 }
 
 export interface ApiResponse<T> {

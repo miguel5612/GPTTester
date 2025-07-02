@@ -11,7 +11,8 @@ import {
   ActionAssignmentCreate, Actor, ActorCreate, AgentCreate, ExecutionPlanCreate,
   LoginRequest, LoginResponse, UserRoleUpdate, PendingExecution,
   MarketplaceComponent, MarketplaceComponentCreate,
-  Task, Interaction, Validation, Question, RawData, Feature
+  Task, Interaction, Validation, Question, RawData, Feature,
+  PagePermission, PagePermissionCreate, ApiPermission, ApiPermissionCreate
 } from '../models';
 
 @Injectable({
@@ -76,6 +77,10 @@ export class ApiService {
 
   updateRole(id: number, role: RoleCreate): Observable<Role> {
     return this.http.put<Role>(`${this.baseUrl}/roles/${id}`, role, { headers: this.getHeaders() });
+  }
+
+  updateRoleActive(id: number, isActive: boolean): Observable<Role> {
+    return this.http.put<Role>(`${this.baseUrl}/roles/${id}/active`, { is_active: isActive }, { headers: this.getHeaders() });
   }
 
   deleteRole(id: number): Observable<any> {
@@ -260,6 +265,32 @@ export class ApiService {
 
   deletePage(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/pages/${id}`, { headers: this.getHeaders() });
+  }
+
+  // Role permissions
+  getPagePermissions(roleId: number): Observable<PagePermission[]> {
+    return this.http.get<PagePermission[]>(`${this.baseUrl}/roles/${roleId}/permissions`, { headers: this.getHeaders() });
+  }
+
+  addPagePermission(roleId: number, perm: PagePermissionCreate): Observable<PagePermission> {
+    return this.http.post<PagePermission>(`${this.baseUrl}/roles/${roleId}/permissions`, perm, { headers: this.getHeaders() });
+  }
+
+  deletePagePermission(roleId: number, page: string): Observable<any> {
+    const encoded = encodeURIComponent(page);
+    return this.http.delete(`${this.baseUrl}/roles/${roleId}/permissions/${encoded}`, { headers: this.getHeaders() });
+  }
+
+  getApiPermissions(roleId: number): Observable<ApiPermission[]> {
+    return this.http.get<ApiPermission[]>(`${this.baseUrl}/roles/${roleId}/api-permissions`, { headers: this.getHeaders() });
+  }
+
+  addApiPermission(roleId: number, perm: ApiPermissionCreate): Observable<ApiPermission> {
+    return this.http.post<ApiPermission>(`${this.baseUrl}/roles/${roleId}/api-permissions`, perm, { headers: this.getHeaders() });
+  }
+
+  deleteApiPermission(roleId: number, permId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/roles/${roleId}/api-permissions/${permId}`, { headers: this.getHeaders() });
   }
 
   // Page Elements

@@ -8,6 +8,7 @@ class Role(BaseModel):
     id: int
     name: str
     description: str
+    is_active: bool = True
 
     class Config:
         orm_mode = True
@@ -25,6 +26,10 @@ class User(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class UserActiveUpdate(BaseModel):
+    is_active: bool
 
 
 # 3️⃣ PagePermissions

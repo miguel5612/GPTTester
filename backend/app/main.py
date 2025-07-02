@@ -111,6 +111,22 @@ def seed_database() -> None:
                 )
             )
 
+        default_users = [
+            ("architect", "Arquitecto de Automatización"),
+            ("AngelC", "Gerente de servicios"),
+            ("T23AutoPerson", "Automatizador de Pruebas"),
+        ]
+        for username, role_name in default_users:
+            role = role_map.get(role_name)
+            if role and not db.query(models.User).filter_by(username=username).first():
+                db.add(
+                    models.User(
+                        username=username,
+                        password=deps.get_password_hash("admin"),
+                        role_id=role.id,
+                    )
+                )
+
         db.commit()
         logger.info("Database seed commit successful")
     finally:
@@ -348,3 +364,20 @@ def assign_role(
     db.commit()
     db.refresh(user)
     return user
+
+
+@app.put("/roles/{role_id}/active", response_model=schemas.Role)
+def update_role_active(
+    role_id: int,
+    data: dict,
+    db: Session = Depends(deps.get_db),
+    _: models.User = Depends(deps.require_admin),
+):
+    role = db.query(models.Role).filter_by(id=role_id).first()
+    if not role:
+        raise HTTPException(status_code=404, detail="Not found")
+    role.is_active = bool(data.get("is_active"))
+    db.commit()
+    db.refresh(role)
+    return role
+
