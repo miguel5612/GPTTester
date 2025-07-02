@@ -125,6 +125,13 @@ def require_admin(current_user: models.User = Depends(get_current_user)):
     return current_user
 
 
+def require_architect(current_user: models.User = Depends(get_current_user)):
+    """Ensure the user has the Architect role."""
+    if current_user.role.name != "Arquitecto de Automatización":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Architect only")
+    return current_user
+
+
 def require_page_permission(page: str):
     def _check(
         current_user: models.User = Depends(get_current_user),

@@ -444,7 +444,8 @@ export class MainLayoutComponent implements OnInit {
     
     // Arquitecto
     { label: 'Componentes', icon: 'puzzle-piece', route: '/marketplace', roles: ['Arquitecto de Automatización'] },
-    { label: 'Métricas', icon: 'chart-line', route: '/bi', roles: ['Arquitecto de Automatización', 'Administrador'] },
+    { label: 'Pendientes', icon: 'clipboard-list', route: '/architect/pending', roles: ['Arquitecto de Automatización'] },
+    { label: 'Métricas', icon: 'chart-line', route: '/architect/metrics', roles: ['Arquitecto de Automatización', 'Administrador'] },
   ];
 
   constructor(

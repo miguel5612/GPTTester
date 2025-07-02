@@ -4,6 +4,8 @@ logging.basicConfig(level=logging.INFO)
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from sqlalchemy import func
+from datetime import datetime
 
 from .database import engine, SessionLocal
 from . import models, schemas, deps
@@ -386,4 +388,130 @@ def update_role_active(
     db.commit()
     db.refresh(role)
     return role
+
+
+# ---------------- Architect Endpoints -----------------
+
+@app.get("/metrics/dashboard")
+def metrics_dashboard(
+    db: Session = Depends(deps.get_db),
+    _: models.User = Depends(deps.require_architect),
+):
+    """Return key metrics for the automation architect dashboard."""
+    scripts_per_day = (
+        db.query(func.coalesce(func.sum(models.Project.scripts_per_day), 0)).scalar()
+    )
+    active_projects = db.query(models.Project).filter(models.Project.is_active == True).count()
+
+    pending_state = (
+        db.query(models.InteractionApprovalState)
+        .filter_by(name="pendiente")
+        .first()
+    )
+    pend_int = (
+        db.query(models.InteractionApproval)
+        .filter_by(interactionAprovalStateId=pending_state.id)
+        .count()
+        if pending_state
+        else 0
+    )
+    pend_val = (
+        db.query(models.ValidationApproval)
+        .filter_by(interactionAprovalStateId=pending_state.id)
+        .count()
+        if pending_state
+        else 0
+    )
+    return {
+        "scripts_per_day": scripts_per_day or 0,
+        "active_projects": active_projects,
+        "pending_interactions": pend_int,
+        "pending_validations": pend_val,
+    }
+
+
+@app.get("/architect/pending/interactions")
+def list_pending_interactions(
+    db: Session = Depends(deps.get_db),
+    _: models.User = Depends(deps.require_architect),
+):
+    state = db.query(models.InteractionApprovalState).filter_by(name="pendiente").first()
+    if not state:
+        return []
+    approvals = (
+        db.query(models.InteractionApproval)
+        .filter_by(interactionAprovalStateId=state.id)
+        .all()
+    )
+    result = []
+    for a in approvals:
+        interaction = db.query(models.Interaction).get(a.interactionId)
+        result.append({"approval": a, "interaction": interaction})
+    return result
+
+
+@app.get("/architect/pending/validations")
+def list_pending_validations(
+    db: Session = Depends(deps.get_db),
+    _: models.User = Depends(deps.require_architect),
+):
+    state = db.query(models.InteractionApprovalState).filter_by(name="pendiente").first()
+    if not state:
+        return []
+    approvals = (
+        db.query(models.ValidationApproval)
+        .filter_by(interactionAprovalStateId=state.id)
+        .all()
+    )
+    result = []
+    for a in approvals:
+        validation = db.query(models.Validation).get(a.validationId)
+        result.append({"approval": a, "validation": validation})
+    return result
+
+
+@app.post("/interactionapprovals/{approval_id}/{action}", response_model=schemas.InteractionApproval)
+def update_interaction_approval_state(
+    approval_id: int,
+    action: str,
+    db: Session = Depends(deps.get_db),
+    _: models.User = Depends(deps.require_architect),
+):
+    approval = db.query(models.InteractionApproval).filter_by(id=approval_id).first()
+    if not approval:
+        raise HTTPException(status_code=404, detail="Not found")
+    if action not in {"approve", "reject"}:
+        raise HTTPException(status_code=400, detail="Invalid action")
+    state_name = "aprobado" if action == "approve" else "rechazado"
+    state = db.query(models.InteractionApprovalState).filter_by(name=state_name).first()
+    if not state:
+        raise HTTPException(status_code=404, detail="State not found")
+    approval.interactionAprovalStateId = state.id
+    approval.aprovalDate = datetime.utcnow()
+    db.commit()
+    db.refresh(approval)
+    return approval
+
+
+@app.post("/validationapprovals/{approval_id}/{action}", response_model=schemas.ValidationApproval)
+def update_validation_approval_state(
+    approval_id: int,
+    action: str,
+    db: Session = Depends(deps.get_db),
+    _: models.User = Depends(deps.require_architect),
+):
+    approval = db.query(models.ValidationApproval).filter_by(id=approval_id).first()
+    if not approval:
+        raise HTTPException(status_code=404, detail="Not found")
+    if action not in {"approve", "reject"}:
+        raise HTTPException(status_code=400, detail="Invalid action")
+    state_name = "aprobado" if action == "approve" else "rechazado"
+    state = db.query(models.InteractionApprovalState).filter_by(name=state_name).first()
+    if not state:
+        raise HTTPException(status_code=404, detail="State not found")
+    approval.interactionAprovalStateId = state.id
+    approval.aprovalDate = datetime.utcnow()
+    db.commit()
+    db.refresh(approval)
+    return approval
 

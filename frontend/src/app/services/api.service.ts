@@ -579,6 +579,31 @@ export class ApiService {
     return this.http.post<RawData>(`${this.baseUrl}/rawdata/`, r, { headers: this.getHeaders() });
   }
 
+  // Architect specific endpoints
+  getPendingInteractions(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/architect/pending/interactions`, { headers: this.getHeaders() });
+  }
+
+  getPendingValidations(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/architect/pending/validations`, { headers: this.getHeaders() });
+  }
+
+  approveInteraction(id: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/interactionapprovals/${id}/approve`, {}, { headers: this.getHeaders() });
+  }
+
+  rejectInteraction(id: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/interactionapprovals/${id}/reject`, {}, { headers: this.getHeaders() });
+  }
+
+  approveValidation(id: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/validationapprovals/${id}/approve`, {}, { headers: this.getHeaders() });
+  }
+
+  rejectValidation(id: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/validationapprovals/${id}/reject`, {}, { headers: this.getHeaders() });
+  }
+
   isAuthenticated(): boolean {
     return !!this.tokenSubject.value;
   }
