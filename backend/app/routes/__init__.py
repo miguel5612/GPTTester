@@ -5,3 +5,6 @@ all_routers = [
     digital_assets.router,
     projects.router,
 ]
+
+# Backwards compatibility: older modules expect a variable named ``routers``.
+routers = all_routers
