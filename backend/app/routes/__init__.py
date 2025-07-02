@@ -6,5 +6,5 @@ all_routers = [
     projects.router,
 ]
 
-# Exported for backward compatibility with older imports
+# Backwards compatibility with older imports
 routers = all_routers
