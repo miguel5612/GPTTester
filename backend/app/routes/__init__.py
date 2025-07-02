@@ -6,5 +6,6 @@ all_routers = [
     projects.router,
 ]
 
-# Backwards compatibility: older modules expect a variable named ``routers``.
+# Compatibility alias expected by main.py and some tests
+# Backwards compatibility for legacy imports
 routers = all_routers
