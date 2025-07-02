@@ -101,8 +101,13 @@ export class ProjectAnalystsComponent implements OnChanges {
     if (!confirm(msg)) {
       return;
     }
+    const scripts = this.scripts[user.id] ?? 0;
+    if (checked && scripts <= 0) {
+      alert('Indique scripts por d\u00eda mayores a 0');
+      return;
+    }
     const obs = checked ?
-      this.projectService.assignAnalyst(this.project.id, user.id, this.scripts[user.id] || 0) :
+      this.projectService.assignAnalyst(this.project.id, user.id, scripts) :
       this.projectService.unassignAnalyst(this.project.id, user.id);
     obs.subscribe(p => {
       this.project = p;
