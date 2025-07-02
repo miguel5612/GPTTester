@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
-import { User } from '../../models';
+import { User, Client, Project } from '../../models';
 
 interface MenuItem {
   label: string;
-  route: string;
+  route?: string;
   icon: string;
+  children?: { label: string; route: string; icon: string }[];
 }
 
 @Component({
@@ -34,6 +35,50 @@ interface MenuItem {
               <a [routerLink]="item.route" routerLinkActive="active" (click)="onNavigate()">
                 <span class="icon">{{ item.icon }}</span>
                 <span class="label">{{ item.label }}</span>
+              </a>
+            </li>
+            <li *ngFor="let c of clients">
+              <details>
+                <summary>
+                  <span class="icon">📁</span>
+                  <span class="label">{{ c.name }}</span>
+                </summary>
+                <ul>
+                  <li>
+                    <a [routerLink]="'/clients/' + c.id + '/actors'" routerLinkActive="active" (click)="onNavigate()">
+                      <span class="icon">🎭</span>
+                      <span class="label">Actores</span>
+                    </a>
+                  </li>
+                  <li *ngFor="let p of projectsByClient[c.id] || []">
+                    <details>
+                      <summary>
+                        <span class="icon">📂</span>
+                        <span class="label">{{ p.name }}</span>
+                      </summary>
+                      <ul>
+                        <li>
+                          <a [routerLink]="'/projects/' + p.id + '/scenarios'" routerLinkActive="active" (click)="onNavigate()">
+                            <span class="icon">📜</span>
+                            <span class="label">Escenarios</span>
+                          </a>
+                        </li>
+                        <li>
+                          <a [routerLink]="'/projects/' + p.id + '/features'" routerLinkActive="active" (click)="onNavigate()">
+                            <span class="icon">🌟</span>
+                            <span class="label">Features</span>
+                          </a>
+                        </li>
+                      </ul>
+                    </details>
+                  </li>
+                </ul>
+              </details>
+            </li>
+            <li>
+              <a [routerLink]="'/interactions'" routerLinkActive="active" (click)="onNavigate()">
+                <span class="icon">⚙️</span>
+                <span class="label">Interacciones</span>
               </a>
             </li>
           </ul>
@@ -64,6 +109,10 @@ interface MenuItem {
     .sidebar ul { list-style: none; margin: 0; padding: 0; }
     .sidebar li a { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; text-decoration: none; color: var(--title-color); }
     .sidebar li a.active { background: var(--btn-primary); color: var(--btn-primary-text); }
+    .sidebar details { border-bottom: 1px solid var(--border-color); }
+    .sidebar details summary { cursor: pointer; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; list-style: none; }
+    .sidebar details ul { list-style: none; margin: 0; padding: 0; }
+    .sidebar details ul li a { padding-left: 2rem; }
     .content { flex: 1; padding: 1rem; }
     .footer { text-align: center; padding: 0.5rem; background: var(--panel-bg); border-top: 1px solid var(--border-color); }
 
@@ -78,9 +127,10 @@ interface MenuItem {
 export class MainLayoutComponent implements OnInit {
   currentUser: User | null = null;
   menu: MenuItem[] = [
-    { label: 'Clientes', route: '/clients', icon: '🏢' },
-    { label: 'Actores', route: '/actors', icon: '🎭' }
+    { label: 'Clientes', route: '/clients', icon: '🏢' }
   ];
+  clients: Client[] = [];
+  projectsByClient: { [key: number]: Project[] } = {};
   sidebarOpen = false;
   userMenuOpen = false;
   headerTitle = 'GPTTester';
@@ -100,6 +150,26 @@ export class MainLayoutComponent implements OnInit {
         this.currentUser = u;
       });
     }
+    this.loadClients();
+  }
+
+  loadClients() {
+    this.api.getClients().subscribe(cs => {
+      this.clients = cs;
+      this.loadProjects();
+    });
+  }
+
+  loadProjects() {
+    this.api.getProjects().subscribe(ps => {
+      this.projectsByClient = {};
+      ps.forEach(p => {
+        if (!this.projectsByClient[p.client_id]) {
+          this.projectsByClient[p.client_id] = [];
+        }
+        this.projectsByClient[p.client_id].push(p);
+      });
+    });
   }
 
   toggleSidebar() {

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { Actor, Client, User } from '../../models';
 import { ActorService } from '../../services/actor.service';
 import { ApiService } from '../../services/api.service';
@@ -13,7 +14,7 @@ import { ActorFormComponent } from './actor-form.component';
   template: `
     <div class="main-panel">
       <h1>Gestión de Actores</h1>
-      <div class="mb-3">
+      <div class="mb-3" *ngIf="!hasRouteClient">
         <label>Cliente</label>
         <select class="form-select" [(ngModel)]="selectedClient" (change)="load()">
           <option [ngValue]="null">Todos</option>
@@ -38,7 +39,12 @@ import { ActorFormComponent } from './actor-form.component';
       </table>
       <div *ngIf="actors.length === 0">No hay actores.</div>
 
-      <app-actor-form *ngIf="showForm" [actor]="editing" (saved)="onSaved()" (cancel)="showForm=false"></app-actor-form>
+      <app-actor-form
+        *ngIf="showForm"
+        [actor]="editing"
+        [clientId]="selectedClient"
+        (saved)="onSaved()"
+        (cancel)="showForm=false"></app-actor-form>
     </div>
   `
 })
@@ -47,12 +53,22 @@ export class ActorsComponent implements OnInit {
   clients: Client[] = [];
   currentUser: User | null = null;
   selectedClient: number | null = null;
+  hasRouteClient = false;
   showForm = false;
   editing: Actor | null = null;
 
-  constructor(private service: ActorService, private api: ApiService) {}
+  constructor(
+    private service: ActorService,
+    private api: ApiService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
+    const cid = this.route.snapshot.paramMap.get('clientId');
+    if (cid) {
+      this.selectedClient = Number(cid);
+      this.hasRouteClient = true;
+    }
     this.api.getCurrentUser().subscribe(user => {
       this.currentUser = user;
       this.loadClients();
