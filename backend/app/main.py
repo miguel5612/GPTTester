@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from .database import engine, SessionLocal
 from . import models, schemas, deps
 from .crud import create_crud_router
+from .routes import all_routers
 
 logger = logging.getLogger(__name__)
 
@@ -215,13 +216,10 @@ def register_cruds():
         ("users", models.User, schemas.User),
         ("pagepermissions", models.PagePermission, schemas.PagePermission),
         ("apipermissions", models.ApiPermission, schemas.ApiPermission),
-        ("clients", models.Client, schemas.Client),
         ("businessagreements", models.BusinessAgreement, schemas.BusinessAgreement),
-        ("digitalassets", models.DigitalAsset, schemas.DigitalAsset),
         ("userinterfaces", models.UserInterface, schemas.UserInterface),
         ("elementtypes", models.ElementType, schemas.ElementType),
         ("elements", models.Element, schemas.Element),
-        ("projects", models.Project, schemas.Project),
         ("projectemployees", models.ProjectEmployee, schemas.ProjectEmployee),
         ("actors", models.Actor, schemas.Actor),
         ("habilities", models.Hability, schemas.Hability),
@@ -267,6 +265,8 @@ def register_cruds():
 
 
 register_cruds()
+for r in all_routers:
+    app.include_router(r)
 
 from .routes import routers as custom_routers
 
