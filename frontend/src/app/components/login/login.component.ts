@@ -177,7 +177,15 @@ export class LoginComponent {
     this.apiService.login(this.credentials).subscribe({
       next: () => {
         this.isLoading = false;
-        this.router.navigate(['/clients']);
+        this.apiService.getCurrentUser().subscribe({
+          next: (u) => {
+            const target = u.role?.name === 'Administrador' ? '/users' : '/clients';
+            this.router.navigate([target]);
+          },
+          error: () => {
+            this.router.navigate(['/clients']);
+          }
+        });
       },
       error: (error) => {
         this.isLoading = false;
