@@ -200,35 +200,13 @@ def register_cruds():
         ("projectemployees", models.ProjectEmployee, schemas.ProjectEmployee),
         ("actors", models.Actor, schemas.Actor),
         ("habilities", models.Hability, schemas.Hability),
-        ("interactions", models.Interaction, schemas.Interaction),
-        (
-            "interactionparameters",
-            models.InteractionParameter,
-            schemas.InteractionParameter,
-        ),
-        (
-            "interactionapprovalstates",
-            models.InteractionApprovalState,
-            schemas.InteractionApprovalState,
-        ),
-        (
-            "interactionapprovals",
-            models.InteractionApproval,
-            schemas.InteractionApproval,
-        ),
+        ("interactionapprovalstates", models.InteractionApprovalState, schemas.InteractionApprovalState),
         ("tasks", models.Task, schemas.Task),
         (
             "taskhaveinteractions",
             models.TaskHaveInteraction,
             schemas.TaskHaveInteraction,
         ),
-        ("validations", models.Validation, schemas.Validation),
-        (
-            "validationparameters",
-            models.ValidationParameter,
-            schemas.ValidationParameter,
-        ),
-        ("validationapprovals", models.ValidationApproval, schemas.ValidationApproval),
         ("questions", models.Question, schemas.Question),
         (
             "questionhasvalidations",
@@ -250,6 +228,16 @@ def register_cruds():
 
 
 register_cruds()
+
+from .routes import interactions as interactions_routes
+from .routes import validations as validations_routes
+
+app.include_router(interactions_routes.router)
+app.include_router(interactions_routes.param_router)
+app.include_router(interactions_routes.approval_router)
+app.include_router(validations_routes.router)
+app.include_router(validations_routes.param_router)
+app.include_router(validations_routes.approval_router)
 
 
 @app.get("/users/me/", response_model=schemas.User)
