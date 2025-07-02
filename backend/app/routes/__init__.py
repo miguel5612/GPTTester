@@ -5,3 +5,6 @@ all_routers = [
     digital_assets.router,
     projects.router,
 ]
+
+# Backwards compatibility for legacy imports
+routers = all_routers
