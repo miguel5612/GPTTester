@@ -270,7 +270,7 @@ register_cruds()
 for r in all_routers:
     app.include_router(r)
 
-from .routes import routers as custom_routers
+from .routes import all_routers as custom_routers
 
 for r in custom_routers:
     app.include_router(r)
