@@ -123,6 +123,21 @@ models.Base.metadata.create_all(bind=engine)
 logger.info("Tables created")
 seed_database()
 
+def validate_database() -> None:
+    """Ensure critical tables exist and have data."""
+    logger.info("Validating seeded tables")
+    db = SessionLocal()
+    try:
+        roles = db.query(models.Role).count()
+        types = db.query(models.ElementType).count()
+        if roles < 1 or types < 1:
+            raise RuntimeError("Database seeding failed")
+        logger.info("Validation successful: %d roles, %d element types", roles, types)
+    finally:
+        db.close()
+
+validate_database()
+
 app = FastAPI(title="Test Automation API")
 
 # Enable CORS for frontend requests
