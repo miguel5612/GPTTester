@@ -1,4 +1,7 @@
 import os
+import types
+
+import bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -12,6 +15,14 @@ SECRET_KEY = os.getenv("SECRET_KEY", "secret")
 ALGORITHM = "HS256"
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+# passlib<=1.7.4 expects `bcrypt.__about__.__version__`, which is no longer
+# available starting with bcrypt 4.0. To remain compatible with newer bcrypt
+# releases while keeping passlib untouched, emulate the old attribute if it is
+# missing.
+if not hasattr(bcrypt, "__about__"):
+    bcrypt.__about__ = types.SimpleNamespace(__version__=bcrypt.__version__)
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
