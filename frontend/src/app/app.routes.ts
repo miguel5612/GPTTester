@@ -82,6 +82,16 @@ export const routes: Routes = [
       {
         path: 'interactions',
         loadComponent: () => import('./components/interactions/interactions.component').then(m => m.InteractionsComponent)
+      },
+      {
+        path: 'architect/pending',
+        loadComponent: () => import('./components/architect/architect-pending.component').then(m => m.ArchitectPendingComponent),
+        canActivate: [() => import('./architect.guard').then(m => m.architectGuard)]
+      },
+      {
+        path: 'architect/metrics',
+        loadComponent: () => import('./components/architect/architect-metrics.component').then(m => m.ArchitectMetricsComponent),
+        canActivate: [() => import('./architect.guard').then(m => m.architectGuard)]
       }
     ]
   },

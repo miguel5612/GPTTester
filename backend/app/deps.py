@@ -131,13 +131,12 @@ def require_admin(current_user: models.User = Depends(get_current_user)):
     return current_user
 
 
-def require_self_or_admin(
-    item_id: int,
-    current_user: models.User = Depends(get_current_user),
-):
-    if current_user.role.name == "Administrador" or current_user.id == item_id:
-        return current_user
-    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden")
+def require_architect(current_user: models.User = Depends(get_current_user)):
+    """Ensure the user has the Architect role."""
+    if current_user.role.name != "Arquitecto de Automatización":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Architect only")
+    return current_user
+
 
 
 def require_page_permission(page: str):
