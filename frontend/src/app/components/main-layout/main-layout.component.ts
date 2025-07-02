@@ -73,12 +73,6 @@ interface MenuItem {
                 </ul>
               </details>
             </li>
-            <li>
-              <a [routerLink]="'/interactions'" routerLinkActive="active" (click)="onNavigate()">
-                <span class="icon">⚙️</span>
-                <span class="label">Interacciones</span>
-              </a>
-            </li>
           </ul>
         </nav>
         <main class="content">
@@ -143,6 +137,7 @@ export class MainLayoutComponent implements OnInit {
       { label: 'Dashboard', route: '/dashboard', icon: '🏠' },
       { label: 'Usuarios', route: '/users', icon: '👥' },
       { label: 'Roles', route: '/roles', icon: '🛡️' },
+      { label: 'Permisos', route: '/permissions', icon: '🔑' },
       { label: 'Agentes', route: '/agents', icon: '🤖' }
     ];
 
@@ -163,8 +158,9 @@ export class MainLayoutComponent implements OnInit {
         this.currentUser = u;
         this.buildMenu();
       });
+    } else {
+      this.buildMenu();
     }
-    this.buildMenu();
     this.loadClients();
   }
 

@@ -58,6 +58,11 @@ export const routes: Routes = [
         canActivate: [() => import('./admin.guard').then(m => m.adminGuard)]
       },
       {
+        path: 'permissions',
+        loadComponent: () => import('./components/permissions/permissions.component').then(m => m.PermissionsComponent),
+        canActivate: [() => import('./admin.guard').then(m => m.adminGuard)]
+      },
+      {
         path: 'agents',
         loadComponent: () => import('./components/agents/agents.component').then(m => m.AgentsComponent),
         canActivate: [() => import('./admin.guard').then(m => m.adminGuard)]
