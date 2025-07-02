@@ -103,6 +103,14 @@ export class ApiService {
     return this.http.put<User>(`${this.baseUrl}/users/${userId}/active`, { is_active: isActive }, { headers: this.getHeaders() });
   }
 
+  updateUser(id: number, data: any): Observable<User> {
+    return this.http.put<User>(`${this.baseUrl}/users/${id}`, data, { headers: this.getHeaders() });
+  }
+
+  deleteUser(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/users/${id}`, { headers: this.getHeaders() });
+  }
+
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.baseUrl}/users/`, { headers: this.getHeaders() });
   }
