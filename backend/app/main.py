@@ -127,6 +127,12 @@ def login(
     return {"access_token": token, "token_type": "bearer"}
 
 
+@app.post("/logout")
+def logout(token: str = Depends(deps.oauth2_scheme)):
+    deps.revoke_token(token)
+    return {"ok": True}
+
+
 # CRUD routers for main entities
 def register_cruds():
     mappings = [
