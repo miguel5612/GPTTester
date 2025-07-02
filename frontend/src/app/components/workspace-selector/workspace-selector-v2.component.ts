@@ -4,6 +4,10 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { WorkspaceService, ClientOption, ProjectOption } from '../../services/workspace-v2.service';
 import { AuthService } from '../../services/auth.service';
+import { DigitalAssetService } from '../../services/digital-asset.service';
+import { ClientService } from '../../services/client.service';
+import { ProjectService } from '../../services/project.service';
+import { Client, DigitalAsset, Project } from '../../models';
 
 @Component({
   selector: 'app-workspace-selector',
@@ -33,7 +37,7 @@ import { AuthService } from '../../services/auth.service';
             <div class="form-section">
               <h3><i class="fas fa-building"></i> Cliente</h3>
               <div class="client-grid">
-                <div 
+                <div
                   class="client-card"
                   *ngFor="let client of clients"
                   [class.selected]="selectedClient?.id === client.id"
@@ -54,6 +58,27 @@ import { AuthService } from '../../services/auth.service';
               </div>
             </div>
 
+            <!-- Selección de Activo Digital -->
+            <div class="form-section" *ngIf="selectedClient">
+              <h3><i class="fas fa-box"></i> Activo Digital</h3>
+              <div class="project-grid">
+                <div
+                  class="project-card"
+                  *ngFor="let asset of assets"
+                  [class.selected]="selectedAsset?.id === asset.id"
+                  (click)="selectAsset(asset)">
+                  <div class="project-header">
+                    <h4>{{ asset.description }}</h4>
+                    <i class="fas fa-check-circle" *ngIf="selectedAsset?.id === asset.id"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="error-message" *ngIf="workspaceForm.get('asset_id')?.touched && !selectedAsset">
+                <i class="fas fa-exclamation-circle"></i>
+                Debes seleccionar un activo digital
+              </div>
+            </div>
+
             <!-- Selección de Proyecto (opcional) -->
             <div class="form-section" *ngIf="selectedClient">
               <h3><i class="fas fa-folder"></i> Proyecto (opcional)</h3>
@@ -65,9 +90,9 @@ import { AuthService } from '../../services/auth.service';
                   <i class="fas fa-folder-open"></i>
                   <span>Sin proyecto específico</span>
                 </div>
-                <div 
+                <div
                   class="project-card"
-                  *ngFor="let project of selectedClient.projects"
+                  *ngFor="let project of projects"
                   [class.selected]="selectedProject?.id === project.id"
                   (click)="selectProject(project)">
                   <div class="project-header">
@@ -423,7 +448,10 @@ import { AuthService } from '../../services/auth.service';
 export class WorkspaceSelectorComponent implements OnInit {
   workspaceForm: FormGroup;
   clients: ClientOption[] = [];
+  assets: DigitalAsset[] = [];
+  projects: Project[] = [];
   selectedClient: ClientOption | null = null;
+  selectedAsset: DigitalAsset | null = null;
   selectedProject: ProjectOption | null = null;
   loading = true;
   submitting = false;
@@ -434,10 +462,14 @@ export class WorkspaceSelectorComponent implements OnInit {
     private fb: FormBuilder,
     private workspaceService: WorkspaceService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private clientService: ClientService,
+    private assetService: DigitalAssetService,
+    private projectService: ProjectService
   ) {
     this.workspaceForm = this.fb.group({
       client_id: ['', Validators.required],
+      asset_id: ['', Validators.required],
       project_id: ['']
     });
   }
@@ -460,25 +492,48 @@ export class WorkspaceSelectorComponent implements OnInit {
 
   loadWorkspaces() {
     this.loading = true;
-    this.workspaceService.getAvailableWorkspaces().subscribe({
-      next: (options) => {
-        this.clients = options.clients;
+    this.clientService.getClients().subscribe({
+      next: clients => {
+        this.clients = clients as any;
         this.loading = false;
       },
-      error: (error) => {
+      error: () => {
         this.loading = false;
         this.errorMessage = 'Error al cargar los clientes disponibles';
-        console.error(error);
       }
     });
   }
 
   selectClient(client: ClientOption) {
     this.selectedClient = client;
+    this.selectedAsset = null;
     this.selectedProject = null;
     this.workspaceForm.patchValue({
       client_id: client.id,
+      asset_id: null,
       project_id: null
+    });
+    this.loading = true;
+    this.assetService.getAssets(client.id).subscribe({
+      next: assets => {
+        this.assets = assets;
+        this.loading = false;
+      },
+      error: () => (this.loading = false)
+    });
+  }
+
+  selectAsset(asset: DigitalAsset) {
+    this.selectedAsset = asset;
+    this.selectedProject = null;
+    this.workspaceForm.patchValue({ asset_id: asset.id, project_id: null });
+    this.loading = true;
+    this.projectService.getProjectsByAsset(asset.id).subscribe({
+      next: ps => {
+        this.projects = ps;
+        this.loading = false;
+      },
+      error: () => (this.loading = false)
     });
   }
 
@@ -492,6 +547,10 @@ export class WorkspaceSelectorComponent implements OnInit {
   onSubmit() {
     if (!this.selectedClient) {
       this.workspaceForm.get('client_id')?.markAsTouched();
+      return;
+    }
+    if (!this.selectedAsset) {
+      this.workspaceForm.get('asset_id')?.markAsTouched();
       return;
     }
 

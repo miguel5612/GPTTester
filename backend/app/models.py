@@ -114,6 +114,14 @@ class Client(Base):
 
 
 # 🔟 BusinessAgreements
+class ClientAnalyst(Base):
+    __tablename__ = 'client_analysts'
+    id = Column(Integer, primary_key=True, index=True)
+    clientId = Column(Integer, ForeignKey('clients.id'), nullable=False)
+    userId = Column(Integer, ForeignKey('users.id'), nullable=False)
+    dedication = Column(Integer)
+
+
 class BusinessAgreement(Base):
     __tablename__ = 'business_agreements'
     id = Column(Integer, primary_key=True, index=True)

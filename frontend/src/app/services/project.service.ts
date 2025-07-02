@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ApiService } from './api.service';
 import { Project, ProjectCreate } from '../models';
 
@@ -17,6 +17,12 @@ export class ProjectService {
 
   getProjectsByClient(clientId: number): Observable<Project[]> {
     return this.api.getProjectsByClient(clientId);
+  }
+
+  getProjectsByAsset(assetId: number): Observable<Project[]> {
+    return this.api.getProjects().pipe(
+      map(ps => ps.filter(p => p.digitalAssetsId === assetId))
+    );
   }
 
   createProject(project: ProjectCreate): Observable<Project> {

@@ -78,6 +78,7 @@ class Client(BaseModel):
     vision: str
     paginaInicio: str
     dedication: Optional[int]
+    analysts: Optional[list[User]] = []
 
     class Config:
         orm_mode = True
@@ -90,6 +91,16 @@ class BusinessAgreement(BaseModel):
     description: str
     okr: str
     kpi: str
+
+    class Config:
+        orm_mode = True
+
+
+class ClientAnalyst(BaseModel):
+    id: int
+    clientId: int
+    userId: int
+    dedication: Optional[int]
 
     class Config:
         orm_mode = True
@@ -148,6 +159,7 @@ class Project(BaseModel):
     objective: Optional[str]
     is_active: bool
     scripts_per_day: Optional[int]
+    analysts: Optional[list[User]] = []
 
     class Config:
         orm_mode = True
@@ -235,6 +247,48 @@ class InteractionApproval(BaseModel):
         orm_mode = True
 
 
+class InteractionCreate(BaseModel):
+    userId: int
+    code: str
+    name: str
+    requireReview: bool = False
+    description: str
+
+
+class InteractionUpdate(BaseModel):
+    code: Optional[str] = None
+    name: Optional[str] = None
+    requireReview: Optional[bool] = None
+    description: Optional[str] = None
+
+
+class InteractionParameterCreate(BaseModel):
+    interactionId: int
+    name: str
+    description: str
+    direction: bool = True
+
+
+class InteractionParameterUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    direction: Optional[bool] = None
+
+
+class InteractionApprovalCreate(BaseModel):
+    interactionId: int
+    creatorId: int
+    aprovalUserId: int
+    comment: str
+    interactionAprovalStateId: int
+
+
+class InteractionApprovalUpdate(BaseModel):
+    aprovalUserId: Optional[int] = None
+    comment: Optional[str] = None
+    interactionAprovalStateId: Optional[int] = None
+
+
 # 19️⃣ Task
 class Task(BaseModel):
     id: int
@@ -295,6 +349,48 @@ class ValidationApproval(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class ValidationCreate(BaseModel):
+    userId: int
+    code: str
+    name: str
+    requireReview: bool = False
+    description: str
+
+
+class ValidationUpdate(BaseModel):
+    code: Optional[str] = None
+    name: Optional[str] = None
+    requireReview: Optional[bool] = None
+    description: Optional[str] = None
+
+
+class ValidationParameterCreate(BaseModel):
+    interactionId: int
+    name: str
+    description: str
+    direction: bool = True
+
+
+class ValidationParameterUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    direction: Optional[bool] = None
+
+
+class ValidationApprovalCreate(BaseModel):
+    validationId: int
+    creatorId: int
+    aprovalUserId: int
+    comment: str
+    interactionAprovalStateId: int
+
+
+class ValidationApprovalUpdate(BaseModel):
+    aprovalUserId: Optional[int] = None
+    comment: Optional[str] = None
+    interactionAprovalStateId: Optional[int] = None
 
 
 # 24️⃣ Question
