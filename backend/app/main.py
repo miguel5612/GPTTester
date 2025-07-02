@@ -364,3 +364,4 @@ def update_role_active(
     db.commit()
     db.refresh(role)
     return role
+

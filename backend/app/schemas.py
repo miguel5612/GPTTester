@@ -28,6 +28,10 @@ class User(BaseModel):
         orm_mode = True
 
 
+class UserActiveUpdate(BaseModel):
+    is_active: bool
+
+
 # 3️⃣ PagePermissions
 class PagePermission(BaseModel):
     id: int
