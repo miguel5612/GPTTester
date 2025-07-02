@@ -28,18 +28,17 @@ export interface UserInfo {
 export interface AuthResponse {
   access_token: string;
   token_type: string;
-  user: UserInfo;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:8000/api/auth';
+  private baseUrl = 'http://localhost:8000';
   private currentUserSubject = new BehaviorSubject<UserInfo | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   
-  private tokenKey = 'access_token';
+  private tokenKey = 'token';
   private userKey = 'current_user';
 
   constructor(
@@ -84,13 +83,10 @@ export class AuthService {
     formData.append('username', credentials.username);
     formData.append('password', credentials.password);
     
-    return this.http.post<AuthResponse>(`${this.baseUrl}/login`, formData)
+    return this.http.post<AuthResponse>(`${this.baseUrl}/token`, formData)
       .pipe(
         tap(response => {
-          // Guardar token y usuario
           localStorage.setItem(this.tokenKey, response.access_token);
-          localStorage.setItem(this.userKey, JSON.stringify(response.user));
-          this.currentUserSubject.next(response.user);
         }),
         catchError(error => {
           let message = 'Error al iniciar sesión';
@@ -125,7 +121,7 @@ export class AuthService {
   }
 
   getCurrentUser(): Observable<UserInfo> {
-    return this.http.get<UserInfo>(`${this.baseUrl}/me`, { headers: this.getHeaders() })
+    return this.http.get<UserInfo>(`${this.baseUrl}/users/me/`, { headers: this.getHeaders() })
       .pipe(
         tap(user => {
           localStorage.setItem(this.userKey, JSON.stringify(user));
