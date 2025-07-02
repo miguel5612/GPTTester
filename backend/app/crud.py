@@ -16,7 +16,14 @@ def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
         return Depends(deps.require_api_permission(f"/{prefix}", method))
 
     @router.post("/", response_model=schema, dependencies=[perm("POST")])
-    def create(item: schema, db: Session = Depends(deps.get_db)):
+    def create(
+        item: schema,
+        db: Session = Depends(deps.get_db),
+        current_user: models.User = Depends(deps.get_current_user),
+    ):
+        # Only administrators may create users or roles
+        if model in (models.Role, models.User) and current_user.role.name != "Administrador":
+            raise HTTPException(status_code=403, detail="Admin only")
         data = item.dict()
         if model is models.User:
             data["password"] = deps.get_password_hash(data["password"])
@@ -32,7 +39,13 @@ def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
         return db_obj
 
     @router.get("/", response_model=List[schema], dependencies=[perm("GET")])
-    def read_all(db: Session = Depends(deps.get_db)):
+    def read_all(
+        db: Session = Depends(deps.get_db),
+        current_user: models.User = Depends(deps.get_current_user),
+    ):
+        # Listing users or roles is restricted to administrators
+        if model in (models.Role, models.User) and current_user.role.name != "Administrador":
+            raise HTTPException(status_code=403, detail="Admin only")
         objs = db.query(model).all()
         if model is models.RawData:
             for o in objs:
@@ -41,19 +54,38 @@ def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
         return objs
 
     @router.get("/{item_id}", response_model=schema, dependencies=[perm("GET")])
-    def read_one(item_id: int, db: Session = Depends(deps.get_db)):
+    def read_one(
+        item_id: int,
+        db: Session = Depends(deps.get_db),
+        current_user: models.User = Depends(deps.get_current_user),
+    ):
         db_obj = db.query(model).filter(model.id == item_id).first()
         if not db_obj:
             raise HTTPException(status_code=404, detail="Not found")
+        # Non admin users can only read their own user record
+        if model is models.Role and current_user.role.name != "Administrador":
+            raise HTTPException(status_code=403, detail="Admin only")
+        if model is models.User and current_user.role.name != "Administrador" and current_user.id != item_id:
+            raise HTTPException(status_code=403, detail="Forbidden")
         if model is models.RawData and db_obj.fieldValue is not None:
             db_obj.fieldValue = crypto.decrypt(db_obj.fieldValue)
         return db_obj
 
     @router.put("/{item_id}", response_model=schema, dependencies=[perm("PUT")])
-    def update(item_id: int, item: schema, db: Session = Depends(deps.get_db)):
+    def update(
+        item_id: int,
+        item: schema,
+        db: Session = Depends(deps.get_db),
+        current_user: models.User = Depends(deps.get_current_user),
+    ):
         db_obj = db.query(model).filter(model.id == item_id).first()
         if not db_obj:
             raise HTTPException(status_code=404, detail="Not found")
+        # Non admin users can only update themselves
+        if model is models.Role and current_user.role.name != "Administrador":
+            raise HTTPException(status_code=403, detail="Admin only")
+        if model is models.User and current_user.role.name != "Administrador" and current_user.id != item_id:
+            raise HTTPException(status_code=403, detail="Forbidden")
         data = item.dict()
         if model is models.User and "password" in data:
             data["password"] = deps.get_password_hash(data["password"])
@@ -69,7 +101,14 @@ def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
         return db_obj
 
     @router.delete("/{item_id}", dependencies=[perm("DELETE")])
-    def delete(item_id: int, db: Session = Depends(deps.get_db)):
+    def delete(
+        item_id: int,
+        db: Session = Depends(deps.get_db),
+        current_user: models.User = Depends(deps.get_current_user),
+    ):
+        # Deleting users or roles requires administrator access
+        if model in (models.Role, models.User) and current_user.role.name != "Administrador":
+            raise HTTPException(status_code=403, detail="Admin only")
         db_obj = db.query(model).filter(model.id == item_id).first()
         if not db_obj:
             raise HTTPException(status_code=404, detail="Not found")
