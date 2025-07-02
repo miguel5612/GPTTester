@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
 import logging
+
 logging.basicConfig(level=logging.INFO)
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -139,6 +140,7 @@ models.Base.metadata.create_all(bind=engine)
 logger.info("Tables created")
 seed_database()
 
+
 def validate_database() -> None:
     """Ensure critical tables exist and have data."""
     logger.info("Validating seeded tables")
@@ -151,6 +153,7 @@ def validate_database() -> None:
         logger.info("Validation successful: %d roles, %d element types", roles, types)
     finally:
         db.close()
+
 
 validate_database()
 
@@ -222,45 +225,55 @@ def register_cruds():
         ("projectemployees", models.ProjectEmployee, schemas.ProjectEmployee),
         ("actors", models.Actor, schemas.Actor),
         ("habilities", models.Hability, schemas.Hability),
-        ("interactionapprovalstates", models.InteractionApprovalState, schemas.InteractionApprovalState),
+        ("interactions", models.Interaction, schemas.Interaction),
+        (
+            "interactionparameters",
+            models.InteractionParameter,
+            schemas.InteractionParameter,
+        ),
+        (
+            "interactionapprovalstates",
+            models.InteractionApprovalState,
+            schemas.InteractionApprovalState,
+        ),
+        (
+            "interactionapprovals",
+            models.InteractionApproval,
+            schemas.InteractionApproval,
+        ),
+        ("validations", models.Validation, schemas.Validation),
+        (
+            "validationparameters",
+            models.ValidationParameter,
+            schemas.ValidationParameter,
+        ),
+        ("validationapprovals", models.ValidationApproval, schemas.ValidationApproval),
         ("tasks", models.Task, schemas.Task),
+
         (
             "taskhaveinteractions",
             models.TaskHaveInteraction,
             schemas.TaskHaveInteraction,
         ),
-        ("questions", models.Question, schemas.Question),
-        (
-            "questionhasvalidations",
-            models.QuestionHasValidation,
-            schemas.QuestionHasValidation,
-        ),
-        ("scenarios", models.Scenario, schemas.Scenario),
-        ("scenariodata", models.ScenarioData, schemas.ScenarioData),
-        ("rawdata", models.RawData, schemas.RawData),
         ("fieldtypes", models.FieldType, schemas.FieldType),
         ("features", models.Feature, schemas.Feature),
         ("clientanalysts", models.ClientAnalyst, schemas.ClientAnalyst),
         ("scenariohasfeatures", models.ScenarioHasFeature, schemas.ScenarioHasFeature),
         ("featuresteps", models.FeatureStep, schemas.FeatureStep),
-        ("scenarioinfo", models.ScenarioInfo, schemas.ScenarioInfo),
+        ("scenarioinfo", models.ScenarioInfo, schemas.ScenarioInfo)
     ]
     for prefix, model, schema in mappings:
         app.include_router(create_crud_router(prefix, model, schema))
 
 
-
 register_cruds()
 
+from .routes import routers as custom_routers
+
+for r in custom_routers:
+    app.include_router(r)
 from .routes import interactions as interactions_routes
 from .routes import validations as validations_routes
-
-app.include_router(interactions_routes.router)
-app.include_router(interactions_routes.param_router)
-app.include_router(interactions_routes.approval_router)
-app.include_router(validations_routes.router)
-app.include_router(validations_routes.param_router)
-app.include_router(validations_routes.approval_router)
 
 
 @app.get("/users/me/", response_model=schemas.User)
