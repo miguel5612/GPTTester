@@ -629,6 +629,7 @@ export class ApiService {
 
   rejectValidation(id: number): Observable<any> {
     return this.http.post(`${this.baseUrl}/validationapprovals/${id}/reject`, {}, { headers: this.getHeaders() });
+  }
 
   // Scenarios
   getScenarios(): Observable<Scenario[]> {
