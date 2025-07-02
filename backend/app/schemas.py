@@ -32,6 +32,12 @@ class UserActiveUpdate(BaseModel):
     is_active: bool
 
 
+class UserRegister(BaseModel):
+    username: str
+    password: str
+    user_type: str
+
+
 # 3️⃣ PagePermissions
 class PagePermission(BaseModel):
     id: int
