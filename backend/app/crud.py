@@ -1,7 +1,8 @@
 import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import Type, List
+from sqlalchemy import func
+from typing import Type, List, Optional
 
 from . import models, deps, crypto
 
@@ -14,6 +15,17 @@ def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
 
     def perm(method: str):
         return Depends(deps.require_api_permission(f"/{prefix}", method))
+
+    def _validate_dedication(user_id: int, hours: int, db: Session, exclude_id: Optional[int] = None) -> None:
+        """Ensure a user is not assigned more than 9 hours across projects."""
+        if user_id is None or hours is None:
+            return
+        q = db.query(func.sum(models.ProjectEmployee.dedicationHours)).filter(models.ProjectEmployee.userId == user_id)
+        if exclude_id is not None:
+            q = q.filter(models.ProjectEmployee.id != exclude_id)
+        total = q.scalar() or 0
+        if total + hours > 9:
+            raise HTTPException(status_code=400, detail="dedication hours exceed daily limit of 9")
 
     @router.post("/", response_model=schema, dependencies=[perm("POST")])
     def create(
@@ -29,6 +41,12 @@ def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
             data["password"] = deps.get_password_hash(data["password"])
         if model is models.RawData and data.get("fieldValue") is not None:
             data["fieldValue"] = crypto.encrypt(data["fieldValue"])
+        if model is models.ProjectEmployee:
+            _validate_dedication(
+                data.get("userId"),
+                data.get("dedicationHours") or 0,
+                db,
+            )
         logger.debug("Creating %s with data: %s", model.__name__, data)
         db_obj = model(**data)
         db.add(db_obj)
@@ -121,6 +139,13 @@ def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
             data["password"] = deps.get_password_hash(data["password"])
         if model is models.RawData and "fieldValue" in data and data["fieldValue"] is not None:
             data["fieldValue"] = crypto.encrypt(data["fieldValue"])
+        if model is models.ProjectEmployee:
+            _validate_dedication(
+                data.get("userId", db_obj.userId),
+                data.get("dedicationHours", db_obj.dedicationHours) or 0,
+                db,
+                exclude_id=item_id,
+            )
         for field, value in data.items():
             setattr(db_obj, field, value)
         logger.debug("Updating %s %s with data: %s", model.__name__, item_id, data)
