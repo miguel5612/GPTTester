@@ -121,9 +121,7 @@ interface MenuItem {
 })
 export class MainLayoutComponent implements OnInit {
   currentUser: User | null = null;
-  menu: MenuItem[] = [
-    { label: 'Clientes', route: '/clients', icon: '🏢' }
-  ];
+  menu: MenuItem[] = [];
   clients: Client[] = [];
   projectsByClient: { [key: number]: Project[] } = {};
   sidebarOpen = false;
@@ -134,6 +132,27 @@ export class MainLayoutComponent implements OnInit {
     private router: Router
   ) {}
 
+  buildMenu() {
+    const base = [
+      { label: 'Clientes', route: '/clients', icon: '🏢' }
+    ];
+    const extra = [
+      { label: 'Interacciones', route: '/interactions', icon: '⚙️' }
+    ];
+    const admin = [
+      { label: 'Dashboard', route: '/dashboard', icon: '🏠' },
+      { label: 'Usuarios', route: '/users', icon: '👥' },
+      { label: 'Roles', route: '/roles', icon: '🛡️' },
+      { label: 'Agentes', route: '/agents', icon: '🤖' }
+    ];
+
+    if (this.currentUser?.role?.name === 'Administrador') {
+      this.menu = [...admin, ...base, ...extra];
+    } else {
+      this.menu = [...base, ...extra];
+    }
+  }
+
   get isMobile(): boolean {
     return window.innerWidth <= 768;
   }
@@ -142,8 +161,10 @@ export class MainLayoutComponent implements OnInit {
     if (this.api.isAuthenticated()) {
       this.api.getCurrentUser().subscribe(u => {
         this.currentUser = u;
+        this.buildMenu();
       });
     }
+    this.buildMenu();
     this.loadClients();
   }
 
