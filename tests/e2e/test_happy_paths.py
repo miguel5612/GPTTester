@@ -1,7 +1,7 @@
-from .context import load_context
-from .data_factory import DataFactory
-from .test_cases.web_happy_path import WebHappyPath
-from .test_cases.api_happy_path import ApiHappyPath
+from ..context import load_context
+from ..data_factory import DataFactory
+from ..test_cases.web_happy_path import WebHappyPath
+from ..test_cases.api_happy_path import ApiHappyPath
 
 
 def test_web_happy_path():

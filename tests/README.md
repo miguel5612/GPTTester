@@ -13,6 +13,8 @@ Mobile y Performance.
   se especializa por canal en `test_cases/`.
 - **Variables de Contexto Globales**: `load_context()` expone configuración
   común (por ejemplo `BASE_URL`).
+La carpeta se divide en `unit`, `integration` y `e2e` para distinguir los niveles de prueba.
+
 
 Ejecuta las pruebas con:
 
