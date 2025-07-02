@@ -19,6 +19,14 @@ export class UserService {
     return this.api.createUser(user);
   }
 
+  updateUser(id: number, data: any): Observable<User> {
+    return this.api.updateUser(id, data);
+  }
+
+  deleteUser(id: number): Observable<any> {
+    return this.api.deleteUser(id);
+  }
+
   updateUserRole(id: number, role: UserRoleUpdate): Observable<User> {
     return this.api.updateUserRole(id, role);
   }
