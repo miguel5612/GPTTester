@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Role } from '../../models';
 import { RoleService } from '../../services/role.service';
 import { RoleFormComponent } from './role-form.component';
+import { RolePermissionsComponent } from './role-permissions.component';
 
 @Component({
   selector: 'app-roles',
   standalone: true,
-  imports: [CommonModule, FormsModule, RoleFormComponent],
+  imports: [CommonModule, FormsModule, RoleFormComponent, RolePermissionsComponent],
   template: `
     <div class="main-panel">
       <h1>Roles</h1>
@@ -22,6 +23,7 @@ import { RoleFormComponent } from './role-form.component';
             <td>{{ r.name }}</td>
             <td>
               <button class="btn btn-sm btn-secondary me-2" (click)="edit(r)">Editar</button>
+              <button class="btn btn-sm btn-info me-2" (click)="permissions(r)">Permisos</button>
               <button class="btn btn-sm btn-danger" (click)="remove(r)">Eliminar</button>
             </td>
           </tr>
@@ -30,6 +32,7 @@ import { RoleFormComponent } from './role-form.component';
       <div *ngIf="roles.length === 0">No hay roles.</div>
 
       <app-role-form *ngIf="showForm" [role]="editing" (saved)="onSaved()" (cancel)="showForm=false"></app-role-form>
+      <app-role-permissions *ngIf="selectedRole" [role]="selectedRole" (close)="selectedRole=null"></app-role-permissions>
     </div>
   `
 })
@@ -37,6 +40,7 @@ export class RolesComponent implements OnInit {
   roles: Role[] = [];
   showForm = false;
   editing: Role | null = null;
+  selectedRole: Role | null = null;
 
   constructor(private service: RoleService) {}
 
@@ -51,6 +55,8 @@ export class RolesComponent implements OnInit {
   new() { this.editing = null; this.showForm = true; }
 
   edit(r: Role) { this.editing = r; this.showForm = true; }
+
+  permissions(r: Role) { this.selectedRole = r; }
 
   remove(r: Role) {
     if (confirm('¿Eliminar rol?')) {
