@@ -111,6 +111,22 @@ def seed_database() -> None:
                 )
             )
 
+        default_users = [
+            ("architect", "Arquitecto de Automatización"),
+            ("AngelC", "Gerente de servicios"),
+            ("T23AutoPerson", "Automatizador de Pruebas"),
+        ]
+        for username, role_name in default_users:
+            role = role_map.get(role_name)
+            if role and not db.query(models.User).filter_by(username=username).first():
+                db.add(
+                    models.User(
+                        username=username,
+                        password=deps.get_password_hash("admin"),
+                        role_id=role.id,
+                    )
+                )
+
         db.commit()
         logger.info("Database seed commit successful")
     finally:
