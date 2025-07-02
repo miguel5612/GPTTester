@@ -248,7 +248,13 @@ def register_cruds():
         app.include_router(create_crud_router(prefix, model, schema))
 
 
+
 register_cruds()
+
+
+@app.get("/users/me/", response_model=schemas.User)
+def read_current_user(current_user: models.User = Depends(deps.get_current_user)):
+    return current_user
 
 
 @app.get("/permissions")
