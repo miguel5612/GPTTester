@@ -68,9 +68,9 @@ export const routes: Routes = [
         canActivate: [() => import('./admin.guard').then(m => m.adminGuard)]
       },
       {
-        path: 'service-manager',
-        loadComponent: () => import('./components/service-manager/service-manager.component').then(m => m.ServiceManagerComponent),
-        canActivate: [() => import('./service-manager.guard').then(m => m.managerGuard)]
+        path: 'performance',
+        loadComponent: () => import('./components/performance/performance.component').then(m => m.PerformanceComponent),
+        canActivate: [() => import('./performance.guard').then(m => m.performanceGuard)]
       },
       {
         path: 'interactions',

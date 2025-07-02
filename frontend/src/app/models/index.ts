@@ -359,3 +359,10 @@ export interface Feature {
   description: string;
   status: boolean;
 }
+
+export interface Scenario {
+  id: number;
+  name: string;
+  description?: string;
+  status: boolean;
+}
