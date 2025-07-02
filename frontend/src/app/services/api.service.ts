@@ -47,8 +47,17 @@ export class ApiService {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    this.tokenSubject.next(null);
+    this.http.post(`${this.baseUrl}/logout`, {}, { headers: this.getHeaders() })
+      .subscribe({
+        complete: () => {
+          localStorage.removeItem('token');
+          this.tokenSubject.next(null);
+        },
+        error: () => {
+          localStorage.removeItem('token');
+          this.tokenSubject.next(null);
+        }
+      });
   }
 
   getCurrentUser(): Observable<User> {

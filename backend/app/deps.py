@@ -16,6 +16,18 @@ ALGORITHM = "HS256"
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+# store revoked JWT tokens
+revoked_tokens: set[str] = set()
+
+
+def revoke_token(token: str) -> None:
+    """Mark a token as revoked so it can no longer be used."""
+    revoked_tokens.add(token)
+
+
+def is_token_revoked(token: str) -> bool:
+    return token in revoked_tokens
+
 # passlib<=1.7.4 expects `bcrypt.__about__.__version__`, which is no longer
 # available starting with bcrypt 4.0. To remain compatible with newer bcrypt
 # releases while keeping passlib untouched, emulate the old attribute if it is
@@ -73,6 +85,8 @@ def get_current_user(
         if user_id is None:
             raise credentials_exception
     except JWTError:
+        raise credentials_exception
+    if is_token_revoked(token):
         raise credentials_exception
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if user is None:
