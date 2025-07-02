@@ -5,3 +5,6 @@ all_routers = [
     digital_assets.router,
     projects.router,
 ]
+
+# Compatibility alias expected by main.py and some tests
+routers = all_routers
