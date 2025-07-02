@@ -12,6 +12,7 @@ import {
   LoginRequest, LoginResponse, UserRoleUpdate, PendingExecution,
   MarketplaceComponent, MarketplaceComponentCreate,
   Task, Interaction, Validation, Question, RawData, Feature,
+  Scenario,
   PagePermission, PagePermissionCreate, ApiPermission, ApiPermissionCreate
 } from '../models';
 
@@ -577,6 +578,20 @@ export class ApiService {
 
   createRawData(r: RawData): Observable<RawData> {
     return this.http.post<RawData>(`${this.baseUrl}/rawdata/`, r, { headers: this.getHeaders() });
+  }
+
+  // Scenarios
+  getScenarios(): Observable<Scenario[]> {
+    return this.http.get<Scenario[]>(`${this.baseUrl}/scenarios/`, { headers: this.getHeaders() });
+  }
+
+  // Performance execution
+  runPerformanceTest(cfg: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/k6/run`, cfg, { headers: this.getHeaders() });
+  }
+
+  getPerformanceResults(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/k6/results`, { headers: this.getHeaders() });
   }
 
   isAuthenticated(): boolean {
