@@ -12,7 +12,8 @@ import {
   LoginRequest, LoginResponse, UserRoleUpdate, PendingExecution,
   MarketplaceComponent, MarketplaceComponentCreate,
   Task, Interaction, Validation, Question, RawData, Feature,
-  PagePermission, PagePermissionCreate, ApiPermission, ApiPermissionCreate
+  DigitalAsset, DigitalAssetCreate, Scenario,PagePermission, PagePermissionCreate,
+  ApiPermission, ApiPermissionCreate
 } from '../models';
 
 @Injectable({
@@ -154,6 +155,24 @@ export class ApiService {
 
   unassignClientAnalyst(clientId: number, userId: number): Observable<Client> {
     return this.http.delete<Client>(`${this.baseUrl}/clients/${clientId}/analysts/${userId}`, { headers: this.getHeaders() });
+  }
+
+  // Digital Assets
+  getDigitalAssets(clientId?: number): Observable<DigitalAsset[]> {
+    const query = clientId ? `?clientId=${clientId}` : '';
+    return this.http.get<DigitalAsset[]>(`${this.baseUrl}/digitalassets/${query}`, { headers: this.getHeaders() });
+  }
+
+  createDigitalAsset(asset: DigitalAssetCreate): Observable<DigitalAsset> {
+    return this.http.post<DigitalAsset>(`${this.baseUrl}/digitalassets/`, asset, { headers: this.getHeaders() });
+  }
+
+  updateDigitalAsset(id: number, asset: DigitalAssetCreate): Observable<DigitalAsset> {
+    return this.http.put<DigitalAsset>(`${this.baseUrl}/digitalassets/${id}`, asset, { headers: this.getHeaders() });
+  }
+
+  deleteDigitalAsset(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/digitalassets/${id}`, { headers: this.getHeaders() });
   }
 
   // Proyectos
@@ -602,6 +621,19 @@ export class ApiService {
 
   rejectValidation(id: number): Observable<any> {
     return this.http.post(`${this.baseUrl}/validationapprovals/${id}/reject`, {}, { headers: this.getHeaders() });
+
+  // Scenarios
+  getScenarios(): Observable<Scenario[]> {
+    return this.http.get<Scenario[]>(`${this.baseUrl}/scenarios/`, { headers: this.getHeaders() });
+  }
+
+  // Performance execution
+  runPerformanceTest(cfg: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/k6/run`, cfg, { headers: this.getHeaders() });
+  }
+
+  getPerformanceResults(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/k6/results`, { headers: this.getHeaders() });
   }
 
   isAuthenticated(): boolean {

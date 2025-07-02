@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
 import { routes } from './app/app.routes';
 import { WorkspaceInterceptor } from './app/workspace.interceptor';
 import { AuthInterceptor } from './app/auth.interceptor';
+import { JwtInterceptor } from './app/jwt.interceptor';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -18,6 +19,11 @@ bootstrapApplication(AppComponent, {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: WorkspaceInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: JwtInterceptor,
       multi: true
     },
     {

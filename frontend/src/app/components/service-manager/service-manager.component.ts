@@ -114,15 +114,31 @@ export class ServiceManagerComponent implements OnInit {
   createClient() {
     const name = this.newClient.trim();
     if (!name) return;
-    this.clientService.createClient({name}).subscribe(() => {
-      this.newClient='';
-      this.loadData();
+    this.clientService.createClient({name}).subscribe({
+      next: () => {
+        this.newClient='';
+        this.loadData();
+        alert('Cliente creado');
+      },
+      error: err => {
+        console.error('Error creating client:', err);
+        alert('Error al crear cliente');
+      }
     });
   }
 
-  openClientAnalysts(c: Client) { this.selectedClient = c; }
-  openProjectAnalysts(p: Project) { this.selectedProject = p; }
-  openProjects(c: Client) { this.projectClient = c; }
+  openClientAnalysts(c: Client) {
+    if (!c.is_active) { alert('Cliente inactivo'); return; }
+    this.selectedClient = c;
+  }
+  openProjectAnalysts(p: Project) {
+    if (!p.is_active) { alert('Proyecto inactivo'); return; }
+    this.selectedProject = p;
+  }
+  openProjects(c: Client) {
+    if (!c.is_active) { alert('Cliente inactivo'); return; }
+    this.projectClient = c;
+  }
 
   filteredProjects(): Project[] {
     return this.filterClient ? this.projects.filter(p => p.client_id === this.filterClient) : this.projects;

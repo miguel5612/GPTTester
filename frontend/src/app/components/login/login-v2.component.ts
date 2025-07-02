@@ -308,8 +308,14 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
-        // Login exitoso, redirigir a selección de workspace
-        this.router.navigate(['/workspace']);
+        this.authService.getCurrentUser().subscribe({
+          next: () => {
+            this.router.navigate(['/workspace']);
+          },
+          error: () => {
+            this.router.navigate(['/workspace']);
+          }
+        });
       },
       error: (error) => {
         this.loading = false;
