@@ -189,6 +189,33 @@ def logout(token: str = Depends(deps.oauth2_scheme)):
     return {"ok": True}
 
 
+@app.post("/register", response_model=schemas.User)
+def register(user: schemas.UserRegister, db: Session = Depends(deps.get_db)):
+    """Public endpoint to create a new user with the selected role."""
+    role_map = {
+        "analyst": "Analista de Pruebas con skill de automatización",
+        "service_manager": "Gerente de servicios",
+        "architect": "Arquitecto de Automatización",
+    }
+    role_name = role_map.get(user.user_type)
+    if not role_name:
+        raise HTTPException(status_code=400, detail="Invalid user_type")
+    role = db.query(models.Role).filter_by(name=role_name).first()
+    if role is None:
+        raise HTTPException(status_code=400, detail="Role not found")
+    if db.query(models.User).filter_by(username=user.username).first():
+        raise HTTPException(status_code=400, detail="Username already exists")
+    db_user = models.User(
+        username=user.username,
+        password=deps.get_password_hash(user.password),
+        role_id=role.id,
+    )
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+
 def _client_with_analysts(client: models.Client, db: Session) -> models.Client:
     analysts = (
         db.query(models.User)
