@@ -6,6 +6,5 @@ all_routers = [
     projects.router,
 ]
 
-# Placeholder for dynamically added routers. main.py imports this name
-# expecting a list, so provide an empty one by default.
-routers: list = []
+# Exported for backward compatibility with older imports
+routers = all_routers
