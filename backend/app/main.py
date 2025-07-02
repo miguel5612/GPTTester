@@ -348,3 +348,19 @@ def assign_role(
     db.commit()
     db.refresh(user)
     return user
+
+
+@app.put("/roles/{role_id}/active", response_model=schemas.Role)
+def update_role_active(
+    role_id: int,
+    data: dict,
+    db: Session = Depends(deps.get_db),
+    _: models.User = Depends(deps.require_admin),
+):
+    role = db.query(models.Role).filter_by(id=role_id).first()
+    if not role:
+        raise HTTPException(status_code=404, detail="Not found")
+    role.is_active = bool(data.get("is_active"))
+    db.commit()
+    db.refresh(role)
+    return role

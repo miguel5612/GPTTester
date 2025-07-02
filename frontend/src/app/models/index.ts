@@ -1,6 +1,7 @@
 export interface Role {
   id: number;
   name: string;
+  is_active: boolean;
 }
 
 export interface User {
@@ -150,6 +151,7 @@ export interface PendingExecution {
 // DTOs para creación
 export interface RoleCreate {
   name: string;
+  is_active?: boolean;
 }
 
 export interface UserCreate {

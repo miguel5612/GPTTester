@@ -8,6 +8,7 @@ class Role(BaseModel):
     id: int
     name: str
     description: str
+    is_active: bool = True
 
     class Config:
         orm_mode = True
