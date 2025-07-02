@@ -38,6 +38,22 @@ def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
             for o in objs:
                 if o.fieldValue is not None:
                     o.fieldValue = crypto.decrypt(o.fieldValue)
+        if model is models.Client:
+            for c in objs:
+                c.analysts = (
+                    db.query(models.User)
+                    .join(models.ClientAnalyst, models.ClientAnalyst.userId == models.User.id)
+                    .filter(models.ClientAnalyst.clientId == c.id)
+                    .all()
+                )
+        if model is models.Project:
+            for p in objs:
+                p.analysts = (
+                    db.query(models.User)
+                    .join(models.ProjectEmployee, models.ProjectEmployee.userId == models.User.id)
+                    .filter(models.ProjectEmployee.projectId == p.id)
+                    .all()
+                )
         return objs
 
     @router.get("/{item_id}", response_model=schema, dependencies=[perm("GET")])
@@ -47,6 +63,20 @@ def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
             raise HTTPException(status_code=404, detail="Not found")
         if model is models.RawData and db_obj.fieldValue is not None:
             db_obj.fieldValue = crypto.decrypt(db_obj.fieldValue)
+        if model is models.Client:
+            db_obj.analysts = (
+                db.query(models.User)
+                .join(models.ClientAnalyst, models.ClientAnalyst.userId == models.User.id)
+                .filter(models.ClientAnalyst.clientId == db_obj.id)
+                .all()
+            )
+        if model is models.Project:
+            db_obj.analysts = (
+                db.query(models.User)
+                .join(models.ProjectEmployee, models.ProjectEmployee.userId == models.User.id)
+                .filter(models.ProjectEmployee.projectId == db_obj.id)
+                .all()
+            )
         return db_obj
 
     @router.put("/{item_id}", response_model=schema, dependencies=[perm("PUT")])
