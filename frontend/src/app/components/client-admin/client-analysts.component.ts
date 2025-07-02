@@ -96,8 +96,13 @@ export class ClientAnalystsComponent implements OnChanges {
 
   toggle(user: User, checked: boolean) {
     if (!this.client) return;
+    const dedication = this.dedication[user.id] ?? 100;
+    if (checked && (dedication < 1 || dedication > 100)) {
+      alert('La dedicaci\u00f3n debe estar entre 1 y 100');
+      return;
+    }
     const obs = checked
-      ? this.clientService.assignAnalyst(this.client.id, user.id, this.dedication[user.id] || 100)
+      ? this.clientService.assignAnalyst(this.client.id, user.id, dedication)
       : this.clientService.unassignAnalyst(this.client.id, user.id);
     obs.subscribe(c => {
       this.client = c;

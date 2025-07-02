@@ -75,6 +75,11 @@ export const routes: Routes = [
         canActivate: [() => import('./admin.guard').then(m => m.adminGuard)]
       },
       {
+        path: 'performance',
+        loadComponent: () => import('./components/performance/performance.component').then(m => m.PerformanceComponent),
+        canActivate: [() => import('./performance.guard').then(m => m.performanceGuard)]
+      },
+      {
         path: 'interactions',
         loadComponent: () => import('./components/interactions/interactions.component').then(m => m.InteractionsComponent)
       }
