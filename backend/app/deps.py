@@ -1,5 +1,6 @@
 import os
 import types
+import logging
 
 import bcrypt
 from fastapi import Depends, HTTPException, status
@@ -9,6 +10,8 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from .database import SessionLocal
+
+logger = logging.getLogger(__name__)
 from . import models
 
 SECRET_KEY = os.getenv("SECRET_KEY", "secret")
@@ -40,10 +43,12 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_db():
     db = SessionLocal()
+    logger.debug("DB session opened")
     try:
         yield db
     finally:
         db.close()
+        logger.debug("DB session closed")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:

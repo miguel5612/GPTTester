@@ -1,8 +1,12 @@
+import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import Type, List
 
 from . import models, deps, crypto
+
+
+logger = logging.getLogger(__name__)
 
 
 def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
@@ -18,6 +22,7 @@ def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
             data["password"] = deps.get_password_hash(data["password"])
         if model is models.RawData and data.get("fieldValue") is not None:
             data["fieldValue"] = crypto.encrypt(data["fieldValue"])
+        logger.debug("Creating %s with data: %s", model.__name__, data)
         db_obj = model(**data)
         db.add(db_obj)
         db.commit()
@@ -56,6 +61,7 @@ def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
             data["fieldValue"] = crypto.encrypt(data["fieldValue"])
         for field, value in data.items():
             setattr(db_obj, field, value)
+        logger.debug("Updating %s %s with data: %s", model.__name__, item_id, data)
         db.commit()
         db.refresh(db_obj)
         if model is models.RawData and db_obj.fieldValue is not None:
@@ -69,6 +75,7 @@ def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
             raise HTTPException(status_code=404, detail="Not found")
         db.delete(db_obj)
         db.commit()
+        logger.debug("Deleted %s %s", model.__name__, item_id)
         return {"ok": True}
 
     return router

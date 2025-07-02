@@ -1,4 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
+import logging
+logging.basicConfig(level=logging.INFO)
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -7,8 +9,11 @@ from .database import engine, SessionLocal
 from . import models, schemas, deps
 from .crud import create_crud_router
 
+logger = logging.getLogger(__name__)
+
 
 def seed_database() -> None:
+    logger.info("Seeding database")
     db = SessionLocal()
     try:
         roles = [
@@ -107,11 +112,15 @@ def seed_database() -> None:
             )
 
         db.commit()
+        logger.info("Database seed commit successful")
     finally:
         db.close()
+        logger.info("Seeding finished")
 
 
+logger.info("Creating database tables")
 models.Base.metadata.create_all(bind=engine)
+logger.info("Tables created")
 seed_database()
 
 app = FastAPI(title="Test Automation API")
