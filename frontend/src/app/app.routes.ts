@@ -24,20 +24,27 @@ export const routes: Routes = [
         loadComponent: () => import('./components/actors/actors.component').then(m => m.ActorsComponent)
       },
       {
+        path: 'clients/:clientId/assets',
+        loadComponent: () => import('./components/digital-assets/digital-assets.component').then(m => m.DigitalAssetsComponent)
+      },
+      {
         path: 'clients/:clientId/projects',
         loadComponent: () => import('./components/projects/projects.component').then(m => m.ProjectsComponent)
       },
       {
         path: 'projects/:projectId/scenarios',
-        loadComponent: () => import('./components/scenarios/scenarios.component').then(m => m.ScenariosComponent)
+        loadComponent: () => import('./components/scenarios/scenarios.component').then(m => m.ScenariosComponent),
+        canActivate: [() => import('./analyst.guard').then(m => m.analystGuard)]
       },
       {
         path: 'projects/:projectId/scenarios/:scenarioId/tasks',
-        loadComponent: () => import('./components/tasks/tasks.component').then(m => m.TasksComponent)
+        loadComponent: () => import('./components/tasks/tasks.component').then(m => m.TasksComponent),
+        canActivate: [() => import('./analyst.guard').then(m => m.analystGuard)]
       },
       {
         path: 'projects/:projectId/scenarios/:scenarioId/data',
-        loadComponent: () => import('./components/scenario-data/scenario-data.component').then(m => m.ScenarioDataComponent)
+        loadComponent: () => import('./components/scenario-data/scenario-data.component').then(m => m.ScenarioDataComponent),
+        canActivate: [() => import('./analyst.guard').then(m => m.analystGuard)]
       },
       {
         path: 'projects/:projectId/features',
