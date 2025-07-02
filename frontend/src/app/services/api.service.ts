@@ -52,14 +52,17 @@ export class ApiService {
     this.http.post(`${this.baseUrl}/logout`, {}, { headers: this.getHeaders() })
       .subscribe({
         complete: () => {
-          localStorage.removeItem('token');
-          this.tokenSubject.next(null);
+          this.clearSession();
         },
         error: () => {
-          localStorage.removeItem('token');
-          this.tokenSubject.next(null);
+          this.clearSession();
         }
       });
+  }
+
+  clearSession(): void {
+    localStorage.removeItem('token');
+    this.tokenSubject.next(null);
   }
 
   getCurrentUser(): Observable<User> {
