@@ -276,6 +276,34 @@ export interface MarketplaceComponentCreate {
   version?: string;
 }
 
+export interface PagePermission {
+  id: number;
+  page: string;
+  role_id: number;
+  isStartPage: boolean;
+  description?: string;
+}
+
+export interface PagePermissionCreate {
+  page: string;
+  isStartPage?: boolean;
+  description?: string;
+}
+
+export interface ApiPermission {
+  id: number;
+  route: string;
+  method: string;
+  role_id: number;
+  description?: string;
+}
+
+export interface ApiPermissionCreate {
+  route: string;
+  method: string;
+  description?: string;
+}
+
 export interface ApiResponse<T> {
   data?: T;
   error?: string;
