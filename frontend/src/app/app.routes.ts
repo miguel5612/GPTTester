@@ -44,6 +44,25 @@ export const routes: Routes = [
         loadComponent: () => import('./components/features/features.component').then(m => m.FeaturesComponent)
       },
       {
+        path: 'dashboard',
+        loadComponent: () => import('./components/dashboard/dashboard.component').then(m => m.DashboardComponent)
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./components/users/users.component').then(m => m.UsersComponent),
+        canActivate: [() => import('./admin.guard').then(m => m.adminGuard)]
+      },
+      {
+        path: 'roles',
+        loadComponent: () => import('./components/roles/roles.component').then(m => m.RolesComponent),
+        canActivate: [() => import('./admin.guard').then(m => m.adminGuard)]
+      },
+      {
+        path: 'agents',
+        loadComponent: () => import('./components/agents/agents.component').then(m => m.AgentsComponent),
+        canActivate: [() => import('./admin.guard').then(m => m.adminGuard)]
+      },
+      {
         path: 'interactions',
         loadComponent: () => import('./components/interactions/interactions.component').then(m => m.InteractionsComponent)
       }
