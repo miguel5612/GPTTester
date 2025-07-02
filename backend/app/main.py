@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
 import logging
+
 logging.basicConfig(level=logging.INFO)
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -139,6 +140,7 @@ models.Base.metadata.create_all(bind=engine)
 logger.info("Tables created")
 seed_database()
 
+
 def validate_database() -> None:
     """Ensure critical tables exist and have data."""
     logger.info("Validating seeded tables")
@@ -151,6 +153,7 @@ def validate_database() -> None:
         logger.info("Validation successful: %d roles, %d element types", roles, types)
     finally:
         db.close()
+
 
 validate_database()
 
@@ -216,12 +219,6 @@ def register_cruds():
             models.InteractionApproval,
             schemas.InteractionApproval,
         ),
-        ("tasks", models.Task, schemas.Task),
-        (
-            "taskhaveinteractions",
-            models.TaskHaveInteraction,
-            schemas.TaskHaveInteraction,
-        ),
         ("validations", models.Validation, schemas.Validation),
         (
             "validationparameters",
@@ -229,27 +226,24 @@ def register_cruds():
             schemas.ValidationParameter,
         ),
         ("validationapprovals", models.ValidationApproval, schemas.ValidationApproval),
-        ("questions", models.Question, schemas.Question),
+        ("tasks", models.Task, schemas.Task),
         (
-            "questionhasvalidations",
-            models.QuestionHasValidation,
-            schemas.QuestionHasValidation,
+            "taskhaveinteractions",
+            models.TaskHaveInteraction,
+            schemas.TaskHaveInteraction,
         ),
-        ("scenarios", models.Scenario, schemas.Scenario),
-        ("scenariodata", models.ScenarioData, schemas.ScenarioData),
-        ("rawdata", models.RawData, schemas.RawData),
         ("fieldtypes", models.FieldType, schemas.FieldType),
-        ("features", models.Feature, schemas.Feature),
-        ("scenariohasfeatures", models.ScenarioHasFeature, schemas.ScenarioHasFeature),
-        ("featuresteps", models.FeatureStep, schemas.FeatureStep),
-        ("scenarioinfo", models.ScenarioInfo, schemas.ScenarioInfo),
     ]
     for prefix, model, schema in mappings:
         app.include_router(create_crud_router(prefix, model, schema))
 
 
-
 register_cruds()
+
+from .routes import routers as custom_routers
+
+for r in custom_routers:
+    app.include_router(r)
 
 
 @app.get("/users/me/", response_model=schemas.User)
@@ -386,4 +380,3 @@ def update_role_active(
     db.commit()
     db.refresh(role)
     return role
-
