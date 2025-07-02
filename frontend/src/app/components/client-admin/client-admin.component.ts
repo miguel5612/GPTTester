@@ -77,7 +77,16 @@ import { ClientProjectsComponent } from './client-projects.component';
         </nav>
       </div>
 
-      <app-client-form *ngIf="showForm" [client]="editing" (saved)="onSaved($event)" (cancel)="showForm=false"></app-client-form>
+      <div class="modal fade show d-block" tabindex="-1" *ngIf="showForm" (click)="closeForm()">
+        <div class="modal-dialog" (click)="$event.stopPropagation()">
+          <div class="modal-content">
+            <div class="modal-body">
+              <app-client-form [client]="editing" (saved)="onSaved($event)" (cancel)="closeForm()"></app-client-form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-backdrop fade show" *ngIf="showForm"></div>
 
       <div class="modal fade show d-block" tabindex="-1" *ngIf="selectedProject" (click)="selectedProject=null">
         <div class="modal-dialog modal-lg" (click)="$event.stopPropagation()">
@@ -237,5 +246,9 @@ export class ClientAdminComponent implements OnInit {
     this.loadData();
     const action = this.editing ? 'actualizado' : 'creado';
     this.history.push({ client: c.name, action });
+  }
+
+  closeForm() {
+    this.showForm = false;
   }
 }
