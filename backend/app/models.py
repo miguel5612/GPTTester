@@ -8,7 +8,6 @@ class Role(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), unique=True, nullable=False)
     description = Column(Text)
-    is_active = Column(Boolean, default=True)
 
     users = relationship("User", back_populates="role")
     page_permissions = relationship("PagePermission", back_populates="role")
@@ -25,11 +24,59 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     endSubscriptionDate = Column(DateTime)
     role_id = Column(Integer, ForeignKey('roles.id'), nullable=False)
+    dedication = Column(Integer)
 
     role = relationship("Role", back_populates="users")
 
 
-# 3️⃣ PagePermissions
+# 3️⃣ Execution
+class Execution(Base):
+    __tablename__ = 'executions'
+    id = Column(Integer, primary_key=True, index=True)
+    userId = Column(Integer, ForeignKey('users.id'), nullable=False)
+    launchDate = Column(DateTime)
+    endDate = Column(DateTime)
+    status = Column(String(50))
+    is_active = Column(Boolean, default=True)
+
+    user = relationship("User")
+
+
+# 4️⃣ Report
+class Report(Base):
+    __tablename__ = 'reports'
+    id = Column(Integer, primary_key=True, index=True)
+    executionId = Column(Integer, ForeignKey('executions.id'), nullable=False)
+    result = Column(String(100))
+    summary = Column(Text)
+
+    execution = relationship("Execution")
+
+
+# 5️⃣ Step
+class Step(Base):
+    __tablename__ = 'steps'
+    id = Column(Integer, primary_key=True, index=True)
+    reportId = Column(Integer, ForeignKey('reports.id'), nullable=False)
+    result = Column(String(100))
+    summary = Column(Text)
+
+    report = relationship("Report")
+
+
+# 6️⃣ Evidence
+class Evidence(Base):
+    __tablename__ = 'evidence'
+    id = Column(Integer, primary_key=True, index=True)
+    stepId = Column(Integer, ForeignKey('steps.id'), nullable=False)
+    location = Column(String(200))
+    base64IMG = Column(Text)
+    summary = Column(Text)
+
+    step = relationship("Step")
+
+
+# 7️⃣ PagePermissions
 class PagePermission(Base):
     __tablename__ = 'page_permissions'
     id = Column(Integer, primary_key=True, index=True)
@@ -41,7 +88,7 @@ class PagePermission(Base):
     role = relationship("Role", back_populates="page_permissions")
 
 
-# 4️⃣ ApiPermissions
+# 8️⃣ ApiPermissions
 class ApiPermission(Base):
     __tablename__ = 'api_permissions'
     id = Column(Integer, primary_key=True, index=True)
@@ -53,7 +100,7 @@ class ApiPermission(Base):
     role = relationship("Role", back_populates="api_permissions")
 
 
-# 5️⃣ Clients
+# 9️⃣ Clients
 class Client(Base):
     __tablename__ = 'clients'
     id = Column(Integer, primary_key=True, index=True)
@@ -66,6 +113,7 @@ class Client(Base):
     dedication = Column(Integer)
 
 
+# 🔟 BusinessAgreements
 class ClientAnalyst(Base):
     __tablename__ = 'client_analysts'
     id = Column(Integer, primary_key=True, index=True)
@@ -74,7 +122,6 @@ class ClientAnalyst(Base):
     dedication = Column(Integer)
 
 
-# 6️⃣ BusinessAgreements
 class BusinessAgreement(Base):
     __tablename__ = 'business_agreements'
     id = Column(Integer, primary_key=True, index=True)
@@ -84,7 +131,7 @@ class BusinessAgreement(Base):
     kpi = Column(Text)
 
 
-# 7️⃣ DigitalAssets
+# 1️⃣1️⃣ DigitalAssets
 class DigitalAsset(Base):
     __tablename__ = 'digital_assets'
     id = Column(Integer, primary_key=True, index=True)
@@ -94,7 +141,7 @@ class DigitalAsset(Base):
     kpi = Column(Text)
 
 
-# 8️⃣ UserInterface
+# 1️⃣2️⃣ UserInterface
 class UserInterface(Base):
     __tablename__ = 'user_interfaces'
     id = Column(Integer, primary_key=True, index=True)
@@ -103,7 +150,7 @@ class UserInterface(Base):
     status = Column(Boolean, default=True)
 
 
-# 9️⃣ ElementType
+# 1️⃣3️⃣ ElementType
 class ElementType(Base):
     __tablename__ = 'element_types'
     id = Column(Integer, primary_key=True, index=True)
@@ -111,7 +158,7 @@ class ElementType(Base):
     status = Column(Boolean, default=True)
 
 
-# 🔟 Element
+# 1️⃣4️⃣ Element
 class Element(Base):
     __tablename__ = 'elements'
     id = Column(Integer, primary_key=True, index=True)
@@ -121,7 +168,7 @@ class Element(Base):
     status = Column(Boolean, default=True)
 
 
-# 11️⃣ Projects
+# 1️⃣5️⃣ Projects
 class Project(Base):
     __tablename__ = 'projects'
     id = Column(Integer, primary_key=True, index=True)
@@ -132,7 +179,7 @@ class Project(Base):
     scripts_per_day = Column(Integer)
 
 
-# 12️⃣ ProjectEmployee
+# 1️⃣6️⃣ ProjectEmployee
 class ProjectEmployee(Base):
     __tablename__ = 'project_employees'
     id = Column(Integer, primary_key=True, index=True)
@@ -142,7 +189,7 @@ class ProjectEmployee(Base):
     dedicationHours = Column(Integer)
 
 
-# 13️⃣ Actors
+# 1️⃣7️⃣ Actors
 class Actor(Base):
     __tablename__ = 'actors'
     id = Column(Integer, primary_key=True, index=True)
@@ -151,14 +198,14 @@ class Actor(Base):
     client_id = Column(Integer, ForeignKey('clients.id'), nullable=False)
 
 
-# 14️⃣ Habilities
+# 1️⃣8️⃣ Habilities
 class Hability(Base):
     __tablename__ = 'habilities'
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(200), nullable=False)
 
 
-# 15️⃣ Interactions
+# 1️⃣9️⃣ Interactions
 class Interaction(Base):
     __tablename__ = 'interactions'
     id = Column(Integer, primary_key=True, index=True)
@@ -169,7 +216,7 @@ class Interaction(Base):
     description = Column(Text)
 
 
-# 16️⃣ InteractionParameters
+# 2️⃣0️⃣ InteractionParameters
 class InteractionParameter(Base):
     __tablename__ = 'interaction_parameters'
     id = Column(Integer, primary_key=True, index=True)
@@ -179,7 +226,7 @@ class InteractionParameter(Base):
     direction = Column(Boolean, default=True)
 
 
-# 17️⃣ InteractionApprovalState
+# 2️⃣1️⃣ InteractionApprovalState
 class InteractionApprovalState(Base):
     __tablename__ = 'interaction_approval_states'
     id = Column(Integer, primary_key=True, index=True)
@@ -187,7 +234,7 @@ class InteractionApprovalState(Base):
     description = Column(Text)
 
 
-# 18️⃣ InteractionApproval
+# 2️⃣2️⃣ InteractionApproval
 class InteractionApproval(Base):
     __tablename__ = 'interaction_approvals'
     id = Column(Integer, primary_key=True, index=True)
@@ -200,7 +247,7 @@ class InteractionApproval(Base):
     creationDate = Column(DateTime)
 
 
-# 19️⃣ Task
+# 2️⃣3️⃣ Task
 class Task(Base):
     __tablename__ = 'tasks'
     id = Column(Integer, primary_key=True, index=True)
@@ -209,7 +256,7 @@ class Task(Base):
     status = Column(Boolean, default=True)
 
 
-# 20️⃣ TaskHaveInteraction
+# 2️⃣4️⃣ TaskHaveInteraction
 class TaskHaveInteraction(Base):
     __tablename__ = 'task_have_interactions'
     id = Column(Integer, primary_key=True, index=True)
@@ -218,7 +265,7 @@ class TaskHaveInteraction(Base):
     status = Column(Boolean, default=True)
 
 
-# 21️⃣ Validation
+# 2️⃣5️⃣ Validation
 class Validation(Base):
     __tablename__ = 'validations'
     id = Column(Integer, primary_key=True, index=True)
@@ -229,7 +276,7 @@ class Validation(Base):
     description = Column(Text)
 
 
-# 22️⃣ ValidationParameters
+# 2️⃣6️⃣ ValidationParameters
 class ValidationParameter(Base):
     __tablename__ = 'validation_parameters'
     id = Column(Integer, primary_key=True, index=True)
@@ -239,7 +286,7 @@ class ValidationParameter(Base):
     direction = Column(Boolean, default=True)
 
 
-# 23️⃣ ValidationApproval
+# 2️⃣7️⃣ ValidationApproval
 class ValidationApproval(Base):
     __tablename__ = 'validation_approvals'
     id = Column(Integer, primary_key=True, index=True)
@@ -252,7 +299,7 @@ class ValidationApproval(Base):
     creationDate = Column(DateTime)
 
 
-# 24️⃣ Question
+# 2️⃣8️⃣ Question
 class Question(Base):
     __tablename__ = 'questions'
     id = Column(Integer, primary_key=True, index=True)
@@ -261,7 +308,7 @@ class Question(Base):
     status = Column(Boolean, default=True)
 
 
-# 25️⃣ QuestionHasValidation
+# 2️⃣9️⃣ QuestionHasValidation
 class QuestionHasValidation(Base):
     __tablename__ = 'question_has_validations'
     id = Column(Integer, primary_key=True, index=True)
@@ -269,7 +316,7 @@ class QuestionHasValidation(Base):
     questionId = Column(Integer, ForeignKey('questions.id'), nullable=False)
 
 
-# 26️⃣ Scenario
+# 3️⃣0️⃣ Scenario
 class Scenario(Base):
     __tablename__ = 'scenarios'
     id = Column(Integer, primary_key=True, index=True)
@@ -278,7 +325,7 @@ class Scenario(Base):
     status = Column(Boolean, default=True)
 
 
-# 27️⃣ ScenarioData
+# 3️⃣1️⃣ ScenarioData
 class ScenarioData(Base):
     __tablename__ = 'scenario_data'
     id = Column(Integer, primary_key=True, index=True)
@@ -286,7 +333,7 @@ class ScenarioData(Base):
     status = Column(Boolean, default=True)
 
 
-# 28️⃣ RawData
+# 3️⃣2️⃣ RawData
 class RawData(Base):
     __tablename__ = 'raw_data'
     id = Column(Integer, primary_key=True, index=True)
@@ -299,7 +346,7 @@ class RawData(Base):
     status = Column(Boolean, default=True)
 
 
-# 29️⃣ FieldType
+# 3️⃣3️⃣ FieldType
 class FieldType(Base):
     __tablename__ = 'field_types'
     id = Column(Integer, primary_key=True, index=True)
@@ -309,7 +356,7 @@ class FieldType(Base):
     status = Column(Boolean, default=True)
 
 
-# 30️⃣ Feature
+# 3️⃣4️⃣ Feature
 class Feature(Base):
     __tablename__ = 'features'
     id = Column(Integer, primary_key=True, index=True)
@@ -318,7 +365,7 @@ class Feature(Base):
     status = Column(Boolean, default=True)
 
 
-# 31️⃣ ScenarioHasFeature
+# 3️⃣5️⃣ ScenarioHasFeature
 class ScenarioHasFeature(Base):
     __tablename__ = 'scenario_has_features'
     id = Column(Integer, primary_key=True, index=True)
@@ -326,7 +373,7 @@ class ScenarioHasFeature(Base):
     scenarioId = Column(Integer, ForeignKey('scenarios.id'), nullable=False)
 
 
-# 32️⃣ FeatureStep
+# 3️⃣6️⃣ FeatureStep
 class FeatureStep(Base):
     __tablename__ = 'feature_steps'
     id = Column(Integer, primary_key=True, index=True)
@@ -335,7 +382,7 @@ class FeatureStep(Base):
     taskId = Column(Integer, ForeignKey('tasks.id'))
 
 
-# 33️⃣ ScenarioInfo
+# 3️⃣7️⃣ ScenarioInfo
 class ScenarioInfo(Base):
     __tablename__ = 'scenario_info'
     id = Column(Integer, primary_key=True, index=True)
