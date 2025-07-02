@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import Type, List
 
-from . import models, deps
+from . import models, deps, crypto
 
 
 def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
@@ -16,21 +16,32 @@ def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
         data = item.dict()
         if model is models.User:
             data["password"] = deps.get_password_hash(data["password"])
+        if model is models.RawData and data.get("fieldValue") is not None:
+            data["fieldValue"] = crypto.encrypt(data["fieldValue"])
         db_obj = model(**data)
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
+        if model is models.RawData and db_obj.fieldValue is not None:
+            db_obj.fieldValue = crypto.decrypt(db_obj.fieldValue)
         return db_obj
 
     @router.get("/", response_model=List[schema], dependencies=[perm("GET")])
     def read_all(db: Session = Depends(deps.get_db)):
-        return db.query(model).all()
+        objs = db.query(model).all()
+        if model is models.RawData:
+            for o in objs:
+                if o.fieldValue is not None:
+                    o.fieldValue = crypto.decrypt(o.fieldValue)
+        return objs
 
     @router.get("/{item_id}", response_model=schema, dependencies=[perm("GET")])
     def read_one(item_id: int, db: Session = Depends(deps.get_db)):
         db_obj = db.query(model).filter(model.id == item_id).first()
         if not db_obj:
             raise HTTPException(status_code=404, detail="Not found")
+        if model is models.RawData and db_obj.fieldValue is not None:
+            db_obj.fieldValue = crypto.decrypt(db_obj.fieldValue)
         return db_obj
 
     @router.put("/{item_id}", response_model=schema, dependencies=[perm("PUT")])
@@ -41,10 +52,14 @@ def create_crud_router(prefix: str, model: Type[models.Base], schema: Type):
         data = item.dict()
         if model is models.User and "password" in data:
             data["password"] = deps.get_password_hash(data["password"])
+        if model is models.RawData and "fieldValue" in data and data["fieldValue"] is not None:
+            data["fieldValue"] = crypto.encrypt(data["fieldValue"])
         for field, value in data.items():
             setattr(db_obj, field, value)
         db.commit()
         db.refresh(db_obj)
+        if model is models.RawData and db_obj.fieldValue is not None:
+            db_obj.fieldValue = crypto.decrypt(db_obj.fieldValue)
         return db_obj
 
     @router.delete("/{item_id}", dependencies=[perm("DELETE")])
