@@ -77,6 +77,14 @@ export class ClientProjectsComponent implements OnChanges {
   }
 
   save() {
+    if (!this.form.name.trim()) {
+      alert('El nombre es obligatorio');
+      return;
+    }
+    if (!this.client?.is_active) {
+      alert('Cliente inactivo');
+      return;
+    }
     const obs = this.editing
       ? this.projectService.updateProject(this.editing.id, this.form)
       : this.projectService.createProject(this.form);
