@@ -137,6 +137,7 @@ export class MainLayoutComponent implements OnInit {
       { label: 'Dashboard', route: '/dashboard', icon: '🏠' },
       { label: 'Usuarios', route: '/users', icon: '👥' },
       { label: 'Roles', route: '/roles', icon: '🛡️' },
+      { label: 'Permisos', route: '/permissions', icon: '🔑' },
       { label: 'Agentes', route: '/agents', icon: '🤖' }
     ];
 
