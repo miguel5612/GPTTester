@@ -104,6 +104,8 @@ def require_api_permission(route: str, method: str):
         current_user: models.User = Depends(get_current_user),
         db: Session = Depends(get_db),
     ):
+        if current_user.role.name == "Administrador":
+            return
         perms = (
             db.query(models.ApiPermission).filter_by(route=route, method=method).all()
         )
