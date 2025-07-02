@@ -20,7 +20,12 @@ import { ApiService } from '../../services/api.service';
           </div>
           <div class="mb-3">
             <label class="form-label">Cliente</label>
-            <select class="form-control" [(ngModel)]="form.client_id" name="client_id" required>
+            <select
+              class="form-control"
+              [(ngModel)]="form.client_id"
+              name="client_id"
+              [disabled]="clientId !== null"
+              required>
               <option *ngFor="let c of clients" [ngValue]="c.id">{{ c.name }}</option>
             </select>
           </div>
@@ -33,6 +38,7 @@ import { ApiService } from '../../services/api.service';
 })
 export class ActorFormComponent implements OnInit {
   @Input() actor: Actor | null = null;
+  @Input() clientId: number | null = null;
   @Output() saved = new EventEmitter<void>();
   @Output() cancel = new EventEmitter<void>();
 
@@ -48,6 +54,8 @@ export class ActorFormComponent implements OnInit {
       this.loadClients();
       if (this.actor) {
         this.form = { name: this.actor.name, client_id: this.actor.client_id };
+      } else if (this.clientId) {
+        this.form.client_id = this.clientId;
       }
     });
   }
