@@ -7,4 +7,5 @@ all_routers = [
 ]
 
 # Compatibility alias expected by main.py and some tests
+# Backwards compatibility for legacy imports
 routers = all_routers
