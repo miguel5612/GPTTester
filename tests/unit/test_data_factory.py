@@ -1,6 +1,6 @@
 import os
-from .context import load_context
-from .data_factory import DataFactory
+from ..context import load_context
+from ..data_factory import DataFactory
 
 
 def test_dynamic_placeholders():
