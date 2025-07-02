@@ -77,6 +77,10 @@ export class ApiService {
     return this.http.put<Role>(`${this.baseUrl}/roles/${id}`, role, { headers: this.getHeaders() });
   }
 
+  updateRoleActive(id: number, isActive: boolean): Observable<Role> {
+    return this.http.put<Role>(`${this.baseUrl}/roles/${id}/active`, { is_active: isActive }, { headers: this.getHeaders() });
+  }
+
   deleteRole(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/roles/${id}`, { headers: this.getHeaders() });
   }

@@ -8,6 +8,7 @@ class Role(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), unique=True, nullable=False)
     description = Column(Text)
+    is_active = Column(Boolean, default=True)
 
     users = relationship("User", back_populates="role")
     page_permissions = relationship("PagePermission", back_populates="role")

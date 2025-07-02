@@ -350,17 +350,18 @@ def assign_role(
     return user
 
 
-@app.put("/users/{user_id}/active", response_model=schemas.User)
-def update_user_active(
-    user_id: int,
-    payload: schemas.UserActiveUpdate,
+@app.put("/roles/{role_id}/active", response_model=schemas.Role)
+def update_role_active(
+    role_id: int,
+    data: dict,
     db: Session = Depends(deps.get_db),
     _: models.User = Depends(deps.require_admin),
 ):
-    user = db.query(models.User).filter_by(id=user_id).first()
-    if not user:
+    role = db.query(models.Role).filter_by(id=role_id).first()
+    if not role:
         raise HTTPException(status_code=404, detail="Not found")
-    user.is_active = payload.is_active
+    role.is_active = bool(data.get("is_active"))
     db.commit()
-    db.refresh(user)
-    return user
+    db.refresh(role)
+    return role
+

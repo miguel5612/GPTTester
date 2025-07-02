@@ -19,6 +19,10 @@ export class RoleService {
     return this.api.updateRole(id, role);
   }
 
+  updateRoleActive(id: number, isActive: boolean): Observable<Role> {
+    return this.api.updateRoleActive(id, isActive);
+  }
+
   deleteRole(id: number): Observable<any> {
     return this.api.deleteRole(id);
   }

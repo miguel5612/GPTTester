@@ -15,11 +15,14 @@ import { RoleFormComponent } from './role-form.component';
       <button class="btn btn-primary mb-2" (click)="new()">Nuevo Rol</button>
       <table class="table" *ngIf="roles.length > 0">
         <thead>
-          <tr><th>Nombre</th><th></th></tr>
+          <tr><th>Nombre</th><th>Activo</th><th></th></tr>
         </thead>
         <tbody>
           <tr *ngFor="let r of roles">
             <td>{{ r.name }}</td>
+            <td>
+              <input class="form-check-input" type="checkbox" [checked]="r.is_active" (change)="toggleActive(r, $any($event.target).checked)">
+            </td>
             <td>
               <button class="btn btn-sm btn-secondary me-2" (click)="edit(r)">Editar</button>
               <button class="btn btn-sm btn-danger" (click)="remove(r)">Eliminar</button>
@@ -56,6 +59,10 @@ export class RolesComponent implements OnInit {
     if (confirm('¿Eliminar rol?')) {
       this.service.deleteRole(r.id).subscribe(() => this.load());
     }
+  }
+
+  toggleActive(role: Role, active: boolean) {
+    this.service.updateRoleActive(role.id, active).subscribe(r => role.is_active = r.is_active);
   }
 
   onSaved() {
