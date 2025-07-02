@@ -10,7 +10,8 @@ import {
   TestPlanCreate, PageCreate, PageElementCreate, ActionCreate,
   ActionAssignmentCreate, Actor, ActorCreate, AgentCreate, ExecutionPlanCreate,
   LoginRequest, LoginResponse, UserRoleUpdate, PendingExecution,
-  MarketplaceComponent, MarketplaceComponentCreate
+  MarketplaceComponent, MarketplaceComponentCreate,
+  Task, Interaction, Validation, Question, RawData, Feature
 } from '../models';
 
 @Injectable({
@@ -488,6 +489,60 @@ export class ApiService {
   deleteMarketplaceComponent(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/marketplace/components/${id}`, { headers: this.getHeaders() });
 
+  }
+
+  // Features
+  getFeatures(): Observable<Feature[]> {
+    return this.http.get<Feature[]>(`${this.baseUrl}/features/`, { headers: this.getHeaders() });
+  }
+
+  createFeature(feature: Feature): Observable<Feature> {
+    return this.http.post<Feature>(`${this.baseUrl}/features/`, feature, { headers: this.getHeaders() });
+  }
+
+  // Tasks
+  getTasks(): Observable<Task[]> {
+    return this.http.get<Task[]>(`${this.baseUrl}/tasks/`, { headers: this.getHeaders() });
+  }
+
+  createTask(task: Task): Observable<Task> {
+    return this.http.post<Task>(`${this.baseUrl}/tasks/`, task, { headers: this.getHeaders() });
+  }
+
+  // Interactions
+  getInteractions(): Observable<Interaction[]> {
+    return this.http.get<Interaction[]>(`${this.baseUrl}/interactions/`, { headers: this.getHeaders() });
+  }
+
+  createInteraction(interaction: Interaction): Observable<Interaction> {
+    return this.http.post<Interaction>(`${this.baseUrl}/interactions/`, interaction, { headers: this.getHeaders() });
+  }
+
+  // Validations
+  getValidations(): Observable<Validation[]> {
+    return this.http.get<Validation[]>(`${this.baseUrl}/validations/`, { headers: this.getHeaders() });
+  }
+
+  createValidation(v: Validation): Observable<Validation> {
+    return this.http.post<Validation>(`${this.baseUrl}/validations/`, v, { headers: this.getHeaders() });
+  }
+
+  // Questions
+  getQuestions(): Observable<Question[]> {
+    return this.http.get<Question[]>(`${this.baseUrl}/questions/`, { headers: this.getHeaders() });
+  }
+
+  createQuestion(q: Question): Observable<Question> {
+    return this.http.post<Question>(`${this.baseUrl}/questions/`, q, { headers: this.getHeaders() });
+  }
+
+  // RawData
+  getRawData(): Observable<RawData[]> {
+    return this.http.get<RawData[]>(`${this.baseUrl}/rawdata/`, { headers: this.getHeaders() });
+  }
+
+  createRawData(r: RawData): Observable<RawData> {
+    return this.http.post<RawData>(`${this.baseUrl}/rawdata/`, r, { headers: this.getHeaders() });
   }
 
   isAuthenticated(): boolean {
