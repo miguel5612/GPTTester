@@ -14,6 +14,7 @@ pip install -r requirements.txt
 ```
 
 Configura la variable `DATABASE_URL` según tu entorno y ejecuta la aplicación desde la raíz del repositorio:
+También puedes definir `DATA_ENCRYPTION_KEY` para personalizar la clave usada al cifrar valores sensibles.
 
 ```bash
 uvicorn backend.app.main:app --reload

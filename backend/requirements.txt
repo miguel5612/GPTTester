@@ -51,3 +51,4 @@ uvicorn==0.34.3
 weasyprint==65.1
 webencodings==0.5.1
 zopfli==0.2.3.post1
+cryptography==42.0.7
